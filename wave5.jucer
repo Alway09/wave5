@@ -7,6 +7,10 @@
     <GROUP id="{A564B8E3-0814-10CF-D162-A47A9F97DA3A}" name="Source">
       <GROUP id="{244EE145-9A84-6309-8B1A-877AE529B6CD}" name="Data">
         <FILE id="vsdk1y" name="OscData.h" compile="0" resource="0" file="Source/OscData.h"/>
+        <FILE id="gR1GoQ" name="ModifiedAdsrData.cpp" compile="1" resource="0"
+              file="Source/ModifiedAdsrData.cpp"/>
+        <FILE id="Pov9Vk" name="ModifiedAdsrData.h" compile="0" resource="0"
+              file="Source/ModifiedAdsrData.h"/>
         <FILE id="wpKx1P" name="OscData.cpp" compile="1" resource="0" file="Source/OscData.cpp"/>
       </GROUP>
       <GROUP id="{8C3E6C96-EEBA-2BD5-E15D-4A48D96B562C}" name="UI"/>
