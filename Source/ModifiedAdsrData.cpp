@@ -2,7 +2,7 @@
 
 ModifiedAdsrData::ModifiedAdsrData()
 {
-    //recalculateRates();
+    recalculateRates();
 }
 
 /** Sets the parameters that will be used by an ADSR object.

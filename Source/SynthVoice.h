@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "SynthSound.h"
 #include "OscData.h"
+#include "ModifiedAdsrData.h"
 
 //==============================================================================
 /*
@@ -32,11 +33,13 @@ public:
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
 
     OscData& getOscillator() { return osc; }
+    ModifiedAdsrData& getAdsr() { return adsr; }
 
 private:
     juce::AudioBuffer<float> voiceBuffer;
 
     OscData osc;
+    ModifiedAdsrData adsr;
 
     bool isPrepared{ false };
 };

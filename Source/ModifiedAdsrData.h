@@ -27,7 +27,7 @@
             {
             }
 
-            float attack = 0.1f, decay = 0.1f, sustain = 1.0f, release = 0.1f;
+            float attack = 1.0f, decay = 0.1f, sustain = 0.5f, release = 0.1f;
         };
      
         void setParameters(const Parameters& newParameters);
