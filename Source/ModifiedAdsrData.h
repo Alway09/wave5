@@ -20,22 +20,31 @@
                 float decayTimeSeconds,
                 float sustainLevel,
                 float releaseTimeSeconds)
-                : attack(attackTimeSeconds),
-                decay(decayTimeSeconds),
-                sustain(sustainLevel),
-                release(releaseTimeSeconds)
+                : attackTime(attackTimeSeconds),
+                decayTime(decayTimeSeconds),
+                sustainLevel(sustainLevel),
+                releaseTime(releaseTimeSeconds)
             {
             }
 
-            float attack = 1.0f, decay = 0.1f, sustain = 0.5f, release = 0.1f;
-        };
+            enum ParametersIDs {
+                attackTimeSeconds,
+                decayTimeSeconds,
+                sustainLevelNormalised,
+                releaseTimeSeconds
+            };
+
+            static const juce::StringArray idList;
+
+            float attackTime = 1.0f, decayTime = 0.1f, sustainLevel = 0.5f, releaseTime = 0.1f;
+        };     
      
-        void setParameters(const Parameters& newParameters);
+        //void setParameters(const Parameters& newParameters);
 
         /** Returns the parameters currently being used by an ADSR object.
             @see setParameters
         */
-        const Parameters& getParameters() const noexcept { return parameters; }
+        //const Parameters& getParameters() const noexcept { return parameters; }
 
         /** Returns true if the envelope is in its attack, decay, sustain or release stage. */
         bool isActive() const noexcept { return state != State::idle; }
@@ -64,6 +73,8 @@
         //==============================================================================
         float getNextSample() noexcept;
 
+        void updateParameters(float attack, float decay, float sustain, float release);
+
         /** This method will conveniently apply the next numSamples number of envelope values
             to an AudioBuffer.
             @see getNextSample
@@ -81,7 +92,7 @@
 
             if (state == State::sustain)
             {
-                buffer.applyGain(startSample, numSamples, parameters.sustain);
+                buffer.applyGain(startSample, numSamples, parameters.sustainLevel);
                 return;
             }
 

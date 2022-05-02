@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "SynthSound.h"
 #include "SynthVoice.h"
+#include "ModifiedAdsrData.h"
 
 //==============================================================================
 /**
@@ -55,8 +56,17 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void updateAdsr(ModifiedAdsrData& adsr);
+
+    juce::Synthesiser& getSynthesizer() { return synth; }
+
+    juce::AudioProcessorValueTreeState apvts;
+
 private:
+    juce::AudioProcessorValueTreeState::ParameterLayout createParams();
+
     juce::Synthesiser synth;
+    unsigned int numberOfVoices = 4;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessor)
 };

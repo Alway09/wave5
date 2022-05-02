@@ -1,7 +1,23 @@
 #include "ModifiedAdsrData.h"
+const juce::StringArray ModifiedAdsrData::Parameters::idList = {
+                "ATTACKTIME",
+                "DECAYTIME",
+                "SUSTAINLEVEL",
+                "RELEASETIME"
+};
 
 ModifiedAdsrData::ModifiedAdsrData()
 {
+
+    recalculateRates();
+}
+
+void ModifiedAdsrData::updateParameters(float attack, float decay, float sustain, float release) {
+    parameters.attackTime = attack;
+    parameters.decayTime = decay;
+    parameters.sustainLevel = sustain;
+    parameters.releaseTime = release;
+
     recalculateRates();
 }
 
@@ -10,14 +26,14 @@ ModifiedAdsrData::ModifiedAdsrData()
             this otherwise the values may be incorrect!
             @see getParameters
 */
-void ModifiedAdsrData::setParameters(const Parameters& newParameters)
+/*void ModifiedAdsrData::setParameters(const Parameters& newParameters)
 {
     // need to call setSampleRate() first!
     jassert(sampleRate > 0.0);
 
     parameters = newParameters;
     recalculateRates();
-}
+}*/
 
 void ModifiedAdsrData::recalculateRates() noexcept
 {
@@ -26,12 +42,12 @@ void ModifiedAdsrData::recalculateRates() noexcept
         return timeInSeconds > 0.0f ? (float)(distance / (timeInSeconds * sr)) : -1.0f;
     };
 
-    attackRate = getRate(1.0f, parameters.attack, sampleRate);
-    decayRate = getRate(1.0f - parameters.sustain, parameters.decay, sampleRate);
-    releaseRate = getRate(parameters.sustain, parameters.release, sampleRate);
+    attackRate = getRate(1.0f, parameters.attackTime, sampleRate);
+    decayRate = getRate(1.0f - parameters.sustainLevel, parameters.decayTime, sampleRate);
+    releaseRate = getRate(parameters.sustainLevel, parameters.releaseTime, sampleRate);
 
     if ((state == State::attack && attackRate <= 0.0f)
-        || (state == State::decay && (decayRate <= 0.0f || envelopeVal <= parameters.sustain))
+        || (state == State::decay && (decayRate <= 0.0f || envelopeVal <= parameters.sustainLevel))
         || (state == State::release && releaseRate <= 0.0f))
     {
         goToNextState();
@@ -70,15 +86,15 @@ float ModifiedAdsrData::getNextSample() noexcept
     {
         envelopeVal -= decayRate;
 
-        if (envelopeVal <= parameters.sustain)
+        if (envelopeVal <= parameters.sustainLevel)
         {
-            envelopeVal = parameters.sustain;
+            envelopeVal = parameters.sustainLevel;
             goToNextState();
         }
     }
     else if (state == State::sustain)
     {
-        envelopeVal = parameters.sustain;
+        envelopeVal = parameters.sustainLevel;
     }
     else if (state == State::release)
     {
@@ -105,7 +121,7 @@ void ModifiedAdsrData::noteOn() noexcept
     }
     else
     {
-        envelopeVal = parameters.sustain;
+        envelopeVal = parameters.sustainLevel;
         state = State::sustain;
     }
 }
@@ -115,9 +131,9 @@ void ModifiedAdsrData::noteOff() noexcept
 {
     if (state != State::idle)
     {
-        if (parameters.release > 0.0f)
+        if (parameters.releaseTime > 0.0f)
         {
-            releaseRate = (float)(envelopeVal / (parameters.release * sampleRate));
+            releaseRate = (float)(envelopeVal / (parameters.releaseTime * sampleRate));
             state = State::release;
         }
         else

@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -19,11 +11,13 @@ Wave5AudioProcessor::Wave5AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), apvts(*this, nullptr, "Parameters", createParams())
 #endif
 {
     synth.addSound(new SynthSound());
-    synth.addVoice(new SynthVoice());
+
+    for(int i = 0; i < numberOfVoices; ++i)
+        synth.addVoice(new SynthVoice());
 }
 
 Wave5AudioProcessor::~Wave5AudioProcessor()
@@ -156,6 +150,7 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 // Osc
                 voice->getOscillator().setWaveType(0);
                 // ADSR
+                updateAdsr(voice->getAdsr());
                 // Etc...
             }
             
@@ -163,6 +158,44 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     }
 
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+}
+
+void Wave5AudioProcessor::updateAdsr(ModifiedAdsrData& adsr) {
+    using Params = ModifiedAdsrData::Parameters;
+
+    auto& attack = *apvts.getRawParameterValue(Params::idList[Params::ParametersIDs::attackTimeSeconds]);
+    auto& decay = *apvts.getRawParameterValue(Params::idList[Params::ParametersIDs::decayTimeSeconds]);
+    auto& sustain = *apvts.getRawParameterValue(Params::idList[Params::ParametersIDs::sustainLevelNormalised]);
+    auto& release = *apvts.getRawParameterValue(Params::idList[Params::ParametersIDs::releaseTimeSeconds]);
+
+    adsr.updateParameters(attack.load(), decay.load(), sustain.load(), release.load());
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createParams() {
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
+    // ADSR
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        ModifiedAdsrData::Parameters::idList[ModifiedAdsrData::Parameters::ParametersIDs::attackTimeSeconds],
+        "Attack Time", 
+        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        ModifiedAdsrData::Parameters::idList[ModifiedAdsrData::Parameters::ParametersIDs::decayTimeSeconds],
+        "Decay Time",
+        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        ModifiedAdsrData::Parameters::idList[ModifiedAdsrData::Parameters::ParametersIDs::sustainLevelNormalised],
+        "Sustain Level",
+        juce::NormalisableRange<float> { 0.0f, 1.0f, 0.01f, 0.3f }, 0.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        ModifiedAdsrData::Parameters::idList[ModifiedAdsrData::Parameters::ParametersIDs::releaseTimeSeconds],
+        "Release Time",
+        juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
+
+    return { params.begin(), params.end() };
 }
 
 //==============================================================================

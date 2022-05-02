@@ -13,7 +13,18 @@
               file="Source/ModifiedAdsrData.h"/>
         <FILE id="wpKx1P" name="OscData.cpp" compile="1" resource="0" file="Source/OscData.cpp"/>
       </GROUP>
-      <GROUP id="{8C3E6C96-EEBA-2BD5-E15D-4A48D96B562C}" name="UI"/>
+      <GROUP id="{8C3E6C96-EEBA-2BD5-E15D-4A48D96B562C}" name="UI">
+        <FILE id="s2675N" name="CustomRotarySlider.cpp" compile="1" resource="0"
+              file="Source/CustomRotarySlider.cpp"/>
+        <FILE id="fOAspt" name="CustomRotarySlider.h" compile="0" resource="0"
+              file="Source/CustomRotarySlider.h"/>
+        <FILE id="i5QHdi" name="GlobalUIConstants.h" compile="0" resource="0"
+              file="Source/GlobalUIConstants.h"/>
+        <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"
+              file="Source/ModifiedAdsrComponent.h"/>
+        <FILE id="Msn69F" name="ModifiedAdsrComponent.cpp" compile="1" resource="0"
+              file="Source/ModifiedAdsrComponent.cpp"/>
+      </GROUP>
       <FILE id="W7idD2" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="XRV4ko" name="PluginProcessor.h" compile="0" resource="0"
