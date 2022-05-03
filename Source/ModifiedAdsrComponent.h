@@ -14,6 +14,7 @@
 #include "ModifiedAdsrData.h"
 #include "CustomRotarySlider.h"
 #include "GlobalUIConstants.h"
+#include "EnvelopeVisualComponent.h"
 
 //==============================================================================
 
@@ -28,16 +29,14 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void updateParameters(juce::AudioProcessorValueTreeState& adsrAPVTS, juce::StringArray idArray);
+    void setSizes();
+
     void prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& adsrAPVTS, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment);
 
 private:
     juce::String name;
 
-    /*std::atomic<float>* attackTimeSeconds;
-    std::atomic<float> *decayTimeSeconds;
-    std::atomic<float> *sustainLevel;
-    std::atomic<float> *releaseTimeSeconds;*/
+    EnvelopeVisualComponent envelope;
 
     CustomRotarySlider attackSlider;
     CustomRotarySlider decaySlider;
@@ -48,6 +47,10 @@ private:
     std::unique_ptr<SliderAttachment> decayAttachment;
     std::unique_ptr<SliderAttachment> sustainAttachment;
     std::unique_ptr<SliderAttachment> releaseAttachment;
+
+    juce::Rectangle<int> slidersAreaBounds;
+    juce::Rectangle<int> sliderBounds;
+    juce::Rectangle<int> envelopeBounds;
     
     float widthInSeconds = 5.0f;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModifiedAdsrComponent)

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "GlobalUIConstants.h"
 #include "PluginProcessor.h"
 #include "ModifiedAdsrComponent.h"
 

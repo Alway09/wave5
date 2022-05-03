@@ -15,7 +15,7 @@ using Params = ModifiedAdsrData::Parameters;
 
 //==============================================================================
 ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioProcessorValueTreeState& apvts)
-    : name(adsrName)
+    : juce::Component(), name(adsrName)
 {
     //updateParameters(apvts, idArray);
 
@@ -23,20 +23,12 @@ ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioP
     prepareSlider(decaySlider, apvts, Params::idList[Params::ParametersIDs::decayTimeSeconds], decayAttachment);
     prepareSlider(sustainSlider, apvts, Params::idList[Params::ParametersIDs::sustainLevelNormalised], sustainAttachment);
     prepareSlider(releaseSlider, apvts, Params::idList[Params::ParametersIDs::releaseTimeSeconds], releaseAttachment);
+
+    addAndMakeVisible(envelope);
 }
 
 ModifiedAdsrComponent::~ModifiedAdsrComponent()
 {
-}
-
-void ModifiedAdsrComponent::updateParameters(juce::AudioProcessorValueTreeState& apvts, juce::StringArray idArray) {
-
-    /*attackTimeSeconds = apvts.getRawParameterValue(idArray[ModifiedAdsrData::Parameters::ParametersIDs::attackTimeSeconds]);
-    decayTimeSeconds = apvts.getRawParameterValue(idArray[ModifiedAdsrData::Parameters::ParametersIDs::decayTimeSeconds]);
-    sustainLevel = apvts.getRawParameterValue(idArray[ModifiedAdsrData::Parameters::ParametersIDs::sustainLevelNormalised]);
-    releaseTimeSeconds = apvts.getRawParameterValue(idArray[ModifiedAdsrData::Parameters::ParametersIDs::releaseTimeSeconds]);*/
-
-    
 }
 
 void ModifiedAdsrComponent::prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& apvts, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment) {
@@ -47,22 +39,44 @@ void ModifiedAdsrComponent::prepareSlider(juce::Slider& slider, juce::AudioProce
 
 void ModifiedAdsrComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::black);   // clear the background
+    g.fillAll (UI::GLOBAL::backColour);
+
+    g.setColour(UI::GLOBAL::strokeLineColour);
+    g.drawRect(slidersAreaBounds, UI::GLOBAL::strokeLineWigthInside);
+    g.drawRect(envelopeBounds, UI::GLOBAL::strokeLineWigthInside);
+
+    g.drawRect(attackSlider.getBounds());
+    g.drawRect(decaySlider.getBounds());
+}
+
+void ModifiedAdsrComponent::setSizes() {
+    //slidersAreaBounds = juce::Rectangle<int>(0, 0, UI::ADSR::sliderAreaWidth, UI::ADSR::sliderAreaHeight);
+    slidersAreaBounds = juce::Rectangle<int>(0, 0,
+        UI::GLOBAL::paddingFromStoke + UI::GLOBAL::sliderComponentPadding + UI::GLOBAL::sliderComponentWidth * 2 + UI::GLOBAL::paddingFromStoke,
+        UI::GLOBAL::paddingFromStoke + UI::GLOBAL::sliderComponentPadding + UI::GLOBAL::sliderComponentHeight * 2 + UI::GLOBAL::paddingFromStoke);
+
+    sliderBounds = juce::Rectangle<int>(0, 0, UI::GLOBAL::sliderComponentWidth, UI::GLOBAL::sliderComponentHeight);
+
+    envelopeBounds = juce::Rectangle<int>(slidersAreaBounds.getWidth() + UI::GLOBAL::paddingComponentsInside, 0, UI::ADSR::envelopeWidth, slidersAreaBounds.getHeight());
 }
 
 void ModifiedAdsrComponent::resized()
 {
-    juce::Rectangle<int> slidersBounds(0, 0, UI::ADSR::sliderAreaWidth, UI::ADSR::sliderAreaHeight);
-    juce::Rectangle<int> sliderBounds(0, 0, UI::GLOBAL::sliderComponentWidth, UI::GLOBAL::sliderComponentHeight);
+    setSizes();
 
-    attackSlider.setBounds(sliderBounds);
+    juce::Rectangle<int> slidersAreaBoundsLocal = slidersAreaBounds.reduced(UI::GLOBAL::paddingFromStoke, UI::GLOBAL::paddingFromStoke);
+    juce::Rectangle<int> sliderBoundsLocal = sliderBounds.withX(slidersAreaBoundsLocal.getX()).withY(slidersAreaBoundsLocal.getY());
+
+    attackSlider.setBounds(sliderBoundsLocal);
     
-    sliderBounds.setX(UI::GLOBAL::sliderComponentWidth + UI::GLOBAL::sliderComponentPadding);
-    decaySlider.setBounds(sliderBounds);
+    sliderBoundsLocal.setX(sliderBoundsLocal.getX() + UI::GLOBAL::sliderComponentWidth + UI::GLOBAL::sliderComponentPadding);
+    decaySlider.setBounds(sliderBoundsLocal);
 
-    sliderBounds.setY(UI::GLOBAL::sliderComponentHeight + UI::GLOBAL::sliderComponentPadding);
-    releaseSlider.setBounds(sliderBounds);
+    sliderBoundsLocal.setY(sliderBoundsLocal.getY() + UI::GLOBAL::sliderComponentHeight + UI::GLOBAL::sliderComponentPadding);
+    releaseSlider.setBounds(sliderBoundsLocal);
 
-    sliderBounds.setX(0);
-    sustainSlider.setBounds(sliderBounds);
+    sliderBoundsLocal.setX(slidersAreaBoundsLocal.getX());
+    sustainSlider.setBounds(sliderBoundsLocal);
+
+    envelope.setBounds(envelopeBounds.reduced(UI::GLOBAL::strokeLineWigthInside));
 }

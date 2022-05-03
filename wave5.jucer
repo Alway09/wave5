@@ -18,8 +18,12 @@
               file="Source/CustomRotarySlider.cpp"/>
         <FILE id="fOAspt" name="CustomRotarySlider.h" compile="0" resource="0"
               file="Source/CustomRotarySlider.h"/>
+        <FILE id="nLWXnO" name="EnvelopeVisualComponent.h" compile="0" resource="0"
+              file="Source/EnvelopeVisualComponent.h"/>
         <FILE id="i5QHdi" name="GlobalUIConstants.h" compile="0" resource="0"
               file="Source/GlobalUIConstants.h"/>
+        <FILE id="YiNCdj" name="EnvelopeVisualComponent.cpp" compile="1" resource="0"
+              file="Source/EnvelopeVisualComponent.cpp"/>
         <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"
               file="Source/ModifiedAdsrComponent.h"/>
         <FILE id="Msn69F" name="ModifiedAdsrComponent.cpp" compile="1" resource="0"
