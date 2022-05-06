@@ -13,6 +13,11 @@
 #include <JuceHeader.h>
 #include "GlobalUIConstants.h"
 
+// left ID, right ID and line between them
+using LinesVectorElement = std::pair<std::pair<int, int>, juce::Line<float>*>;
+using LinesVector = std::vector<LinesVectorElement>;
+
+
 //==============================================================================
 class MovedDot : public juce::Component
 {
@@ -30,7 +35,7 @@ public:
     int getId() const { return dotId; }
     int getLeftId() const { return leftDotId; }
     int getRightId() const { return rightDotId; }
-    //juce::Point<int> getCentre() const { return localBounds.getCentre(); }
+    juce::Point<int> getCentrePosition() const;
     void updateBounds();
 
     void setLeftId(int ID) { leftDotId = ID; }
@@ -48,19 +53,31 @@ private:
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnvelopeVisualComponent);
 };
 
-class LineBetween : public juce::Component
+/*class LineBetween : public juce::Component
 {
 public:
-    LineBetween(MovedDot* dot1, MovedDot* dot2);
+    LineBetween(MovedDot* leftDot, juce::Point<int> leftDotPos, MovedDot* rightDot, juce::Point<int> rightDotPos);
     ~LineBetween(){};
     
     void paint(juce::Graphics&) override;
     void resized() override;
     
+    void paintLine(juce::Graphics&);
+    
+    void updatePositions(juce::Point<int> leftCentre, juce::Point<int> rightCentre);
+    
+    bool isLineBetween(int leftId, int rightId){
+        return ((leftDot->getId() == leftId) && (rightDot->getId() == rightId));
+    };
+    
 private:
-    MovedDot* dotOne;
-    MovedDot* dotTwo;
-};
+    MovedDot* leftDot;
+    juce::Point<int> leftDotCentre;
+    MovedDot* rightDot;
+    juce::Point<int> rightDotCentre;
+    
+    //juce::Rectangle<int> localBounds;
+};*/
 
 class EnvelopeVisualComponent  : public juce::Component
 {
@@ -76,15 +93,27 @@ public:
 
     void addDot(int x, int y);
     void removeDot(int ID);
+    
+    juce::Line<float>* lineBetween(int leftId, int rightId);
+    
+    LinesVector::iterator getLineElement(juce::Line<float>*);
+    
+private:
     int getDotIndex(int ID);
 
     juce::Point<int> stayPointInsideComponent(MovedDot* dot, juce::Point<int> eventPos);
     juce::Point<int> complyOrder(MovedDot* dot, juce::Point<int> eventPos);
-private:
+    
+    MovedDot* getLeftDot(int x, int y);
+    MovedDot* getRightDot(int x, int y);
     //bool doubleClickAllowed;
     int dotsIdConted = 1;
 
     std::vector<MovedDot*> dotsVector;
+    //std::vector<LineBetween*> linesVector;
+    
+    
+    LinesVector linesVector;
     //std::vector<int> dotsIDs;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeVisualComponent)

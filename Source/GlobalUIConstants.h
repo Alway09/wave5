@@ -31,5 +31,8 @@ namespace UI {
 		const int movedDotAreaSize = 25;
 		const juce::Colour dotColour(0, 0, 0);
 		const juce::Colour dotMouseOnColour(128, 128, 128);
+    
+        const int lineThikness = 3;
+        const juce::Colour lineColour(0, 0, 0);
 	}
 }
