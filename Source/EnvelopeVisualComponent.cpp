@@ -127,12 +127,17 @@ juce::Point<int> EnvelopeVisualComponent::complyOrder(MovedDot* dot, juce::Point
 
 void EnvelopeVisualComponent::addDot(int x, int y) {
     std::vector<MovedDot*>::iterator iterStart = dotsVector.begin();
-    int leftID = 0; 
-    //int rightID = std::numeric_limits<int>::max();
+    int leftID = 0;
+    
+    int minDistance = std::numeric_limits<int>::max();
 
-    while (iterStart != dotsVector.end()) { // find left dot
+    while (iterStart != dotsVector.end()) { // find nearest left dot
         if ((*iterStart)->getPosition().getX() + (*iterStart)->getWidth() < x) {
-            leftID = (*iterStart)->getId();
+            int tmp = std::abs((*iterStart)->getPosition().getX() + (*iterStart)->getWidth() - x);
+            if(tmp < minDistance){
+                minDistance = tmp;
+                leftID = (*iterStart)->getId();
+            }
             //(*iterStart)->setRightId(dotsIdConted);
         }
 
@@ -144,12 +149,19 @@ void EnvelopeVisualComponent::addDot(int x, int y) {
 
     std::vector<MovedDot*>::iterator iterEnd = dotsVector.end(); 
     int rightID = std::numeric_limits<int>::max();
+    
+    minDistance = std::numeric_limits<int>::max();
 
-    while (iterEnd != dotsVector.begin()) { // find rigth dot
+    while (iterEnd != dotsVector.begin()) { // find nearest rigth dot
         --iterEnd; // cause end() iter is out of bounds
 
         if ((*iterEnd)->getPosition().getX() + (*iterEnd)->getWidth() > x) {
-            rightID = (*iterEnd)->getId();
+            int tmp = std::abs((*iterEnd)->getPosition().getX() + (*iterEnd)->getWidth() - x);
+            if(tmp < minDistance){
+                minDistance = tmp;
+                rightID = (*iterEnd)->getId();
+            }
+            
             //(*iterEnd)->setLeftId(dotsIdConted);
         }   
     }
@@ -208,9 +220,21 @@ int EnvelopeVisualComponent::getDotIndex(int ID) {
     return -1;
 }
 
+LineBetween::LineBetween(MovedDot* dot1, MovedDot* dot2) :
+    juce::Component(), dotOne(dot1), dotTwo(dot2)
+{
+    
+}
+
+void LineBetween::paint(juce::Graphics& g){
+    
+}
+
+void LineBetween::resized(){};
+
 MovedDot::MovedDot(int ID, int leftID, int rightID, bool doubleClickAllow) : 
-    juce::Component(), dotId(ID), doubleClickAllowed(doubleClickAllow) , 
-    mouseIsOn(true), leftDotId(leftID), rightDotId(rightID)
+    juce::Component(), doubleClickAllowed(doubleClickAllow),
+    mouseIsOn(true), dotId(ID), leftDotId(leftID), rightDotId(rightID)
 {
     localBounds = juce::Rectangle<int>(UI::ADSR::movedDotAreaSize, UI::ADSR::movedDotAreaSize);
     dotBounds = juce::Rectangle<int>(UI::ADSR::movedDotDiameter, UI::ADSR::movedDotDiameter);

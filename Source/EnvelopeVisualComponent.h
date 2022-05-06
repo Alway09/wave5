@@ -48,6 +48,20 @@ private:
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnvelopeVisualComponent);
 };
 
+class LineBetween : public juce::Component
+{
+public:
+    LineBetween(MovedDot* dot1, MovedDot* dot2);
+    ~LineBetween(){};
+    
+    void paint(juce::Graphics&) override;
+    void resized() override;
+    
+private:
+    MovedDot* dotOne;
+    MovedDot* dotTwo;
+};
+
 class EnvelopeVisualComponent  : public juce::Component
 {
 public:
