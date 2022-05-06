@@ -23,7 +23,7 @@ EnvelopeVisualComponent::EnvelopeVisualComponent() :
 
 EnvelopeVisualComponent::~EnvelopeVisualComponent()
 {
-    for each (auto dot in dotsVector)
+    for(auto dot : dotsVector)
     {
         delete dot;
     }

@@ -15,6 +15,8 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
     adsrComponent("ADSR", p.apvts)
 {
     setSize (800, 800);
+    
+    DBG("It works!!");
 
     addAndMakeVisible(adsrComponent);
 }
