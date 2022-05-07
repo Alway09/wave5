@@ -15,7 +15,7 @@ using Params = ModifiedAdsrData::Parameters;
 
 //==============================================================================
 ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioProcessorValueTreeState& apvts)
-    : juce::Component(), name(adsrName)
+    : juce::Component(), name(adsrName), envelope(true)
 {
     //updateParameters(apvts, idArray);
 

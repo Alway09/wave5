@@ -21,13 +21,14 @@ using LinesVector = std::vector<LinesVectorElement>;
 //==============================================================================
 
 
-class EnvelopeVisualComponent  : public juce::Component
+class EnvelopeVisualComponent  : public juce::Component, public juce::Timer
 {
 private:
     class MovingDot : public juce::Component
     {
     public:
-        MovingDot(int ID, int leftID, int rightID, bool doubleClickAllow);
+        MovingDot(int ID, int leftID, int rightID, bool makeRemovible,
+                  bool withConstantX, bool withConstantY);
         ~MovingDot() {};
 
         void paint(juce::Graphics&) override;
@@ -40,14 +41,20 @@ private:
         int getLeftId() const { return leftDotId; }
         int getRightId() const { return rightDotId; }
         juce::Point<int> getCentrePosition() const;
-        void updateBounds();
 
         void setLeftId(int ID) { leftDotId = ID; }
         void setRightId(int ID) { rightDotId = ID; }
+        void setCentrePosition(juce::Point<int> p);
+        
+        bool removable() const { return isRemovable; }
 
     private:
-        bool doubleClickAllowed;
+        bool isRemovable;
         bool mouseIsOn;
+        bool xIsConstant;
+        bool yIsConstant;
+        bool positionInitialized = false;
+        
         int dotId;
         int leftDotId;
         int rightDotId;
@@ -56,7 +63,7 @@ private:
     };
     
 public:
-    EnvelopeVisualComponent();
+    EnvelopeVisualComponent(bool isAdsr = false);
     ~EnvelopeVisualComponent() override;
     
     void paint (juce::Graphics&) override;
@@ -65,7 +72,7 @@ public:
     void mouseDoubleClick(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
 
-    void addDot(int x, int y);
+    void addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
     void removeDot(int ID);
     
     void addLine(EnvelopeVisualComponent::MovingDot const * leftDot,
@@ -83,7 +90,11 @@ private:
     MovingDot* getLeftDot(int x, int y);
     MovingDot* getRightDot(int x, int y);
     
+    void setupAdsr();
+    void timerCallback() override{ setupAdsr(); stopTimer(); };
+    
     int dotsIdCounted = 1;
+    bool isADSR;
 
     std::vector<MovingDot*> dotsVector;
     LinesVector linesVector;

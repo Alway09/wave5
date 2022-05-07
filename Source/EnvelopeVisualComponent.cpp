@@ -13,9 +13,13 @@
 #include <limits>
 
 //==============================================================================
-EnvelopeVisualComponent::EnvelopeVisualComponent() :
-    juce::Component()
-{}
+EnvelopeVisualComponent::EnvelopeVisualComponent(bool isAdsr) :
+    juce::Component(), isADSR(isAdsr)
+{
+    if(isADSR)
+        //setupAdsr();
+        startTimer(200); // cause needs to bounds of component will set
+}
 
 EnvelopeVisualComponent::~EnvelopeVisualComponent()
 {
@@ -27,6 +31,13 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
     for(auto line : linesVector){
         delete line.second;
     }
+}
+
+void EnvelopeVisualComponent::setupAdsr(){
+    addDot(0, getHeight(), false, true, true); // attack
+    addDot(20, 0, false, false, true); // decay
+    addDot(40, 40, false, false, false); // sustain
+    addDot(60, getHeight(), false, false, true); // release
 }
 
 void EnvelopeVisualComponent::paint (juce::Graphics& g)
@@ -45,13 +56,16 @@ void EnvelopeVisualComponent::mouseDoubleClick(const juce::MouseEvent& event) {
     MovingDot* dot = dynamic_cast<MovingDot*>(event.eventComponent);
 
     if (dot == nullptr) { // if event source is not dot
-        auto relativeEvent = event.getEventRelativeTo(this);
-        addDot(relativeEvent.getMouseDownX(), relativeEvent.getMouseDownY());
+        if(!isADSR){
+            auto relativeEvent = event.getEventRelativeTo(this);
+            addDot(relativeEvent.getMouseDownX(), relativeEvent.getMouseDownY(),
+                   true, false, false);
+        }
     }
     else {
-        removeDot(dot->getId());
+        if(dot->removable())
+            removeDot(dot->getId());
     }
-        
 }
 
 void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
@@ -208,7 +222,11 @@ void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
     }
 }
 
-void EnvelopeVisualComponent::addDot(int x, int y) {
+void EnvelopeVisualComponent::addDot(int x, int y,
+                                     bool removable,
+                                     bool withConstantX,
+                                     bool withConstantY)
+{
     MovingDot* leftDot = getLeftDot(x, y);
     if(leftDot){
         dotsVector[getDotIndex(leftDot->getId())]->setRightId(dotsIdCounted);
@@ -222,12 +240,12 @@ void EnvelopeVisualComponent::addDot(int x, int y) {
     MovingDot* dot = new MovingDot(dotsIdCounted,
                                  leftDot ? leftDot->getId() : 0,
                                  rightDot ? rightDot->getId() : std::numeric_limits<int>::max(),
-                                 true);
+                                 removable, withConstantX, withConstantY);
 
     dotsVector.push_back(dot);
     ++dotsIdCounted;
     
-    dot->setCentrePosition(x, y);
+    dot->setCentrePosition(juce::Point<int>(x, y));
     dot->addMouseListener(this, false);
     addAndMakeVisible(dot);
     
@@ -316,9 +334,12 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
 
 //######################################################################
 
-EnvelopeVisualComponent::MovingDot::MovingDot(int ID, int leftID, int rightID, bool doubleClickAllow) :
-    juce::Component(), doubleClickAllowed(doubleClickAllow),
-    mouseIsOn(true), dotId(ID), leftDotId(leftID), rightDotId(rightID)
+EnvelopeVisualComponent::MovingDot::MovingDot(int ID, int leftID, int rightID,
+                                              bool makeRemovable, bool withConstantX,
+                                              bool withConstantY) :
+    juce::Component(), isRemovable(makeRemovable), mouseIsOn(false),
+    xIsConstant(withConstantX), yIsConstant(withConstantY),
+    dotId(ID), leftDotId(leftID), rightDotId(rightID)
 {
     dotBounds = juce::Rectangle<int>(UI::ADSR::movedDotDiameter, UI::ADSR::movedDotDiameter);
     
@@ -332,7 +353,7 @@ void EnvelopeVisualComponent::MovingDot::paint(juce::Graphics& g){
     g.fillAll(juce::Colour::fromRGBA(0, 0, 0, 0));
     g.setOpacity(1.0f);
     
-    g.drawRect(getLocalBounds());
+    //g.drawRect(getLocalBounds());
 
     g.setColour(mouseIsOn ? UI::ADSR::dotMouseOnColour : UI::ADSR::dotColour);
     g.fillEllipse(dotBounds.toFloat());
@@ -347,6 +368,20 @@ void EnvelopeVisualComponent::MovingDot::mouseEnter(const juce::MouseEvent& even
 void EnvelopeVisualComponent::MovingDot::mouseExit(const juce::MouseEvent& event) {
     mouseIsOn = false;
     repaint();
+}
+
+void EnvelopeVisualComponent::MovingDot::setCentrePosition(juce::Point<int> p){
+    juce::Point<int> originalCentre = getBounds().getCentre();
+    juce::Point<int> resultCentre = p.transformedBy(getTransform().inverted());
+    
+    if(xIsConstant && positionInitialized)
+        resultCentre.setX(originalCentre.getX());
+    
+    if(yIsConstant && positionInitialized)
+        resultCentre.setY(originalCentre.getY());
+    
+    setBounds(getBounds().withCentre(resultCentre));
+    positionInitialized = true;
 }
 
 juce::Point<int> EnvelopeVisualComponent::MovingDot::getCentrePosition() const
