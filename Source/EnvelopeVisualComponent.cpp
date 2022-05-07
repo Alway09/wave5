@@ -34,10 +34,10 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
 }
 
 void EnvelopeVisualComponent::setupAdsr(){
-    addDot(0, getHeight(), false, true, true); // attack
-    addDot(20, 0, false, false, true); // decay
-    addDot(40, 40, false, false, false); // sustain
-    addDot(60, getHeight(), false, false, true); // release
+    attackDotId = addDot(0, getHeight(), false, true, true); // attack
+    decayDotId = addDot(20, 0, false, false, true); // decay
+    sustainDotId = addDot(40, 40, false, false, false); // sustain
+    releaseDotId = addDot(60, getHeight(), false, false, true); // release
 }
 
 void EnvelopeVisualComponent::paint (juce::Graphics& g)
@@ -76,28 +76,23 @@ void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
         juce::Point<int> centre = stayPointInsideComponent(dot, pos);
         centre = complyOrder(dot, centre);
         dot->setCentrePosition(centre);
-                
-        auto line = lineBetween(dot->getLeftId(), dot->getId());
         
-        if(line){
-            auto elem = getLineElement(line);
-            delete line;
-            line = new juce::Line<float>(dotsVector[getDotIndex(dot->getLeftId())]->getCentrePosition().toFloat(),
-                                         dot->getCentrePosition().toFloat());
-            elem->second = line;
-        }
-        
-        line = lineBetween(dot->getId(), dot->getRightId());
-        
-        if(line){
-            auto elem = getLineElement(line);
-            delete line;
-            line = new juce::Line<float>(dot->getCentrePosition().toFloat(),
-                                         dotsVector[getDotIndex(dot->getRightId())]->getCentrePosition().toFloat());
-            elem->second = line;
-        }
+        updateLine(dot->getLeftId(), dot->getId());
+        updateLine(dot->getId(), dot->getRightId());
         
         repaint();
+    }
+}
+
+void EnvelopeVisualComponent::updateLine(int leftId, int rightId){
+    auto line = lineBetween(leftId, rightId);
+    
+    if(line){
+        auto elem = getLineElement(line);
+        delete line;
+        line = new juce::Line<float>(dotsVector[getDotIndex(leftId)]->getCentrePosition().toFloat(),
+                                     dotsVector[getDotIndex(rightId)]->getCentrePosition().toFloat());
+        elem->second = line;
     }
 }
 
@@ -222,7 +217,7 @@ void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
     }
 }
 
-void EnvelopeVisualComponent::addDot(int x, int y,
+int EnvelopeVisualComponent::addDot(int x, int y,
                                      bool removable,
                                      bool withConstantX,
                                      bool withConstantY)
@@ -263,6 +258,7 @@ void EnvelopeVisualComponent::addDot(int x, int y,
     }
     
     repaint();
+    return dot->getId();
 }
 
 void EnvelopeVisualComponent::removeDot(int ID) {
@@ -330,8 +326,51 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
     return line;
 }
 
-//######################################################################
+void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
+    
+    if(slider->getName() == "Attack"){
+        attackTimeSeconds = slider->getValue();
+    } else if(slider->getName() == "Decay"){
+        decayTimeSeconds = slider->getValue();
+    } else if(slider->getName() == "Sustain"){
+        sustainLevel = slider->getValue();
+    }else if(slider->getName() == "Release"){
+        releaseTimeSeconds = slider->getValue();
+    }
+    
+    updateAdsr();
+    repaint();
+}
 
+void EnvelopeVisualComponent::updateAdsr(){
+    // move dots to the right with the current values of seconds or levels
+    if(!dotsVector.empty()){
+        int widthScale = getWidth() / widthInSeconds; // pixels in 1 second
+        
+        int width = attackTimeSeconds * widthScale;
+        auto dot = dotsVector[getDotIndex(decayDotId)];
+        
+        dot->setCentrePosition(dot->getCentrePosition().withX(width)); // move dot far from attack dot
+        updateLine(attackDotId, decayDotId);
+        
+        width += decayTimeSeconds * widthScale;
+        dot = dotsVector[getDotIndex(sustainDotId)];
+        
+        dot->setCentrePosition(dot->getCentrePosition().
+                               withX(width).
+                               withY(getHeight() - sustainLevel * getHeight()));
+        
+        updateLine(decayDotId, sustainDotId);
+        
+        width += releaseTimeSeconds * widthScale;
+        dot = dotsVector[getDotIndex(releaseDotId)];
+        
+        dot->setCentrePosition(dot->getCentrePosition().withX(width));
+        updateLine(sustainDotId, releaseDotId);
+    }
+}
+
+//######################################################################
 //######################################################################
 
 EnvelopeVisualComponent::MovingDot::MovingDot(int ID, int leftID, int rightID,

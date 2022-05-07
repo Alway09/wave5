@@ -15,7 +15,8 @@ using Params = ModifiedAdsrData::Parameters;
 
 //==============================================================================
 ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioProcessorValueTreeState& apvts)
-    : juce::Component(), name(adsrName), envelope(true)
+    : juce::Component(), name(adsrName), envelope(true),
+    attackSlider("Attack"), decaySlider("Decay"), sustainSlider("Sustain"), releaseSlider("Release")
 {
     //updateParameters(apvts, idArray);
 
@@ -23,6 +24,16 @@ ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioP
     prepareSlider(decaySlider, apvts, Params::idList[Params::ParametersIDs::decayTimeSeconds], decayAttachment);
     prepareSlider(sustainSlider, apvts, Params::idList[Params::ParametersIDs::sustainLevelNormalised], sustainAttachment);
     prepareSlider(releaseSlider, apvts, Params::idList[Params::ParametersIDs::releaseTimeSeconds], releaseAttachment);
+    
+    attackSlider.addListener(&envelope);
+    decaySlider.addListener(&envelope);
+    sustainSlider.addListener(&envelope);
+    releaseSlider.addListener(&envelope);
+    
+    attackSlider.setValue(1.0);
+    decaySlider.setValue(1.0);
+    sustainSlider.setValue(1.0);
+    releaseSlider.setValue(1.0);
 
     addAndMakeVisible(envelope);
 }

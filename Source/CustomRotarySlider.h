@@ -5,7 +5,7 @@
 class CustomRotarySlider : public juce::Slider
 {
 public:
-	CustomRotarySlider();
+	CustomRotarySlider(const juce::String &sliderName);
 	~CustomRotarySlider();
 private:
 	//juce::Label label;

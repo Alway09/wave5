@@ -21,7 +21,7 @@ using LinesVector = std::vector<LinesVectorElement>;
 //==============================================================================
 
 
-class EnvelopeVisualComponent  : public juce::Component, public juce::Timer
+class EnvelopeVisualComponent  : public juce::Component, public juce::Timer, public juce::Slider::Listener
 {
 private:
     class MovingDot : public juce::Component
@@ -72,12 +72,15 @@ public:
     void mouseDoubleClick(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
 
-    void addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
+    int addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
     void removeDot(int ID);
     
     void addLine(EnvelopeVisualComponent::MovingDot const * leftDot,
                  EnvelopeVisualComponent::MovingDot const * rightDot);
-    void removeLine(int leftId, int righttId);
+    void removeLine(int leftId, int rightId);
+    void updateLine(int leftId, int rightId);
+    
+    void sliderValueChanged (juce::Slider *slider) override;
     
 private:
     int getDotIndex(int ID);
@@ -90,11 +93,25 @@ private:
     MovingDot* getLeftDot(int x, int y);
     MovingDot* getRightDot(int x, int y);
     
-    void setupAdsr();
-    void timerCallback() override{ setupAdsr(); stopTimer(); };
-    
     int dotsIdCounted = 1;
+    
+    //for ADSR
+    void setupAdsr();
+    void updateAdsr();
+    void timerCallback() override{ setupAdsr(); updateAdsr(); stopTimer(); };
     bool isADSR;
+    
+    double attackTimeSeconds = 1.0;
+    double decayTimeSeconds = 1.0;
+    double sustainLevel = 1.0; // 0.0 to 1.0
+    double releaseTimeSeconds = 1.0;
+    
+    int attackDotId;
+    int decayDotId;
+    int sustainDotId;
+    int releaseDotId;
+    
+    double widthInSeconds = 5.0;
 
     std::vector<MovingDot*> dotsVector;
     LinesVector linesVector;
