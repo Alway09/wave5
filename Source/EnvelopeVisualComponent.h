@@ -93,6 +93,8 @@ public:
 
     void addDot(int x, int y);
     void removeDot(int ID);
+    void addLine(MovedDot const * leftDot, MovedDot const * rightDot);
+    void removeLine(int leftId, int righttId);
     
     juce::Line<float>* lineBetween(int leftId, int rightId);
     

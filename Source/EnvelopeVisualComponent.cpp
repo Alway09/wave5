@@ -225,6 +225,23 @@ MovedDot* EnvelopeVisualComponent::getRightDot(int x, int y){
     return dot;
 }
 
+void EnvelopeVisualComponent::addLine(MovedDot const * leftDot, MovedDot const * rightDot){
+    LinesVectorElement elem(std::make_pair(leftDot->getId(), rightDot->getId()),
+                            new juce::Line<float>(leftDot->getCentrePosition().toFloat(),
+                                                  rightDot->getCentrePosition().toFloat()));
+    linesVector.push_back(elem);
+
+}
+
+void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
+    auto line = lineBetween(leftId, rightId);
+    if(line){
+        auto elem = getLineElement(line);
+        delete elem->second;
+        linesVector.erase(elem);
+    }
+}
+
 void EnvelopeVisualComponent::addDot(int x, int y) {
     //-----------------------------------------------
     MovedDot* leftDot = getLeftDot(x, y);
@@ -242,12 +259,7 @@ void EnvelopeVisualComponent::addDot(int x, int y) {
                                  rightDot ? rightDot->getId() : std::numeric_limits<int>::max(),
                                  true);
 
-    /*DBG(dotsIdConted);
-    DBG(leftID);
-    DBG(rightID);
-    DBG("-----------");*/
     dotsVector.push_back(dot);
-    //dotsIDs.push_back(dotsAmount);
     ++dotsIdConted;
     
     dot->setCentrePosition(x, y);
@@ -255,34 +267,15 @@ void EnvelopeVisualComponent::addDot(int x, int y) {
     addAndMakeVisible(dot);
     //-----------------------------------------------
     if(leftDot && rightDot){
-        auto line = lineBetween(leftDot->getId(), rightDot->getId());
-        if(line){
-            auto elem = getLineElement(line);
-            delete elem->second;
-            linesVector.erase(elem);
-        }
+        removeLine(leftDot->getId(), rightDot->getId());
     }
     
     if(leftDot){
-        /*LineBetween* line = new LineBetween(leftDot, leftDot->getCentrePosition(), dot, dot->getCentrePosition());
-        linesVector.push_back(line);
-        line->addMouseListener(this, false);
-        addAndMakeVisible(line);*/
-        LinesVectorElement elem(std::make_pair(leftDot->getId(), dot->getId()),
-                                new juce::Line<float>(leftDot->getCentrePosition().toFloat(),
-                                                      dot->getCentrePosition().toFloat()));
-        linesVector.push_back(elem);
+        addLine(leftDot, dot);
     }
     
     if(rightDot){
-        /*LineBetween* line = new LineBetween(dot, dot->getCentrePosition(), rightDot, rightDot->getCentrePosition());
-        linesVector.push_back(line);
-        line->addMouseListener(this, false);
-        addAndMakeVisible(line);*/
-        LinesVectorElement elem(std::make_pair(dot->getId(), rightDot->getId()),
-                                new juce::Line<float>(dot->getCentrePosition().toFloat(),
-                                                      rightDot->getCentrePosition().toFloat()));
-        linesVector.push_back(elem);
+        addLine(dot, rightDot);
         
     }
     //-----------------------------------------------
@@ -297,13 +290,20 @@ void EnvelopeVisualComponent::removeDot(int ID) {
         int rightDotIndex = getDotIndex(dotsVector[dotIndex]->getRightId());
 
         if (leftDotIndex != -1 && rightDotIndex != -1) {
+            removeLine(dotsVector[dotIndex]->getLeftId(), dotsVector[dotIndex]->getId());
+            removeLine(dotsVector[dotIndex]->getId(), dotsVector[dotIndex]->getRightId());
+            
+            addLine(dotsVector[leftDotIndex], dotsVector[rightDotIndex]);
+            
             dotsVector[leftDotIndex]->setRightId(dotsVector[rightDotIndex]->getId()); //connect before erasing
             dotsVector[rightDotIndex]->setRightId(dotsVector[leftDotIndex]->getId());
         } 
 
         delete *(dotsVector.begin() + dotIndex);
         dotsVector.erase(dotsVector.begin() + dotIndex);
-        //dotsIDs.erase(dotsIDs.begin() + dotIndex);
+        
+        
+        repaint();
     }
 }
 
