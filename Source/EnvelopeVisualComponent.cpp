@@ -15,11 +15,7 @@
 //==============================================================================
 EnvelopeVisualComponent::EnvelopeVisualComponent() :
     juce::Component()
-{
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
-}
+{}
 
 EnvelopeVisualComponent::~EnvelopeVisualComponent()
 {
@@ -37,23 +33,18 @@ void EnvelopeVisualComponent::paint (juce::Graphics& g)
 {
     g.fillAll (UI::GLOBAL::backColour);
     
-    g.setColour(UI::ADSR::lineColour);
+    g.setColour(UI::ADSR::lineColour); //drawing lines
     for(auto l : linesVector){
         g.drawLine(*(l.second), UI::ADSR::lineThikness);
     }
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("EnvelopeVisualComponent", getLocalBounds(),
-                juce::Justification::centred, true);
 }
 
 void EnvelopeVisualComponent::resized(){}
 
 void EnvelopeVisualComponent::mouseDoubleClick(const juce::MouseEvent& event) {
-    MovedDot* dot = dynamic_cast<MovedDot*>(event.eventComponent);
+    MovingDot* dot = dynamic_cast<MovingDot*>(event.eventComponent);
 
-    if (dot == nullptr) {
+    if (dot == nullptr) { // if event source is not dot
         auto relativeEvent = event.getEventRelativeTo(this);
         addDot(relativeEvent.getMouseDownX(), relativeEvent.getMouseDownY());
     }
@@ -63,30 +54,15 @@ void EnvelopeVisualComponent::mouseDoubleClick(const juce::MouseEvent& event) {
         
 }
 
-LinesVector::iterator EnvelopeVisualComponent::getLineElement(juce::Line<float>* line){
-    //LinesVectorElement* elem = nullptr;
-    LinesVector::iterator iter = linesVector.begin();
-    
-    while(iter != linesVector.end()){
-        if(iter->second == line){
-            return iter;
-        }
-        ++iter;
-    }
-    
-    return linesVector.end();
-}
-
-
 void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
-    MovedDot* dot = dynamic_cast<MovedDot*>(event.eventComponent);
+    MovingDot* dot = dynamic_cast<MovingDot*>(event.eventComponent);
 
     if (dot != nullptr) {
         auto pos = event.getEventRelativeTo(this).getPosition();
         juce::Point<int> centre = stayPointInsideComponent(dot, pos);
         centre = complyOrder(dot, centre);
         dot->setCentrePosition(centre);
-        
+                
         auto line = lineBetween(dot->getLeftId(), dot->getId());
         
         if(line){
@@ -108,22 +84,10 @@ void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
         }
         
         repaint();
-        
-        /*for(auto line : linesVector){
-            if(line->isLineBetween(dot->getLeftId(), dot->getId())){
-                auto leftDot = dotsVector[getDotIndex(dot->getLeftId())];
-                line->updatePositions(leftDot->getCentrePosition(), dot->getCentrePosition());
-            }
-            
-            if(line->isLineBetween(dot->getId(), dot->getRightId())){
-                auto rightDot = dotsVector[getDotIndex(dot->getRightId())];
-                line->updatePositions(dot->getCentrePosition(), rightDot->getCentrePosition());
-            }
-        }*/
     }
 }
 
-juce::Point<int> EnvelopeVisualComponent::stayPointInsideComponent(MovedDot* dot, juce::Point<int> eventPos) {
+juce::Point<int> EnvelopeVisualComponent::stayPointInsideComponent(MovingDot* dot, juce::Point<int> eventPos) {
     juce::Point<int> centre;
 
     if (eventPos.getX() < 0) {
@@ -149,42 +113,33 @@ juce::Point<int> EnvelopeVisualComponent::stayPointInsideComponent(MovedDot* dot
     return centre;
 }
 
-juce::Point<int> EnvelopeVisualComponent::complyOrder(MovedDot* dot, juce::Point<int> eventPos) {
+juce::Point<int> EnvelopeVisualComponent::complyOrder(MovingDot* dot, juce::Point<int> eventPos) {
     int leftIndex = getDotIndex(dot->getLeftId());
     int rigthIndex = getDotIndex(dot->getRightId());
 
-    //int leftX = 0;
-    //int rightX = getWidth();
     juce::Point<int> dotCentre(eventPos.getX(), eventPos.getY());
 
     if (leftIndex != -1) {
-        int leftX = dotsVector[leftIndex]->getX() + dotsVector[leftIndex]->getWidth() / 2;
+        int leftX = dotsVector[leftIndex]->getCentrePosition().getX();
         if (dotCentre.getX() < leftX) {
             dotCentre.setX(leftX);
-            //dot->setCentrePosition(dotCentre);
-
-            //return;
         }
     }
 
     if (rigthIndex != -1) {
-        //DBG(rigthIndex);
-        int rightX = dotsVector[rigthIndex]->getX() + dotsVector[rigthIndex]->getWidth() / 2;
+        int rightX = dotsVector[rigthIndex]->getCentrePosition().getX();
         if (dotCentre.getX() > rightX) {
             dotCentre.setX(rightX);
-            //dot->setCentrePosition(dotCentre);
-
-            //return;
         }
     }
 
     return dotCentre;
 }
 
-MovedDot* EnvelopeVisualComponent::getLeftDot(int x, int y){
-    MovedDot* dot = nullptr;
+EnvelopeVisualComponent::MovingDot* EnvelopeVisualComponent::getLeftDot(int x, int y){
+    EnvelopeVisualComponent::MovingDot* dot = nullptr;
     
-    std::vector<MovedDot*>::iterator iter = dotsVector.begin();
+    std::vector<MovingDot*>::iterator iter = dotsVector.begin();
     int minDistance = std::numeric_limits<int>::max();
 
     while (iter != dotsVector.end()) { // find nearest left dot
@@ -193,7 +148,6 @@ MovedDot* EnvelopeVisualComponent::getLeftDot(int x, int y){
             if(tmp < minDistance){
                 minDistance = tmp;
                 dot = (*iter);
-                //leftID = (*iterStart)->getId();
             }
         }
         ++iter;
@@ -202,10 +156,10 @@ MovedDot* EnvelopeVisualComponent::getLeftDot(int x, int y){
     return dot;
 }
 
-MovedDot* EnvelopeVisualComponent::getRightDot(int x, int y){
-    MovedDot* dot = nullptr;
+EnvelopeVisualComponent::MovingDot* EnvelopeVisualComponent::getRightDot(int x, int y){
+    MovingDot* dot = nullptr;
     
-    std::vector<MovedDot*>::iterator iter = dotsVector.end();
+    std::vector<MovingDot*>::iterator iter = dotsVector.end();
     
     int minDistance = std::numeric_limits<int>::max();
 
@@ -217,7 +171,6 @@ MovedDot* EnvelopeVisualComponent::getRightDot(int x, int y){
             if(tmp < minDistance){
                 minDistance = tmp;
                 dot = (*iter);
-                //rightID = (*iterEnd)->getId();
             }
         }
     }
@@ -225,7 +178,20 @@ MovedDot* EnvelopeVisualComponent::getRightDot(int x, int y){
     return dot;
 }
 
-void EnvelopeVisualComponent::addLine(MovedDot const * leftDot, MovedDot const * rightDot){
+LinesVector::iterator EnvelopeVisualComponent::getLineElement(juce::Line<float>* line){
+    LinesVector::iterator iter = linesVector.begin();
+    
+    while(iter != linesVector.end()){
+        if(iter->second == line){
+            return iter;
+        }
+        ++iter;
+    }
+    
+    return linesVector.end();
+}
+
+void EnvelopeVisualComponent::addLine(EnvelopeVisualComponent::MovingDot const * leftDot, EnvelopeVisualComponent::MovingDot const * rightDot){
     LinesVectorElement elem(std::make_pair(leftDot->getId(), rightDot->getId()),
                             new juce::Line<float>(leftDot->getCentrePosition().toFloat(),
                                                   rightDot->getCentrePosition().toFloat()));
@@ -243,29 +209,28 @@ void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
 }
 
 void EnvelopeVisualComponent::addDot(int x, int y) {
-    //-----------------------------------------------
-    MovedDot* leftDot = getLeftDot(x, y);
+    MovingDot* leftDot = getLeftDot(x, y);
     if(leftDot){
-        dotsVector[getDotIndex(leftDot->getId())]->setRightId(dotsIdConted);
+        dotsVector[getDotIndex(leftDot->getId())]->setRightId(dotsIdCounted);
     }
     
-    MovedDot* rightDot = getRightDot(x, y);
+    MovingDot* rightDot = getRightDot(x, y);
     if(rightDot){
-        dotsVector[getDotIndex(rightDot->getId())]->setLeftId(dotsIdConted);
+        dotsVector[getDotIndex(rightDot->getId())]->setLeftId(dotsIdCounted);
     }
 
-    MovedDot* dot = new MovedDot(dotsIdConted,
+    MovingDot* dot = new MovingDot(dotsIdCounted,
                                  leftDot ? leftDot->getId() : 0,
                                  rightDot ? rightDot->getId() : std::numeric_limits<int>::max(),
                                  true);
 
     dotsVector.push_back(dot);
-    ++dotsIdConted;
+    ++dotsIdCounted;
     
     dot->setCentrePosition(x, y);
     dot->addMouseListener(this, false);
     addAndMakeVisible(dot);
-    //-----------------------------------------------
+    
     if(leftDot && rightDot){
         removeLine(leftDot->getId(), rightDot->getId());
     }
@@ -278,37 +243,50 @@ void EnvelopeVisualComponent::addDot(int x, int y) {
         addLine(dot, rightDot);
         
     }
-    //-----------------------------------------------
+    
     repaint();
 }
 
 void EnvelopeVisualComponent::removeDot(int ID) {
-    int dotIndex = getDotIndex(ID);  
+    int dotIndex = getDotIndex(ID);
     
     if (dotIndex != -1) {
         int leftDotIndex = getDotIndex(dotsVector[dotIndex]->getLeftId());
         int rightDotIndex = getDotIndex(dotsVector[dotIndex]->getRightId());
-
-        if (leftDotIndex != -1 && rightDotIndex != -1) {
+        
+        if(leftDotIndex != -1){
             removeLine(dotsVector[dotIndex]->getLeftId(), dotsVector[dotIndex]->getId());
+            
+            if(rightDotIndex != -1){ //connect before erasin
+                dotsVector[leftDotIndex]->setRightId(dotsVector[rightDotIndex]->getId());
+            }else{
+                dotsVector[leftDotIndex]->setRightId(std::numeric_limits<int>::max());
+            }
+        }
+        
+        if(rightDotIndex != -1){
             removeLine(dotsVector[dotIndex]->getId(), dotsVector[dotIndex]->getRightId());
             
+            if(leftDotIndex != -1){ //connect before erasin
+                dotsVector[rightDotIndex]->setLeftId(dotsVector[leftDotIndex]->getId());
+            }else{
+                dotsVector[rightDotIndex]->setLeftId(0);
+            }
+        }
+
+        if (leftDotIndex != -1 && rightDotIndex != -1) {
             addLine(dotsVector[leftDotIndex], dotsVector[rightDotIndex]);
-            
-            dotsVector[leftDotIndex]->setRightId(dotsVector[rightDotIndex]->getId()); //connect before erasing
-            dotsVector[rightDotIndex]->setRightId(dotsVector[leftDotIndex]->getId());
-        } 
+        }
 
         delete *(dotsVector.begin() + dotIndex);
         dotsVector.erase(dotsVector.begin() + dotIndex);
-        
         
         repaint();
     }
 }
 
 int EnvelopeVisualComponent::getDotIndex(int ID) {
-    std::vector<MovedDot*>::iterator iter(dotsVector.begin());
+    std::vector<MovingDot*>::iterator iter(dotsVector.begin());
     int counter = 0;
 
     while (iter != dotsVector.end()) {
@@ -336,101 +314,42 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
 
 //######################################################################
 
-/*LineBetween::LineBetween(MovedDot* leftDot, juce::Point<int> leftDotPos, MovedDot* rightDot, juce::Point<int> rightDotPos) :
-    juce::Component(),
-    leftDot(leftDot), leftDotCentre(leftDotPos),
-    rightDot(rightDot), rightDotCentre(rightDotPos)
-{
-    setOpaque(false);
-    setBounds(juce::Rectangle<int>(leftDotCentre, rightDotCentre));
-}
-
-void LineBetween::paint(juce::Graphics& g){
-    g.setOpacity(0.0f);
-    g.fillAll(juce::Colour::fromRGBA(0, 0, 0, 0));
-    g.setOpacity(1.0f);
-    
-    g.setColour(UI::ADSR::lineColour);
-    //g.drawRect(localBounds);
-    g.drawRect(getLocalBounds());
-    paintLine(g);
-}
-
-void LineBetween::paintLine(juce::Graphics& g){
-    
-    juce::Line<float> line;
-    if(leftDotCentre.getY() < rightDotCentre.getY()){
-        line = juce::Line<float>(getLocalBounds().getTopLeft().toFloat(),
-                                 getLocalBounds().getBottomRight().toFloat());
-    }else{
-        line = juce::Line<float>(getLocalBounds().getBottomLeft().toFloat(), getLocalBounds().getTopRight().toFloat());
-    }
-    //juce::Line<float> line(getLocalBounds().getBottomLeft().toFloat(), getLocalBounds().getTopRight().toFloat());
-    g.drawLine(line, UI::ADSR::lineThikness);
-
-    
-}
-
-void LineBetween::updatePositions(juce::Point<int> leftCentre, juce::Point<int> rightCentre){
-    leftDotCentre = leftCentre; rightDotCentre = rightCentre;
-    setBounds(juce::Rectangle<int>(leftDotCentre, rightDotCentre));
-    
-    juce::AffineTransform tr;
-    int one = (leftCentre.getX() + rightCentre.getX()) / 2;
-    int two = (leftCentre.getX() + rightCentre.getX()) / 2;
-    tr.transformPoint<int>(one, two);
-    tr.rotation(rightCentre.getY());
-    setBounds(getLocalBounds().transformedBy(tr));
-};
-
-void LineBetween::resized(){
-    
-};*/
-
 //######################################################################
 
-MovedDot::MovedDot(int ID, int leftID, int rightID, bool doubleClickAllow) : 
+EnvelopeVisualComponent::MovingDot::MovingDot(int ID, int leftID, int rightID, bool doubleClickAllow) :
     juce::Component(), doubleClickAllowed(doubleClickAllow),
     mouseIsOn(true), dotId(ID), leftDotId(leftID), rightDotId(rightID)
 {
-    localBounds = juce::Rectangle<int>(UI::ADSR::movedDotAreaSize, UI::ADSR::movedDotAreaSize);
     dotBounds = juce::Rectangle<int>(UI::ADSR::movedDotDiameter, UI::ADSR::movedDotDiameter);
-
-    updateBounds();
-
+    
     setOpaque(false);
-    setBounds(localBounds);
+    setBounds(juce::Rectangle<int>(UI::ADSR::movedDotAreaSize, UI::ADSR::movedDotAreaSize));
+    dotBounds.setCentre(getLocalBounds().getCentre());
 }
 
-void MovedDot::updateBounds() {   
-    dotBounds.setCentre(localBounds.getCentre());
-}
-
-void MovedDot::paint(juce::Graphics& g){
+void EnvelopeVisualComponent::MovingDot::paint(juce::Graphics& g){
     g.setOpacity(0.0f);
     g.fillAll(juce::Colour::fromRGBA(0, 0, 0, 0));
     g.setOpacity(1.0f);
     
-    g.drawRect(localBounds);
+    g.drawRect(getLocalBounds());
 
     g.setColour(mouseIsOn ? UI::ADSR::dotMouseOnColour : UI::ADSR::dotColour);
     g.fillEllipse(dotBounds.toFloat());
 }
-void MovedDot::resized(){
+void EnvelopeVisualComponent::MovingDot::resized(){}
 
-}
-
-void MovedDot::mouseEnter(const juce::MouseEvent& event) {
+void EnvelopeVisualComponent::MovingDot::mouseEnter(const juce::MouseEvent& event) {
     mouseIsOn = true;
     repaint();
 }
 
-void MovedDot::mouseExit(const juce::MouseEvent& event) {
+void EnvelopeVisualComponent::MovingDot::mouseExit(const juce::MouseEvent& event) {
     mouseIsOn = false;
     repaint();
 }
 
-juce::Point<int> MovedDot::getCentrePosition() const
+juce::Point<int> EnvelopeVisualComponent::MovingDot::getCentrePosition() const
 {
     juce::Point<int> centre(getPosition());
     centre.setX(centre.getX() + getWidth()/2);
