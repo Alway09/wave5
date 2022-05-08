@@ -80,6 +80,9 @@ void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
         updateLine(dot->getLeftId(), dot->getId());
         updateLine(dot->getId(), dot->getRightId());
         
+        if(isADSR)
+            updateADSRSlider(dot->getId());
+        
         repaint();
     }
 }
@@ -326,6 +329,64 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
     return line;
 }
 
+void EnvelopeVisualComponent::setADSRSliders(juce::Slider* attack, juce::Slider* decay,
+                    juce::Slider* sustain, juce::Slider* release){
+    attackSlider = attack;
+    decaySlider = decay;
+    sustainSlider = sustain;
+    releaseSlider = release;
+    
+    attackSlider->addListener(this);
+    decaySlider->addListener(this);
+    sustainSlider->addListener(this);
+    releaseSlider->addListener(this);
+}
+
+void EnvelopeVisualComponent::updateADSRSlider(int ID){
+    double widthScale = getWidth() / widthInSeconds; // pixels int 1 second
+    
+    MovingDot* dotStart;
+    MovingDot* dotEnd;
+    int distanceX;
+    double distanceY;
+    double value;
+    
+    if(ID == decayDotId){
+        dotStart = dotsVector[getDotIndex(attackDotId)];
+        dotEnd = dotsVector[getDotIndex(decayDotId)];
+        
+        distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+        value = distanceX / widthScale;
+
+        attackSlider->setValue(value);
+    }
+    
+    if(ID == sustainDotId){
+        dotStart = dotsVector[getDotIndex(decayDotId)];
+        dotEnd = dotsVector[getDotIndex(sustainDotId)];
+        
+        distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+        value = distanceX / widthScale;
+        
+        decaySlider->setValue(value);
+        
+        distanceY = getHeight() - dotEnd->getCentrePosition().getY();
+        value = distanceY / getHeight();
+        
+        sustainSlider->setValue(value);
+    }
+    
+    if(ID == releaseDotId){
+        dotStart = dotsVector[getDotIndex(sustainDotId)];
+        dotEnd = dotsVector[getDotIndex(releaseDotId)];
+        
+        distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+        value = distanceX / widthScale;
+        
+        releaseSlider->setValue(value);
+    }
+}
+
 void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
     
     if(slider->getName() == "Attack"){
@@ -344,6 +405,7 @@ void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
 
 void EnvelopeVisualComponent::updateAdsr(){
     // move dots to the right with the current values of seconds or levels
+    //-------------REFATOR THIS----------------------
     if(!dotsVector.empty()){
         int widthScale = getWidth() / widthInSeconds; // pixels in 1 second
         

@@ -80,6 +80,9 @@ public:
     void removeLine(int leftId, int rightId);
     void updateLine(int leftId, int rightId);
     
+    //sliders MUST have names (getName()) "Attack", "Sustain", "Deacay" and "Release"
+    void setADSRSliders(juce::Slider* attack, juce::Slider* decay,
+                        juce::Slider* sustain, juce::Slider* release);
     void sliderValueChanged (juce::Slider *slider) override;
     
 private:
@@ -98,6 +101,7 @@ private:
     //for ADSR
     void setupAdsr();
     void updateAdsr();
+    void updateADSRSlider(int ID);
     void timerCallback() override{ setupAdsr(); updateAdsr(); stopTimer(); };
     bool isADSR;
     
@@ -110,6 +114,11 @@ private:
     int decayDotId;
     int sustainDotId;
     int releaseDotId;
+    
+    juce::Slider* attackSlider = nullptr;
+    juce::Slider* decaySlider = nullptr;
+    juce::Slider* sustainSlider = nullptr;
+    juce::Slider* releaseSlider = nullptr;
     
     double widthInSeconds = 5.0;
 

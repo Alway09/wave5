@@ -25,10 +25,12 @@ ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioP
     prepareSlider(sustainSlider, apvts, Params::idList[Params::ParametersIDs::sustainLevelNormalised], sustainAttachment);
     prepareSlider(releaseSlider, apvts, Params::idList[Params::ParametersIDs::releaseTimeSeconds], releaseAttachment);
     
-    attackSlider.addListener(&envelope);
-    decaySlider.addListener(&envelope);
-    sustainSlider.addListener(&envelope);
-    releaseSlider.addListener(&envelope);
+    //attackSlider.addListener(&envelope);
+    //decaySlider.addListener(&envelope);
+    //sustainSlider.addListener(&envelope);
+    //releaseSlider.addListener(&envelope);
+    
+    envelope.setADSRSliders(&attackSlider, &decaySlider, &sustainSlider, &releaseSlider);
     
     attackSlider.setValue(1.0);
     decaySlider.setValue(1.0);
