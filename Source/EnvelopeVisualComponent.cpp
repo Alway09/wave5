@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    EnvelopeVisualComponent.cpp
-    Created: 3 May 2022 1:22:38pm
-    Author:  alway
-
-  ==============================================================================
-*/
 
 #include <JuceHeader.h>
 #include "EnvelopeVisualComponent.h"
@@ -40,11 +31,6 @@ void EnvelopeVisualComponent::setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::Stri
     adsrParams = new ADSRParameters;
     adsrParams->apvts = apvtsListenTo;
     adsrParams->idList = paramsIDsListenTo;
-    
-    /*adsrParams->apvts->addParameterListener(adsrParams->idList[0], this); // listen attack change
-    adsrParams->apvts->addParameterListener(adsrParams->idList[1], this); // listen decay change
-    adsrParams->apvts->addParameterListener(adsrParams->idList[2], this); // listen sustain change
-    adsrParams->apvts->addParameterListener(adsrParams->idList[3], this); // listen release change*/
     
     startTimer(200); // cause needs to bounds of component have been set
                      // and apvts have been create
@@ -118,13 +104,81 @@ void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
         centre = complyOrder(dot, centre);
         dot->setCentrePosition(centre);
         
-        updateLine(dot->getLeftId(), dot->getId());
-        updateLine(dot->getId(), dot->getRightId());
-        
-        //if(isADSR)
-            //updateADSRSlider(dot->getId());
+        if(!isADSR){
+            updateLine(dot->getLeftId(), dot->getId());
+            updateLine(dot->getId(), dot->getRightId());
+        }else{
+            updateApvtsValues(dot->getId());
+        }
         
         repaint();
+    }
+}
+
+void EnvelopeVisualComponent::updateApvtsValues(int ID){
+    if(isADSR && adsrParams){
+        static double widthScale = getWidth() / widthInSeconds; // pixels int 1 second
+        
+        static MovingDot* dotStart;
+        static MovingDot* dotEnd;
+        static int distanceX;
+        static double distanceY;
+        static float value;
+        
+        static juce::RangedAudioParameter* param;
+        // need it because value in class is normailsed
+        juce::NormalisableRange<float> range;
+        
+        if(ID == adsrParams->decayDotId){
+            dotStart = dotsVector[getDotIndex(adsrParams->attackDotId)];
+            dotEnd = dotsVector[getDotIndex(adsrParams->decayDotId)];
+            
+            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+            value = distanceX / widthScale;
+
+            param = adsrParams->apvts->getParameter(adsrParams->idList[0]);
+            range = param->getNormalisableRange();
+            
+            if(value > range.start && value < range.end)
+                param->setValueNotifyingHost(range.convertTo0to1(value));
+            
+        }
+        
+        if(ID == adsrParams->sustainDotId){
+            dotStart = dotsVector[getDotIndex(adsrParams->decayDotId)];
+            dotEnd = dotsVector[getDotIndex(adsrParams->sustainDotId)];
+            
+            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+            value = distanceX / widthScale;
+            
+            param = adsrParams->apvts->getParameter(adsrParams->idList[1]);
+            range = param->getNormalisableRange();
+            
+            if(value > range.start && value < range.end)
+                param->setValueNotifyingHost(range.convertTo0to1(value));
+            
+            distanceY = getHeight() - dotEnd->getCentrePosition().getY();
+            value = distanceY / getHeight();
+            
+            param = adsrParams->apvts->getParameter(adsrParams->idList[2]);
+            range = param->getNormalisableRange();
+            
+            if(value > range.start && value < range.end)
+                param->setValueNotifyingHost(range.convertTo0to1(value));
+        }
+        
+        if(ID == adsrParams->releaseDotId){
+            dotStart = dotsVector[getDotIndex(adsrParams->sustainDotId)];
+            dotEnd = dotsVector[getDotIndex(adsrParams->releaseDotId)];
+            
+            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+            value = distanceX / widthScale;
+            
+            param = adsrParams->apvts->getParameter(adsrParams->idList[3]);
+            range = param->getNormalisableRange();
+            
+            if(value > range.start && value < range.end)
+                param->setValueNotifyingHost(range.convertTo0to1(value));        }
     }
 }
 
@@ -370,69 +424,6 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
     return line;
 }
 
-/*void EnvelopeVisualComponent::setADSRSliders(juce::Slider* attack, juce::Slider* decay,
-                    juce::Slider* sustain, juce::Slider* release){
-    if(isADSR && adsrParams){
-        adsrParams->attackSlider = attack;
-        adsrParams->decaySlider = decay;
-        adsrParams->sustainSlider = sustain;
-        adsrParams->releaseSlider = release;
-        
-        adsrParams->attackSlider->addListener(this);
-        adsrParams->decaySlider->addListener(this);
-        adsrParams->sustainSlider->addListener(this);
-        adsrParams->releaseSlider->addListener(this);
-    }
-}*/
-
-/*void EnvelopeVisualComponent::updateADSRSlider(int ID){
-    
-    if(isADSR && adsrParams){
-        double widthScale = getWidth() / widthInSeconds; // pixels int 1 second
-        
-        MovingDot* dotStart;
-        MovingDot* dotEnd;
-        int distanceX;
-        double distanceY;
-        double value;
-        
-        if(ID == adsrParams->decayDotId){
-            dotStart = dotsVector[getDotIndex(adsrParams->attackDotId)];
-            dotEnd = dotsVector[getDotIndex(adsrParams->decayDotId)];
-            
-            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
-            value = distanceX / widthScale;
-
-            adsrParams->attackSlider->setValue(value);
-        }
-        
-        if(ID == adsrParams->sustainDotId){
-            dotStart = dotsVector[getDotIndex(adsrParams->decayDotId)];
-            dotEnd = dotsVector[getDotIndex(adsrParams->sustainDotId)];
-            
-            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
-            value = distanceX / widthScale;
-            
-            adsrParams->decaySlider->setValue(value);
-            
-            distanceY = getHeight() - dotEnd->getCentrePosition().getY();
-            value = distanceY / getHeight();
-            
-            adsrParams->sustainSlider->setValue(value);
-        }
-        
-        if(ID == adsrParams->releaseDotId){
-            dotStart = dotsVector[getDotIndex(adsrParams->sustainDotId)];
-            dotEnd = dotsVector[getDotIndex(adsrParams->releaseDotId)];
-            
-            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
-            value = distanceX / widthScale;
-            
-            adsrParams->releaseSlider->setValue(value);
-        }
-    }
-}*/
-
 void EnvelopeVisualComponent::parameterChanged(const juce::String &parameterID, float newValue){
     if(isADSR && adsrParams){
         
@@ -451,27 +442,9 @@ void EnvelopeVisualComponent::parameterChanged(const juce::String &parameterID, 
     }
 }
 
-/*void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
-    
-    if(isADSR){
-        if(slider->getName() == "Attack"){
-            adsrParams->attackTimeSeconds = slider->getValue();
-        } else if(slider->getName() == "Decay"){
-            adsrParams->decayTimeSeconds = slider->getValue();
-        } else if(slider->getName() == "Sustain"){
-            adsrParams->sustainLevel = slider->getValue();
-        }else if(slider->getName() == "Release"){
-            adsrParams->releaseTimeSeconds = slider->getValue();
-        }
-        
-        updateAdsr();
-        repaint();
-    }
-}*/
-
 void EnvelopeVisualComponent::updateAdsr(){
     // move dots to the right with the current values of seconds or levels
-    //-------------REFATOR THIS----------------------
+    //-------------REFACTOR THIS----------------------
     if(isADSR && !dotsVector.empty()){
         int widthScale = getWidth() / widthInSeconds; // pixels in 1 second
         

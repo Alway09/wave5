@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    EnvelopeVisualComponent.h
-    Created: 3 May 2022 1:22:38pm
-    Author:  alway
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -83,12 +73,7 @@ private:
            3 index - release
          */
         juce::StringArray idList;
-        
-        //juce::Slider* attackSlider = nullptr;
-        //juce::Slider* decaySlider = nullptr;
-        //juce::Slider* sustainSlider = nullptr;
-        //juce::Slider* releaseSlider = nullptr;
-        
+                
         int currentPosition = 0;
     };
     
@@ -107,11 +92,6 @@ public:
 
     int addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
     void removeDot(int ID);
-    
-    //sliders MUST have names (getName()) "Attack", "Deacay", "Sustain" and "Release"
-    //this method calls must be call after setEnvelopeAsADSR()
-    //void setADSRSliders(juce::Slider* attack, juce::Slider* decay,
-    //                    juce::Slider* sustain, juce::Slider* release);
     
     // sets envelope as ADSR
     void setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo);
@@ -153,7 +133,7 @@ private:
     //for ADSR
     void setupAdsr();
     void updateAdsr();
-    //void updateADSRSlider(int ID);
+    void updateApvtsValues(int ID);
     void timerCallback() override;
     bool isADSR = false;
     bool adsrIsSettedUp = false;
@@ -161,7 +141,7 @@ private:
     ADSRParameters* adsrParams = nullptr;
     
     int dotsIdCounted = 1;
-    double widthInSeconds = 5.0;
+    double widthInSeconds = 6.0;
 
     std::vector<MovingDot*> dotsVector;
     LinesVector linesVector;
