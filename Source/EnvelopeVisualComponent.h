@@ -62,8 +62,25 @@ private:
         juce::Rectangle<int> dotBounds;
     };
     
+    struct ADSRParameters{
+        double attackTimeSeconds = 1.0;
+        double decayTimeSeconds = 1.0;
+        double sustainLevel = 1.0; // 0.0 to 1.0
+        double releaseTimeSeconds = 1.0;
+        
+        int attackDotId = 0;
+        int decayDotId = 0;
+        int sustainDotId = 0;
+        int releaseDotId = 0;
+        
+        juce::Slider* attackSlider = nullptr;
+        juce::Slider* decaySlider = nullptr;
+        juce::Slider* sustainSlider = nullptr;
+        juce::Slider* releaseSlider = nullptr;
+    };
+    
 public:
-    EnvelopeVisualComponent(bool isAdsr = false);
+    EnvelopeVisualComponent();
     ~EnvelopeVisualComponent() override;
     
     void paint (juce::Graphics&) override;
@@ -75,51 +92,39 @@ public:
     int addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
     void removeDot(int ID);
     
-    void addLine(EnvelopeVisualComponent::MovingDot const * leftDot,
-                 EnvelopeVisualComponent::MovingDot const * rightDot);
-    void removeLine(int leftId, int rightId);
-    void updateLine(int leftId, int rightId);
+    
     
     //sliders MUST have names (getName()) "Attack", "Sustain", "Deacay" and "Release"
     void setADSRSliders(juce::Slider* attack, juce::Slider* decay,
                         juce::Slider* sustain, juce::Slider* release);
+    void setEnvelopeAsADSR();
     void sliderValueChanged (juce::Slider *slider) override;
     
 private:
     int getDotIndex(int ID);
-    juce::Line<float>* lineBetween(int leftId, int rightId);
-    LinesVector::iterator getLineElement(juce::Line<float>*);
-
-    juce::Point<int> stayPointInsideComponent(MovingDot* dot, juce::Point<int> eventPos);
-    juce::Point<int> complyOrder(MovingDot* dot, juce::Point<int> eventPos);
-    
     MovingDot* getLeftDot(int x, int y);
     MovingDot* getRightDot(int x, int y);
     
-    int dotsIdCounted = 1;
+    juce::Point<int> stayPointInsideComponent(MovingDot* dot, juce::Point<int> eventPos);
+    juce::Point<int> complyOrder(MovingDot* dot, juce::Point<int> eventPos);
     
+    void addLine(EnvelopeVisualComponent::MovingDot const * leftDot,
+                 EnvelopeVisualComponent::MovingDot const * rightDot);
+    void removeLine(int leftId, int rightId);
+    void updateLine(int leftId, int rightId);
+    juce::Line<float>* lineBetween(int leftId, int rightId);
+    LinesVector::iterator getLineElement(juce::Line<float>*);
+
     //for ADSR
     void setupAdsr();
     void updateAdsr();
     void updateADSRSlider(int ID);
     void timerCallback() override{ setupAdsr(); updateAdsr(); stopTimer(); };
-    bool isADSR;
+    bool isADSR = false;
     
-    double attackTimeSeconds = 1.0;
-    double decayTimeSeconds = 1.0;
-    double sustainLevel = 1.0; // 0.0 to 1.0
-    double releaseTimeSeconds = 1.0;
+    ADSRParameters* adsrParams = nullptr;
     
-    int attackDotId;
-    int decayDotId;
-    int sustainDotId;
-    int releaseDotId;
-    
-    juce::Slider* attackSlider = nullptr;
-    juce::Slider* decaySlider = nullptr;
-    juce::Slider* sustainSlider = nullptr;
-    juce::Slider* releaseSlider = nullptr;
-    
+    int dotsIdCounted = 1;
     double widthInSeconds = 5.0;
 
     std::vector<MovingDot*> dotsVector;

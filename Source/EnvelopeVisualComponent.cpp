@@ -13,12 +13,9 @@
 #include <limits>
 
 //==============================================================================
-EnvelopeVisualComponent::EnvelopeVisualComponent(bool isAdsr) :
-    juce::Component(), isADSR(isAdsr)
+EnvelopeVisualComponent::EnvelopeVisualComponent() :
+    juce::Component()
 {
-    if(isADSR)
-        //setupAdsr();
-        startTimer(200); // cause needs to bounds of component will set
 }
 
 EnvelopeVisualComponent::~EnvelopeVisualComponent()
@@ -31,13 +28,25 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
     for(auto line : linesVector){
         delete line.second;
     }
+    
+    if(adsrParams){
+        delete adsrParams;
+    }
 }
 
+void EnvelopeVisualComponent::setEnvelopeAsADSR(){
+    isADSR = true;
+    
+    adsrParams = new ADSRParameters;
+    
+    startTimer(200); // cause needs to bounds of component have been set
+};
+
 void EnvelopeVisualComponent::setupAdsr(){
-    attackDotId = addDot(0, getHeight(), false, true, true); // attack
-    decayDotId = addDot(20, 0, false, false, true); // decay
-    sustainDotId = addDot(40, 40, false, false, false); // sustain
-    releaseDotId = addDot(60, getHeight(), false, false, true); // release
+    adsrParams->attackDotId = addDot(0, getHeight(), false, true, true); // attack
+    adsrParams->decayDotId = addDot(20, 0, false, false, true); // decay
+    adsrParams->sustainDotId = addDot(40, 40, false, false, false); // sustain
+    adsrParams->releaseDotId = addDot(60, getHeight(), false, false, true); // release
 }
 
 void EnvelopeVisualComponent::paint (juce::Graphics& g)
@@ -331,104 +340,111 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
 
 void EnvelopeVisualComponent::setADSRSliders(juce::Slider* attack, juce::Slider* decay,
                     juce::Slider* sustain, juce::Slider* release){
-    attackSlider = attack;
-    decaySlider = decay;
-    sustainSlider = sustain;
-    releaseSlider = release;
-    
-    attackSlider->addListener(this);
-    decaySlider->addListener(this);
-    sustainSlider->addListener(this);
-    releaseSlider->addListener(this);
+    if(isADSR && adsrParams){
+        adsrParams->attackSlider = attack;
+        adsrParams->decaySlider = decay;
+        adsrParams->sustainSlider = sustain;
+        adsrParams->releaseSlider = release;
+        
+        adsrParams->attackSlider->addListener(this);
+        adsrParams->decaySlider->addListener(this);
+        adsrParams->sustainSlider->addListener(this);
+        adsrParams->releaseSlider->addListener(this);
+    }
 }
 
 void EnvelopeVisualComponent::updateADSRSlider(int ID){
-    double widthScale = getWidth() / widthInSeconds; // pixels int 1 second
     
-    MovingDot* dotStart;
-    MovingDot* dotEnd;
-    int distanceX;
-    double distanceY;
-    double value;
-    
-    if(ID == decayDotId){
-        dotStart = dotsVector[getDotIndex(attackDotId)];
-        dotEnd = dotsVector[getDotIndex(decayDotId)];
+    if(isADSR && adsrParams){
+        double widthScale = getWidth() / widthInSeconds; // pixels int 1 second
         
-        distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
-        value = distanceX / widthScale;
+        MovingDot* dotStart;
+        MovingDot* dotEnd;
+        int distanceX;
+        double distanceY;
+        double value;
+        
+        if(ID == adsrParams->decayDotId){
+            dotStart = dotsVector[getDotIndex(adsrParams->attackDotId)];
+            dotEnd = dotsVector[getDotIndex(adsrParams->decayDotId)];
+            
+            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+            value = distanceX / widthScale;
 
-        attackSlider->setValue(value);
-    }
-    
-    if(ID == sustainDotId){
-        dotStart = dotsVector[getDotIndex(decayDotId)];
-        dotEnd = dotsVector[getDotIndex(sustainDotId)];
+            adsrParams->attackSlider->setValue(value);
+        }
         
-        distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
-        value = distanceX / widthScale;
+        if(ID == adsrParams->sustainDotId){
+            dotStart = dotsVector[getDotIndex(adsrParams->decayDotId)];
+            dotEnd = dotsVector[getDotIndex(adsrParams->sustainDotId)];
+            
+            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+            value = distanceX / widthScale;
+            
+            adsrParams->decaySlider->setValue(value);
+            
+            distanceY = getHeight() - dotEnd->getCentrePosition().getY();
+            value = distanceY / getHeight();
+            
+            adsrParams->sustainSlider->setValue(value);
+        }
         
-        decaySlider->setValue(value);
-        
-        distanceY = getHeight() - dotEnd->getCentrePosition().getY();
-        value = distanceY / getHeight();
-        
-        sustainSlider->setValue(value);
-    }
-    
-    if(ID == releaseDotId){
-        dotStart = dotsVector[getDotIndex(sustainDotId)];
-        dotEnd = dotsVector[getDotIndex(releaseDotId)];
-        
-        distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
-        value = distanceX / widthScale;
-        
-        releaseSlider->setValue(value);
+        if(ID == adsrParams->releaseDotId){
+            dotStart = dotsVector[getDotIndex(adsrParams->sustainDotId)];
+            dotEnd = dotsVector[getDotIndex(adsrParams->releaseDotId)];
+            
+            distanceX = dotEnd->getCentrePosition().getX() - dotStart->getCentrePosition().getX();
+            value = distanceX / widthScale;
+            
+            adsrParams->releaseSlider->setValue(value);
+        }
     }
 }
 
 void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
     
-    if(slider->getName() == "Attack"){
-        attackTimeSeconds = slider->getValue();
-    } else if(slider->getName() == "Decay"){
-        decayTimeSeconds = slider->getValue();
-    } else if(slider->getName() == "Sustain"){
-        sustainLevel = slider->getValue();
-    }else if(slider->getName() == "Release"){
-        releaseTimeSeconds = slider->getValue();
+    if(isADSR){
+        if(slider->getName() == "Attack"){
+            adsrParams->attackTimeSeconds = slider->getValue();
+        } else if(slider->getName() == "Decay"){
+            adsrParams->decayTimeSeconds = slider->getValue();
+        } else if(slider->getName() == "Sustain"){
+            adsrParams->sustainLevel = slider->getValue();
+        }else if(slider->getName() == "Release"){
+            adsrParams->releaseTimeSeconds = slider->getValue();
+        }
+        
+        updateAdsr();
+        repaint();
     }
-    
-    updateAdsr();
-    repaint();
 }
 
 void EnvelopeVisualComponent::updateAdsr(){
     // move dots to the right with the current values of seconds or levels
     //-------------REFATOR THIS----------------------
-    if(!dotsVector.empty()){
+    if(isADSR && !dotsVector.empty()){
         int widthScale = getWidth() / widthInSeconds; // pixels in 1 second
         
-        int width = attackTimeSeconds * widthScale;
-        auto dot = dotsVector[getDotIndex(decayDotId)];
+        int width = adsrParams->attackTimeSeconds * widthScale;
+        auto dot = dotsVector[getDotIndex(adsrParams->decayDotId)];
         
         dot->setCentrePosition(dot->getCentrePosition().withX(width)); // move dot far from attack dot
-        updateLine(attackDotId, decayDotId);
+        updateLine(adsrParams->attackDotId, adsrParams->decayDotId);
         
-        width += decayTimeSeconds * widthScale;
-        dot = dotsVector[getDotIndex(sustainDotId)];
+        width += adsrParams->decayTimeSeconds * widthScale;
+        dot = dotsVector[getDotIndex(adsrParams->sustainDotId)];
         
         dot->setCentrePosition(dot->getCentrePosition().
                                withX(width).
-                               withY(getHeight() - sustainLevel * getHeight()));
+                               withY(getHeight() - adsrParams->sustainLevel * getHeight()));
         
-        updateLine(decayDotId, sustainDotId);
+        updateLine(adsrParams->decayDotId, adsrParams->sustainDotId);
         
-        width += releaseTimeSeconds * widthScale;
-        dot = dotsVector[getDotIndex(releaseDotId)];
+        width += adsrParams->releaseTimeSeconds * widthScale;
+        dot = dotsVector[getDotIndex(adsrParams->releaseDotId)];
         
         dot->setCentrePosition(dot->getCentrePosition().withX(width));
-        updateLine(sustainDotId, releaseDotId);
+        updateLine(adsrParams->sustainDotId, adsrParams->releaseDotId);
     }
 }
 

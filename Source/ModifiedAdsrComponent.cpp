@@ -15,7 +15,7 @@ using Params = ModifiedAdsrData::Parameters;
 
 //==============================================================================
 ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioProcessorValueTreeState& apvts)
-    : juce::Component(), name(adsrName), envelope(true),
+    : juce::Component(), name(adsrName),
     attackSlider("Attack"), decaySlider("Decay"), sustainSlider("Sustain"), releaseSlider("Release")
 {
     //updateParameters(apvts, idArray);
@@ -30,6 +30,7 @@ ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioP
     //sustainSlider.addListener(&envelope);
     //releaseSlider.addListener(&envelope);
     
+    envelope.setEnvelopeAsADSR();
     envelope.setADSRSliders(&attackSlider, &decaySlider, &sustainSlider, &releaseSlider);
     
     attackSlider.setValue(1.0);
