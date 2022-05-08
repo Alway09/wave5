@@ -30,8 +30,8 @@ ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioP
     //sustainSlider.addListener(&envelope);
     //releaseSlider.addListener(&envelope);
     
-    envelope.setEnvelopeAsADSR();
-    envelope.setADSRSliders(&attackSlider, &decaySlider, &sustainSlider, &releaseSlider);
+    envelope.setEnvelopeAsADSR(&apvts, Params::Parameters::idList);
+    //envelope.setADSRSliders(&attackSlider, &decaySlider, &sustainSlider, &releaseSlider);
     
     attackSlider.setValue(1.0);
     decaySlider.setValue(1.0);

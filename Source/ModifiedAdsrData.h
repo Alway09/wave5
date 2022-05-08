@@ -27,7 +27,7 @@
             {
             }
 
-            enum ParametersIDs {
+            enum ParametersIDs { // in idList
                 attackTimeSeconds,
                 decayTimeSeconds,
                 sustainLevelNormalised,

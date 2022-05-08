@@ -17,11 +17,12 @@
 using LinesVectorElement = std::pair<std::pair<int, int>, juce::Line<float>*>;
 using LinesVector = std::vector<LinesVectorElement>;
 
+using APVTS = juce::AudioProcessorValueTreeState;
 
 //==============================================================================
 
 
-class EnvelopeVisualComponent  : public juce::Component, public juce::Timer, public juce::Slider::Listener
+class EnvelopeVisualComponent  : public juce::Component, public juce::Timer, public APVTS::Listener
 {
 private:
     class MovingDot : public juce::Component
@@ -73,10 +74,22 @@ private:
         int sustainDotId = 0;
         int releaseDotId = 0;
         
-        juce::Slider* attackSlider = nullptr;
-        juce::Slider* decaySlider = nullptr;
-        juce::Slider* sustainSlider = nullptr;
-        juce::Slider* releaseSlider = nullptr;
+        APVTS* apvts;
+        
+        /* in this list MUST be
+           0 index - attack
+           1 index - decay
+           2 index - sustain
+           3 index - release
+         */
+        juce::StringArray idList;
+        
+        //juce::Slider* attackSlider = nullptr;
+        //juce::Slider* decaySlider = nullptr;
+        //juce::Slider* sustainSlider = nullptr;
+        //juce::Slider* releaseSlider = nullptr;
+        
+        int currentPosition = 0;
     };
     
 public:
@@ -86,26 +99,48 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    // add and remove dots handler
     void mouseDoubleClick(const juce::MouseEvent& event) override;
+    
+    // dots move handler
     void mouseDrag(const juce::MouseEvent& event) override;
 
     int addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
     void removeDot(int ID);
     
+    //sliders MUST have names (getName()) "Attack", "Deacay", "Sustain" and "Release"
+    //this method calls must be call after setEnvelopeAsADSR()
+    //void setADSRSliders(juce::Slider* attack, juce::Slider* decay,
+    //                    juce::Slider* sustain, juce::Slider* release);
     
+    // sets envelope as ADSR
+    void setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo);
     
-    //sliders MUST have names (getName()) "Attack", "Sustain", "Deacay" and "Release"
-    void setADSRSliders(juce::Slider* attack, juce::Slider* decay,
-                        juce::Slider* sustain, juce::Slider* release);
-    void setEnvelopeAsADSR();
-    void sliderValueChanged (juce::Slider *slider) override;
+    // calling when attack, decay, sustain, or release value changed
+    // sets ADSR dots
+    //void sliderValueChanged (juce::Slider *slider) override;
+    void parameterChanged(const juce::String &parameterID, float newValue) override;
+    
+    // starts evnelope period
+    void startEnvelope();
+    
+    // stops envelope period
+    void stopEnvelope();
     
 private:
+    // return dot index in dotsVector member
     int getDotIndex(int ID);
+    
+    // return pointer on nearest left dot, if it exist
     MovingDot* getLeftDot(int x, int y);
+    
+    // return pointer on nearest left dot, if it exist
     MovingDot* getRightDot(int x, int y);
     
+    // the handler to keep the dot inside the component
     juce::Point<int> stayPointInsideComponent(MovingDot* dot, juce::Point<int> eventPos);
+    
+    // the handler, observing order of dots
     juce::Point<int> complyOrder(MovingDot* dot, juce::Point<int> eventPos);
     
     void addLine(EnvelopeVisualComponent::MovingDot const * leftDot,
@@ -118,9 +153,10 @@ private:
     //for ADSR
     void setupAdsr();
     void updateAdsr();
-    void updateADSRSlider(int ID);
-    void timerCallback() override{ setupAdsr(); updateAdsr(); stopTimer(); };
+    //void updateADSRSlider(int ID);
+    void timerCallback() override;
     bool isADSR = false;
+    bool adsrIsSettedUp = false;
     
     ADSRParameters* adsrParams = nullptr;
     

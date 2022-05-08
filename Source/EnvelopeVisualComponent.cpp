@@ -34,12 +34,44 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
     }
 }
 
-void EnvelopeVisualComponent::setEnvelopeAsADSR(){
+void EnvelopeVisualComponent::setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo){
     isADSR = true;
     
     adsrParams = new ADSRParameters;
+    adsrParams->apvts = apvtsListenTo;
+    adsrParams->idList = paramsIDsListenTo;
+    
+    /*adsrParams->apvts->addParameterListener(adsrParams->idList[0], this); // listen attack change
+    adsrParams->apvts->addParameterListener(adsrParams->idList[1], this); // listen decay change
+    adsrParams->apvts->addParameterListener(adsrParams->idList[2], this); // listen sustain change
+    adsrParams->apvts->addParameterListener(adsrParams->idList[3], this); // listen release change*/
     
     startTimer(200); // cause needs to bounds of component have been set
+                     // and apvts have been create
+};
+
+void EnvelopeVisualComponent::startEnvelope(){
+    startTimer(1000/60); // 1/60 of second
+}
+
+void EnvelopeVisualComponent::stopEnvelope(){
+    stopTimer();
+}
+
+void EnvelopeVisualComponent::timerCallback(){
+    if(isADSR && adsrIsSettedUp){
+        
+    }
+    
+    if(isADSR && !adsrIsSettedUp){
+        setupAdsr(); updateAdsr(); stopTimer();
+        adsrParams->apvts->addParameterListener(adsrParams->idList[0], this); // listen attack change
+        adsrParams->apvts->addParameterListener(adsrParams->idList[1], this); // listen decay change
+        adsrParams->apvts->addParameterListener(adsrParams->idList[2], this); // listen sustain change
+        adsrParams->apvts->addParameterListener(adsrParams->idList[3], this); // listen release change
+        
+        adsrIsSettedUp = true;
+    }
 };
 
 void EnvelopeVisualComponent::setupAdsr(){
@@ -89,8 +121,8 @@ void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
         updateLine(dot->getLeftId(), dot->getId());
         updateLine(dot->getId(), dot->getRightId());
         
-        if(isADSR)
-            updateADSRSlider(dot->getId());
+        //if(isADSR)
+            //updateADSRSlider(dot->getId());
         
         repaint();
     }
@@ -338,7 +370,7 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
     return line;
 }
 
-void EnvelopeVisualComponent::setADSRSliders(juce::Slider* attack, juce::Slider* decay,
+/*void EnvelopeVisualComponent::setADSRSliders(juce::Slider* attack, juce::Slider* decay,
                     juce::Slider* sustain, juce::Slider* release){
     if(isADSR && adsrParams){
         adsrParams->attackSlider = attack;
@@ -351,9 +383,9 @@ void EnvelopeVisualComponent::setADSRSliders(juce::Slider* attack, juce::Slider*
         adsrParams->sustainSlider->addListener(this);
         adsrParams->releaseSlider->addListener(this);
     }
-}
+}*/
 
-void EnvelopeVisualComponent::updateADSRSlider(int ID){
+/*void EnvelopeVisualComponent::updateADSRSlider(int ID){
     
     if(isADSR && adsrParams){
         double widthScale = getWidth() / widthInSeconds; // pixels int 1 second
@@ -399,9 +431,27 @@ void EnvelopeVisualComponent::updateADSRSlider(int ID){
             adsrParams->releaseSlider->setValue(value);
         }
     }
+}*/
+
+void EnvelopeVisualComponent::parameterChanged(const juce::String &parameterID, float newValue){
+    if(isADSR && adsrParams){
+        
+        if(parameterID == adsrParams->idList[0]){ // if attack
+            adsrParams->attackTimeSeconds = newValue;
+        }else if(parameterID == adsrParams->idList[1]){ // if decay
+            adsrParams->decayTimeSeconds = newValue;
+        }else if(parameterID == adsrParams->idList[2]){ // if sustain
+            adsrParams->sustainLevel = newValue;
+        }else if(parameterID == adsrParams->idList[3]){ // if release
+            adsrParams->releaseTimeSeconds = newValue;
+        }
+                                                   
+        updateAdsr();
+        repaint();
+    }
 }
 
-void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
+/*void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
     
     if(isADSR){
         if(slider->getName() == "Attack"){
@@ -417,7 +467,7 @@ void EnvelopeVisualComponent::sliderValueChanged (juce::Slider *slider){
         updateAdsr();
         repaint();
     }
-}
+}*/
 
 void EnvelopeVisualComponent::updateAdsr(){
     // move dots to the right with the current values of seconds or levels

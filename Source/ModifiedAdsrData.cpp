@@ -8,7 +8,6 @@ const juce::StringArray ModifiedAdsrData::Parameters::idList = {
 
 ModifiedAdsrData::ModifiedAdsrData()
 {
-
     recalculateRates();
 }
 
