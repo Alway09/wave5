@@ -50,7 +50,12 @@ void EnvelopeVisualComponent::timerCallback(){
     }
     
     if(isADSR && !adsrIsSettedUp){
-        setupAdsr(); updateAdsr(); stopTimer();
+        setupAdsr();
+        updateAdsr(adsrParams->decayDotId);
+        updateAdsr(adsrParams->sustainDotId);
+        updateAdsr(adsrParams->releaseDotId);
+        stopTimer();
+        
         adsrParams->apvts->addParameterListener(adsrParams->idList[0], this); // listen attack change
         adsrParams->apvts->addParameterListener(adsrParams->idList[1], this); // listen decay change
         adsrParams->apvts->addParameterListener(adsrParams->idList[2], this); // listen sustain change
@@ -155,7 +160,13 @@ void EnvelopeVisualComponent::updateApvtsValues(int ID){
             range = param->getNormalisableRange();
             
             if(value > range.start && value < range.end)
+            {
+                adsrParams->apvts->removeParameterListener(adsrParams->idList[1], this);
                 param->setValueNotifyingHost(range.convertTo0to1(value));
+                adsrParams->decayTimeSeconds = value;
+                updateAdsr(adsrParams->sustainDotId, false);
+                adsrParams->apvts->addParameterListener(adsrParams->idList[1], this);
+            }
             
             distanceY = getHeight() - dotEnd->getCentrePosition().getY();
             value = distanceY / getHeight();
@@ -164,7 +175,13 @@ void EnvelopeVisualComponent::updateApvtsValues(int ID){
             range = param->getNormalisableRange();
             
             if(value > range.start && value < range.end)
+            {
+                adsrParams->apvts->removeParameterListener(adsrParams->idList[2], this);
                 param->setValueNotifyingHost(range.convertTo0to1(value));
+                adsrParams->sustainLevel = value;
+                updateAdsr(adsrParams->sustainDotId, false);
+                adsrParams->apvts->addParameterListener(adsrParams->idList[2], this);
+            }
         }
         
         if(ID == adsrParams->releaseDotId){
@@ -178,7 +195,9 @@ void EnvelopeVisualComponent::updateApvtsValues(int ID){
             range = param->getNormalisableRange();
             
             if(value > range.start && value < range.end)
-                param->setValueNotifyingHost(range.convertTo0to1(value));        }
+                param->setValueNotifyingHost(range.convertTo0to1(value));
+            
+        }
     }
 }
 
@@ -427,46 +446,68 @@ juce::Line<float>* EnvelopeVisualComponent::lineBetween(int leftId, int rightId)
 void EnvelopeVisualComponent::parameterChanged(const juce::String &parameterID, float newValue){
     if(isADSR && adsrParams){
         
+        int id = 0;
+        
         if(parameterID == adsrParams->idList[0]){ // if attack
             adsrParams->attackTimeSeconds = newValue;
+            id = adsrParams->decayDotId;
         }else if(parameterID == adsrParams->idList[1]){ // if decay
             adsrParams->decayTimeSeconds = newValue;
+            id = adsrParams->sustainDotId;
         }else if(parameterID == adsrParams->idList[2]){ // if sustain
             adsrParams->sustainLevel = newValue;
+            id = adsrParams->sustainDotId;
         }else if(parameterID == adsrParams->idList[3]){ // if release
             adsrParams->releaseTimeSeconds = newValue;
+            id = adsrParams->releaseDotId;
         }
                                                    
-        updateAdsr();
+        updateAdsr(id);
         repaint();
     }
 }
 
-void EnvelopeVisualComponent::updateAdsr(){
-    // move dots to the right with the current values of seconds or levels
+void EnvelopeVisualComponent::updateAdsr(int movingDotId, bool updateFromHost){
+    // move dots to the right or up/down with the current values of seconds or levels
     //-------------REFACTOR THIS----------------------
     if(isADSR && !dotsVector.empty()){
-        int widthScale = getWidth() / widthInSeconds; // pixels in 1 second
+        static int widthScale = getWidth() / widthInSeconds; // pixels in 1 second
         
         int width = adsrParams->attackTimeSeconds * widthScale;
-        auto dot = dotsVector[getDotIndex(adsrParams->decayDotId)];
+        MovingDot* dot;
         
-        dot->setCentrePosition(dot->getCentrePosition().withX(width)); // move dot far from attack dot
-        updateLine(adsrParams->attackDotId, adsrParams->decayDotId);
+        if(movingDotId == adsrParams->decayDotId){
+            dot = dotsVector[getDotIndex(adsrParams->decayDotId)];
+            dot->setCentrePosition(dot->getCentrePosition().withX(width)); // move dot far from attack dot
+            updateLine(adsrParams->attackDotId, adsrParams->decayDotId);
+            movingDotId = adsrParams->sustainDotId;
+        }
         
         width += adsrParams->decayTimeSeconds * widthScale;
-        dot = dotsVector[getDotIndex(adsrParams->sustainDotId)];
         
-        dot->setCentrePosition(dot->getCentrePosition().
-                               withX(width).
-                               withY(getHeight() - adsrParams->sustainLevel * getHeight()));
-        
-        updateLine(adsrParams->decayDotId, adsrParams->sustainDotId);
+        if(movingDotId == adsrParams->sustainDotId){
+            //DBG("here");
+            if(updateFromHost){
+                dot = dotsVector[getDotIndex(adsrParams->sustainDotId)];
+                
+                dot->setCentrePosition(dot->getCentrePosition().
+                                       withX(width).
+                                       withY(getHeight() - adsrParams->sustainLevel * getHeight()));
+                
+                
+            }
+            
+            updateLine(adsrParams->decayDotId, adsrParams->sustainDotId);
+            movingDotId = adsrParams->releaseDotId;
+        }
         
         width += adsrParams->releaseTimeSeconds * widthScale;
-        dot = dotsVector[getDotIndex(adsrParams->releaseDotId)];
         
-        dot->setCentrePosition(dot->getCentrePosition().withX(width));
+        if(movingDotId == adsrParams->releaseDotId){
+            dot = dotsVector[getDotIndex(adsrParams->releaseDotId)];
+            dot->setCentrePosition(dot->getCentrePosition().withX(width));
+        }
+        
         updateLine(adsrParams->sustainDotId, adsrParams->releaseDotId);
     }
 }

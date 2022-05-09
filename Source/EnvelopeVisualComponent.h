@@ -132,7 +132,7 @@ private:
 
     //for ADSR
     void setupAdsr();
-    void updateAdsr();
+    void updateAdsr(int movingDotId, bool updateFromHost = true);
     void updateApvtsValues(int ID);
     void timerCallback() override;
     bool isADSR = false;
