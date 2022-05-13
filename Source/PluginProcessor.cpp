@@ -151,9 +151,19 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
             if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
             {
                 // Osc
+                auto& firstOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::firstOscOn);
+                auto& secondOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::secondOscOn);
+                auto& thirdOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::thirdOscOn);
+                
                 voice->getFirstOscillator().setWaveType(0);
+                voice->setFirstOscState(firstOscState.load());
+                
                 voice->getSecondOscillator().setWaveType(1);
+                voice->setSecondOscState(secondOscState.load());
+                
                 voice->getThirdOscillator().setWaveType(2);
+                voice->setThirdOscState(thirdOscState.load());
+                
                 // ADSR
                 updateAdsr(voice->getFirstAdsr(), STR_CONST::ADSR::firstAdsrParameters);
                 updateAdsr(voice->getSecondAdsr(), STR_CONST::ADSR::secondAdsrParameters);
@@ -180,7 +190,7 @@ void Wave5AudioProcessor::updateAdsr(ModifiedAdsrData& adsr, const juce::StringA
 juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createParams() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
-    // ADSR
+    // ---------ADSR---------
     // for OSC 1
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstAdsrParameters[0],
@@ -201,6 +211,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::ADSR::firstAdsrParameters[3],
         "Release Time",
         juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::ADSR::firstOscOn,
+        "OSC 1 On",
+        true));
     
     // for OSC 2
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
@@ -223,6 +238,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         "Release Time",
         juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
     
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::ADSR::secondOscOn,
+        "OSC 2 On",
+        false));
+    
     // for OSC 3
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::thirdAdsrParameters[0],
@@ -243,6 +263,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::ADSR::thirdAdsrParameters[3],
         "Release Time",
         juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::ADSR::thirdOscOn,
+        "OSC 3 On",
+        false));
 
     return { params.begin(), params.end() };
 }

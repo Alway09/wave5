@@ -9,12 +9,16 @@ namespace STR_CONST{
             "RELEASETIME1"
         };
     
+        const juce::String firstOscOn = "OSCON1";
+    
         const juce::StringArray secondAdsrParameters = {
             "ATTACKTIME2",
             "DECAYTIME2",
             "SUSTAINLEVEL2",
             "RELEASETIME2"
         };
+    
+        const juce::String secondOscOn = "OSCON2";
         
         const juce::StringArray thirdAdsrParameters = {
             "ATTACKTIME3",
@@ -22,6 +26,8 @@ namespace STR_CONST{
             "SUSTAINLEVEL3",
             "RELEASETIME3"
         };
+    
+        const juce::String thirdOscOn = "OSCON3";
         
         //const juce::String adsrStateId = "ADSRSTATE";
         const juce::StringArray adsrStates = {

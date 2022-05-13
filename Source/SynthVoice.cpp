@@ -30,9 +30,15 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     spec.sampleRate = sampleRate;
     spec.numChannels = outputChannels;
 
-    firstOsc.prepareToPlay(spec);
-    secondOsc.prepareToPlay(spec);
-    thirdOsc.prepareToPlay(spec);
+    if(firstOscIsTurnedOn)
+        firstOsc.prepareToPlay(spec);
+    
+    if(secondOscIsTurnedOn)
+        secondOsc.prepareToPlay(spec);
+    
+    if(thirdOscIsTurnedOn)
+        thirdOsc.prepareToPlay(spec);
+    
     //filterAdsr.setSampleRate(sampleRate);
     //filter.prepareToPlay(sampleRate, samplesPerBlock, outputChannels);
     firstAdsr.setSampleRate(sampleRate);
@@ -64,13 +70,23 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     juce::dsp::AudioBlock<float> secondAudioBlock{ secondVoiceBuffer };
     juce::dsp::AudioBlock<float> thirdAudioBlock{ thirdVoiceBuffer };
     
-    firstOsc.getNextAudioBlock(firstAudioBlock);
-    secondOsc.getNextAudioBlock(secondAudioBlock);
-    thirdOsc.getNextAudioBlock(thirdAudioBlock);
+    if(firstOscIsTurnedOn){
+        firstOsc.getNextAudioBlock(firstAudioBlock);
+        firstAdsr.applyEnvelopeToBuffer(firstVoiceBuffer, 0, firstVoiceBuffer.getNumSamples());
+    }
+        
     
-    firstAdsr.applyEnvelopeToBuffer(firstVoiceBuffer, 0, firstVoiceBuffer.getNumSamples());
-    secondAdsr.applyEnvelopeToBuffer(secondVoiceBuffer, 0, secondVoiceBuffer.getNumSamples());
-    thirdAdsr.applyEnvelopeToBuffer(thirdVoiceBuffer, 0, thirdVoiceBuffer.getNumSamples());
+    if(secondOscIsTurnedOn){
+        secondOsc.getNextAudioBlock(secondAudioBlock);
+        secondAdsr.applyEnvelopeToBuffer(secondVoiceBuffer, 0, secondVoiceBuffer.getNumSamples());
+    }
+        
+    
+    if(thirdOscIsTurnedOn){
+        thirdOsc.getNextAudioBlock(thirdAudioBlock);
+        thirdAdsr.applyEnvelopeToBuffer(thirdVoiceBuffer, 0, thirdVoiceBuffer.getNumSamples());
+    }
+    
     //filter.process(synthBuffer);
     //gain.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
 

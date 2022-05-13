@@ -37,8 +37,12 @@ public:
     OscData& getThirdOscillator() { return thirdOsc; }
     
     ModifiedAdsrData& getFirstAdsr() { return firstAdsr; }
-    ModifiedAdsrData& getSecondAdsr() { return firstAdsr; }
-    ModifiedAdsrData& getThirdAdsr() { return firstAdsr; }
+    ModifiedAdsrData& getSecondAdsr() { return secondAdsr; }
+    ModifiedAdsrData& getThirdAdsr() { return thirdAdsr; }
+    
+    void setFirstOscState(bool state){ firstOscIsTurnedOn = state; };
+    void setSecondOscState(bool state){ secondOscIsTurnedOn = state; };
+    void setThirdOscState(bool state){ thirdOscIsTurnedOn = state; };
 
 private:
     juce::AudioBuffer<float> firstVoiceBuffer;
@@ -54,4 +58,8 @@ private:
     ModifiedAdsrData thirdAdsr;
 
     bool isPrepared{ false };
+    
+    bool firstOscIsTurnedOn{ true };
+    bool secondOscIsTurnedOn{ true };
+    bool thirdOscIsTurnedOn{ true };
 };

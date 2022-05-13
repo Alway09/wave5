@@ -36,5 +36,10 @@ public:
     void popupMenuClickOnTab (int tabIndex, const juce::String &tabName) override;
 
 private:
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> firstOscStateAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> secondOscStateAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> thirdOscStateAttachment;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscillatorsBlockComponent)
 };

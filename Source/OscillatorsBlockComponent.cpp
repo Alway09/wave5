@@ -21,21 +21,33 @@ OscillatorsBlockComponent::OscillatorsBlockComponent(juce::AudioProcessorValueTr
     
     // for OSC 1
     juce::ToggleButton* toggle = new juce::ToggleButton();
-    toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
+    firstOscStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            apvts,
+            STR_CONST::ADSR::firstOscOn,
+            *toggle);
+    //toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
     toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
     
     getTabbedButtonBar().getTabButton(0)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
     // for OSC 2
     toggle = new juce::ToggleButton();
-    toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
+    secondOscStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            apvts,
+            STR_CONST::ADSR::secondOscOn,
+            *toggle);
+    //toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
     toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
     
     getTabbedButtonBar().getTabButton(1)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
     // for OSC 3
     toggle = new juce::ToggleButton();
-    toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
+    thirdOscStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            apvts,
+            STR_CONST::ADSR::thirdOscOn,
+            *toggle);
+    //toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
     toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
     
     getTabbedButtonBar().getTabButton(2)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);

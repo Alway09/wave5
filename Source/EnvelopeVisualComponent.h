@@ -74,10 +74,7 @@ private:
          */
         juce::StringArray idList;
         //juce::String adsrStateId;
-        
-        //juce::ComboBox adsrState;
-        //APVTS::ComboBoxAttachment adsrStateAttachment;
-                
+                        
         int currentPosition = 0;
     };
     
