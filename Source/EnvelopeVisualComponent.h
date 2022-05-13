@@ -73,6 +73,10 @@ private:
            3 index - release
          */
         juce::StringArray idList;
+        //juce::String adsrStateId;
+        
+        //juce::ComboBox adsrState;
+        //APVTS::ComboBoxAttachment adsrStateAttachment;
                 
         int currentPosition = 0;
     };

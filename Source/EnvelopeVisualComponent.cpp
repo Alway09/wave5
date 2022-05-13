@@ -25,12 +25,14 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
     }
 }
 
-void EnvelopeVisualComponent::setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo){
+void EnvelopeVisualComponent::setEnvelopeAsADSR(APVTS* apvtsListenTo,
+                                                juce::StringArray paramsIDsListenTo){
     isADSR = true;
     
     adsrParams = new ADSRParameters;
     adsrParams->apvts = apvtsListenTo;
     adsrParams->idList = paramsIDsListenTo;
+    //adsrParams->adsrStateId = adsrStateID;
     
     startTimer(200); // cause needs to bounds of component have been set
                      // and apvts have been create
@@ -60,6 +62,7 @@ void EnvelopeVisualComponent::timerCallback(){
         adsrParams->apvts->addParameterListener(adsrParams->idList[1], this); // listen decay change
         adsrParams->apvts->addParameterListener(adsrParams->idList[2], this); // listen sustain change
         adsrParams->apvts->addParameterListener(adsrParams->idList[3], this); // listen release change
+        //adsrParams->apvts->addParameterListener(adsrParams->adsrStateId, this);// listen ADSR sstate
         
         adsrIsSettedUp = true;
     }
@@ -460,7 +463,10 @@ void EnvelopeVisualComponent::parameterChanged(const juce::String &parameterID, 
         }else if(parameterID == adsrParams->idList[3]){ // if release
             adsrParams->releaseTimeSeconds = newValue;
             id = adsrParams->releaseDotId;
-        }
+        }/*else if(parameterID == adsrParams->adsrStateId){
+            DBG("In env");
+            DBG(newValue);
+        }*/
                                                    
         updateAdsr(id);
         repaint();

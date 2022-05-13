@@ -24,6 +24,10 @@
               file="Source/GlobalUIConstants.h"/>
         <FILE id="YiNCdj" name="EnvelopeVisualComponent.cpp" compile="1" resource="0"
               file="Source/EnvelopeVisualComponent.cpp"/>
+        <FILE id="I9F9vy" name="OscillatorsBlockComponent.cpp" compile="1"
+              resource="0" file="Source/OscillatorsBlockComponent.cpp"/>
+        <FILE id="aaXKdk" name="OscillatorsBlockComponent.h" compile="0" resource="0"
+              file="Source/OscillatorsBlockComponent.h"/>
         <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"
               file="Source/ModifiedAdsrComponent.h"/>
         <FILE id="Msn69F" name="ModifiedAdsrComponent.cpp" compile="1" resource="0"
@@ -38,6 +42,8 @@
       <FILE id="x2Qjwv" name="SynthSound.h" compile="0" resource="0" file="Source/SynthSound.h"/>
       <FILE id="nA69og" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
       <FILE id="h2ikoQ" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
+      <FILE id="fPsLrF" name="StringConstants.h" compile="0" resource="0"
+            file="Source/StringConstants.h"/>
       <FILE id="qnGp1Q" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>

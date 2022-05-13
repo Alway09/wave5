@@ -1,10 +1,12 @@
 #include "ModifiedAdsrData.h"
-const juce::StringArray ModifiedAdsrData::Parameters::idList = {
+/*const juce::StringArray ModifiedAdsrData::Parameters::idList = {
                 "ATTACKTIME",
                 "DECAYTIME",
                 "SUSTAINLEVEL",
                 "RELEASETIME"
-};
+};*/
+
+//const juce::String currentStateId = "ADSRSTATE";
 
 ModifiedAdsrData::ModifiedAdsrData()
 {
@@ -55,12 +57,15 @@ void ModifiedAdsrData::recalculateRates() noexcept
 
 void ModifiedAdsrData::goToNextState() noexcept
 {
-    if (state == State::attack)
+    if (state == State::attack){
         state = (decayRate > 0.0f ? State::decay : State::sustain);
-    else if (state == State::decay)
+    }
+    else if (state == State::decay){
         state = State::sustain;
-    else if (state == State::release)
+    }
+    else if (state == State::release){
         reset();
+    }
 }
 
 /** Returns the next sample value for an ADSR object.

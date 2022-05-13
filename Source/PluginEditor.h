@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 #include "GlobalUIConstants.h"
 #include "PluginProcessor.h"
-#include "ModifiedAdsrComponent.h"
+#include "OscillatorsBlockComponent.h"
 
 //==============================================================================
 /**
@@ -30,7 +30,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     Wave5AudioProcessor& audioProcessor;
-    ModifiedAdsrComponent adsrComponent;
+    //ModifiedAdsrComponent adsrComponent;
+    OscillatorsBlockComponent oscBlock;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessorEditor)
 };

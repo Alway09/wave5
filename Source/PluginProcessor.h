@@ -12,10 +12,12 @@
 #include "SynthSound.h"
 #include "SynthVoice.h"
 #include "ModifiedAdsrData.h"
+#include "StringConstants.h"
 
 //==============================================================================
 /**
 */
+
 class Wave5AudioProcessor  : public juce::AudioProcessor
 {
 public:
@@ -56,7 +58,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void updateAdsr(ModifiedAdsrData& adsr);
+    void updateAdsr(ModifiedAdsrData& adsr, const juce::StringArray& idList);
 
     juce::Synthesiser& getSynthesizer() { return synth; }
 
@@ -64,7 +66,8 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
-
+    //ParametersIDs paramsIDs;
+    
     juce::Synthesiser synth;
     unsigned int numberOfVoices = 4;
     //==============================================================================

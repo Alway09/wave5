@@ -32,14 +32,26 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
 
-    OscData& getOscillator() { return osc; }
-    ModifiedAdsrData& getAdsr() { return adsr; }
+    OscData& getFirstOscillator() { return firstOsc; }
+    OscData& getSecondOscillator() { return secondOsc; }
+    OscData& getThirdOscillator() { return thirdOsc; }
+    
+    ModifiedAdsrData& getFirstAdsr() { return firstAdsr; }
+    ModifiedAdsrData& getSecondAdsr() { return firstAdsr; }
+    ModifiedAdsrData& getThirdAdsr() { return firstAdsr; }
 
 private:
-    juce::AudioBuffer<float> voiceBuffer;
+    juce::AudioBuffer<float> firstVoiceBuffer;
+    juce::AudioBuffer<float> secondVoiceBuffer;
+    juce::AudioBuffer<float> thirdVoiceBuffer;
 
-    OscData osc;
-    ModifiedAdsrData adsr;
+    OscData firstOsc;
+    OscData secondOsc;
+    OscData thirdOsc;
+    
+    ModifiedAdsrData firstAdsr;
+    ModifiedAdsrData secondAdsr;
+    ModifiedAdsrData thirdAdsr;
 
     bool isPrepared{ false };
 };

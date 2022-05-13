@@ -6,8 +6,8 @@ namespace UI {
 	{
 		const float scale = 1.0f;
 
-		const int sliderComponentWidth = 100;
-		const int sliderComponentHeight = 100;
+		const int sliderComponentWidth = 60;
+		const int sliderComponentHeight = 60;
 		const int sliderComponentPadding = 10;
 
 		const int sliderTextBoxWidth = 50;
@@ -35,4 +35,11 @@ namespace UI {
         const int lineThikness = 3;
         const juce::Colour lineColour(0, 0, 0);
 	}
+
+    namespace OSC_BLOCK{
+        const int blockWidth = 500;
+        const int blockHeight = 300;
+    
+        const int toggleWidth = 30;
+    }
 }

@@ -11,14 +11,12 @@
 
 //==============================================================================
 Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p),
-    adsrComponent("ADSR", p.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), oscBlock(p.apvts)
 {
     setSize (800, 800);
-    
-    DBG("It works!!");
 
-    addAndMakeVisible(adsrComponent);
+    //addAndMakeVisible(adsrComponent);
+    addAndMakeVisible(oscBlock);
 }
 
 Wave5AudioProcessorEditor::~Wave5AudioProcessorEditor()
@@ -33,5 +31,6 @@ void Wave5AudioProcessorEditor::paint (juce::Graphics& g)
 
 void Wave5AudioProcessorEditor::resized()
 {
-    adsrComponent.setBounds(getLocalBounds());
+    //adsrComponent.setBounds(getLocalBounds());
+    oscBlock.setBounds(juce::Rectangle<int>(0, 0, UI::OSC_BLOCK::blockWidth, UI::OSC_BLOCK::blockHeight));
 }

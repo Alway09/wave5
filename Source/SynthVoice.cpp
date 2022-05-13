@@ -30,10 +30,14 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     spec.sampleRate = sampleRate;
     spec.numChannels = outputChannels;
 
-    osc.prepareToPlay(spec);
+    firstOsc.prepareToPlay(spec);
+    secondOsc.prepareToPlay(spec);
+    thirdOsc.prepareToPlay(spec);
     //filterAdsr.setSampleRate(sampleRate);
     //filter.prepareToPlay(sampleRate, samplesPerBlock, outputChannels);
-    adsr.setSampleRate(sampleRate);
+    firstAdsr.setSampleRate(sampleRate);
+    secondAdsr.setSampleRate(sampleRate);
+    thirdAdsr.setSampleRate(sampleRate);
     //gain.prepare(spec);
 
     //gain.setGainLinear(0.3f);
@@ -48,38 +52,59 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     if (!isVoiceActive())
         return;
 
-    voiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
+    firstVoiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
+    secondVoiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
+    thirdVoiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
     //filterAdsr.applyEnvelopeToBuffer(outputBuffer, 0, numSamples);
-    voiceBuffer.clear();
+    firstVoiceBuffer.clear();
+    secondVoiceBuffer.clear();
+    thirdVoiceBuffer.clear();
 
-    juce::dsp::AudioBlock<float> audioBlock{ voiceBuffer };
-    osc.getNextAudioBlock(audioBlock);
-    adsr.applyEnvelopeToBuffer(voiceBuffer, 0, voiceBuffer.getNumSamples());
+    juce::dsp::AudioBlock<float> firstAudioBlock{ firstVoiceBuffer };
+    juce::dsp::AudioBlock<float> secondAudioBlock{ secondVoiceBuffer };
+    juce::dsp::AudioBlock<float> thirdAudioBlock{ thirdVoiceBuffer };
+    
+    firstOsc.getNextAudioBlock(firstAudioBlock);
+    secondOsc.getNextAudioBlock(secondAudioBlock);
+    thirdOsc.getNextAudioBlock(thirdAudioBlock);
+    
+    firstAdsr.applyEnvelopeToBuffer(firstVoiceBuffer, 0, firstVoiceBuffer.getNumSamples());
+    secondAdsr.applyEnvelopeToBuffer(secondVoiceBuffer, 0, secondVoiceBuffer.getNumSamples());
+    thirdAdsr.applyEnvelopeToBuffer(thirdVoiceBuffer, 0, thirdVoiceBuffer.getNumSamples());
     //filter.process(synthBuffer);
     //gain.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
 
     for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
     {
-        outputBuffer.addFrom(channel, startSample, voiceBuffer, channel, 0, numSamples);
+        outputBuffer.addFrom(channel, startSample, firstVoiceBuffer, channel, 0, numSamples);
+        outputBuffer.addFrom(channel, startSample, secondVoiceBuffer, channel, 0, numSamples);
+        outputBuffer.addFrom(channel, startSample, thirdVoiceBuffer, channel, 0, numSamples);
 
-        if (!adsr.isActive())
+        if (!firstAdsr.isActive() && !secondAdsr.isActive() && !thirdAdsr.isActive())
             clearCurrentNote();
     }
 }
 
 void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition)
 {
-    osc.setWaveFrequency(midiNoteNumber);
-    adsr.noteOn();
+    firstOsc.setWaveFrequency(midiNoteNumber);
+    secondOsc.setWaveFrequency(midiNoteNumber);
+    thirdOsc.setWaveFrequency(midiNoteNumber);
+    
+    firstAdsr.noteOn();
+    secondAdsr.noteOn();
+    thirdAdsr.noteOn();
     //filterAdsr.noteOn();
 }
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff)
 {
-    adsr.noteOff();
+    firstAdsr.noteOff();
+    secondAdsr.noteOff();
+    thirdAdsr.noteOff();
     //filterAdsr.noteOff();
 
-    if (!allowTailOff || !adsr.isActive())
+    if (!allowTailOff || (!firstAdsr.isActive() && !secondAdsr.isActive() && !thirdAdsr.isActive()))
         clearCurrentNote();
 }
 

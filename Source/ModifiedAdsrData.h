@@ -27,17 +27,10 @@
             {
             }
 
-            enum ParametersIDs { // in idList
-                attackTimeSeconds,
-                decayTimeSeconds,
-                sustainLevelNormalised,
-                releaseTimeSeconds
-            };
-
-            static const juce::StringArray idList;
-
             float attackTime = 1.0f, decayTime = 0.1f, sustainLevel = 0.5f, releaseTime = 0.1f;
-        };     
+        };
+        
+        //void attachADSRState(juce::AudioProcessorValueTreeState& apvts, const juce::String& choiseID);
      
         //void setParameters(const Parameters& newParameters);
 
@@ -107,6 +100,20 @@
 
                 ++startSample;
             }
+        }
+        
+        int getState(){
+            int stateId = 0;
+            switch (state) {
+                case State::attack:
+                    stateId = 1;
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            return stateId;
         }
 
     private:

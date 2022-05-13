@@ -15,6 +15,7 @@
 #include "CustomRotarySlider.h"
 #include "GlobalUIConstants.h"
 #include "EnvelopeVisualComponent.h"
+#include "StringConstants.h"
 
 //==============================================================================
 
@@ -23,7 +24,7 @@ using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 class ModifiedAdsrComponent  : public juce::Component
 {
 public:
-    ModifiedAdsrComponent(juce::String adsrName, juce::AudioProcessorValueTreeState& adsr);
+    ModifiedAdsrComponent(juce::AudioProcessorValueTreeState& adsr, const juce::StringArray& idList);
     ~ModifiedAdsrComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -34,7 +35,7 @@ public:
     void prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& adsrAPVTS, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment);
 
 private:
-    juce::String name;
+    //juce::String name;
 
     EnvelopeVisualComponent envelope;
 
@@ -52,6 +53,6 @@ private:
     juce::Rectangle<int> sliderBounds;
     juce::Rectangle<int> envelopeBounds;
     
-    float widthInSeconds = 5.0f;
+    //float widthInSeconds = 5.0f;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModifiedAdsrComponent)
 };

@@ -11,27 +11,22 @@
 #include <JuceHeader.h>
 #include "ModifiedAdsrComponent.h"
 
-using Params = ModifiedAdsrData::Parameters;
+//using Params = ModifiedAdsrData::Parameters;
 
 //==============================================================================
-ModifiedAdsrComponent::ModifiedAdsrComponent(juce::String adsrName, juce::AudioProcessorValueTreeState& apvts)
-    : juce::Component(), name(adsrName),
+ModifiedAdsrComponent::ModifiedAdsrComponent(juce::AudioProcessorValueTreeState& apvts,
+                                             const juce::StringArray& idList)
+    : juce::Component(),
     attackSlider("Attack"), decaySlider("Decay"), sustainSlider("Sustain"), releaseSlider("Release")
 {
     //updateParameters(apvts, idArray);
 
-    prepareSlider(attackSlider, apvts, Params::idList[Params::ParametersIDs::attackTimeSeconds], attackAttachment);
-    prepareSlider(decaySlider, apvts, Params::idList[Params::ParametersIDs::decayTimeSeconds], decayAttachment);
-    prepareSlider(sustainSlider, apvts, Params::idList[Params::ParametersIDs::sustainLevelNormalised], sustainAttachment);
-    prepareSlider(releaseSlider, apvts, Params::idList[Params::ParametersIDs::releaseTimeSeconds], releaseAttachment);
+    prepareSlider(attackSlider, apvts, idList[0], attackAttachment);
+    prepareSlider(decaySlider, apvts, idList[1], decayAttachment);
+    prepareSlider(sustainSlider, apvts, idList[2], sustainAttachment);
+    prepareSlider(releaseSlider, apvts, idList[3], releaseAttachment);
     
-    //attackSlider.addListener(&envelope);
-    //decaySlider.addListener(&envelope);
-    //sustainSlider.addListener(&envelope);
-    //releaseSlider.addListener(&envelope);
-    
-    envelope.setEnvelopeAsADSR(&apvts, Params::Parameters::idList);
-    //envelope.setADSRSliders(&attackSlider, &decaySlider, &sustainSlider, &releaseSlider);
+    envelope.setEnvelopeAsADSR(&apvts, idList);
     
     attackSlider.setValue(1.0);
     decaySlider.setValue(1.0);
@@ -45,7 +40,8 @@ ModifiedAdsrComponent::~ModifiedAdsrComponent()
 {
 }
 
-void ModifiedAdsrComponent::prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& apvts, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment) {
+void ModifiedAdsrComponent::prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& apvts, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment)
+{
     addAndMakeVisible(slider);
 
     attachment = std::make_unique<SliderAttachment>(apvts, paramId, slider); 
@@ -64,22 +60,51 @@ void ModifiedAdsrComponent::paint (juce::Graphics& g)
 }
 
 void ModifiedAdsrComponent::setSizes() {
-    //slidersAreaBounds = juce::Rectangle<int>(0, 0, UI::ADSR::sliderAreaWidth, UI::ADSR::sliderAreaHeight);
-    slidersAreaBounds = juce::Rectangle<int>(0, 0,
-        UI::GLOBAL::paddingFromStoke + UI::GLOBAL::sliderComponentPadding + UI::GLOBAL::sliderComponentWidth * 2 + UI::GLOBAL::paddingFromStoke,
-        UI::GLOBAL::paddingFromStoke + UI::GLOBAL::sliderComponentPadding + UI::GLOBAL::sliderComponentHeight * 2 + UI::GLOBAL::paddingFromStoke);
+    
+    int x = UI::GLOBAL::paddingFromStoke;
+    int y = UI::GLOBAL::paddingFromStoke;
+    
+    int width = UI::GLOBAL::paddingFromStoke +
+                UI::GLOBAL::sliderComponentWidth +
+                UI::GLOBAL::sliderComponentPadding +
+                UI::GLOBAL::sliderComponentWidth +
+                UI::GLOBAL::paddingFromStoke;
+    
+    int height = UI::GLOBAL::paddingFromStoke +
+                 UI::GLOBAL::sliderComponentHeight +
+                 UI::GLOBAL::sliderComponentPadding +
+                 UI::GLOBAL::sliderComponentHeight +
+                 UI::GLOBAL::paddingFromStoke;
+    
+    slidersAreaBounds = juce::Rectangle<int>(x, y, width, height);
 
-    sliderBounds = juce::Rectangle<int>(0, 0, UI::GLOBAL::sliderComponentWidth, UI::GLOBAL::sliderComponentHeight);
+    width = UI::GLOBAL::sliderComponentWidth;
+    height = UI::GLOBAL::sliderComponentHeight;
+    
+    sliderBounds = juce::Rectangle<int>(0, 0, width, height);
+    
+    x = UI::GLOBAL::paddingFromStoke +
+        slidersAreaBounds.getWidth() +
+        UI::GLOBAL::paddingComponentsInside;
+    
+    width = UI::OSC_BLOCK::blockWidth -
+            UI::GLOBAL::paddingFromStoke -
+            slidersAreaBounds.getWidth() -
+            UI::GLOBAL::paddingComponentsInside -
+            UI::GLOBAL::paddingFromStoke;
+    
+    height = slidersAreaBounds.getHeight();
 
-    envelopeBounds = juce::Rectangle<int>(slidersAreaBounds.getWidth() + UI::GLOBAL::paddingComponentsInside, 0, UI::ADSR::envelopeWidth, slidersAreaBounds.getHeight());
+    envelopeBounds = juce::Rectangle<int>(x, y, width, height);
 }
 
 void ModifiedAdsrComponent::resized()
 {
     setSizes();
-
-    juce::Rectangle<int> slidersAreaBoundsLocal = slidersAreaBounds.reduced(UI::GLOBAL::paddingFromStoke, UI::GLOBAL::paddingFromStoke);
-    juce::Rectangle<int> sliderBoundsLocal = sliderBounds.withX(slidersAreaBoundsLocal.getX()).withY(slidersAreaBoundsLocal.getY());
+    
+    juce::Rectangle<int> sliderBoundsLocal =
+        sliderBounds.withX(slidersAreaBounds.getX() + UI::GLOBAL::paddingFromStoke).
+        withY(slidersAreaBounds.getY() + UI::GLOBAL::paddingFromStoke);
 
     attackSlider.setBounds(sliderBoundsLocal);
     
@@ -89,7 +114,7 @@ void ModifiedAdsrComponent::resized()
     sliderBoundsLocal.setY(sliderBoundsLocal.getY() + UI::GLOBAL::sliderComponentHeight + UI::GLOBAL::sliderComponentPadding);
     releaseSlider.setBounds(sliderBoundsLocal);
 
-    sliderBoundsLocal.setX(slidersAreaBoundsLocal.getX());
+    sliderBoundsLocal.setX(slidersAreaBounds.getX() + UI::GLOBAL::paddingFromStoke);
     sustainSlider.setBounds(sliderBoundsLocal);
 
     envelope.setBounds(envelopeBounds.reduced(UI::GLOBAL::strokeLineWigthInside));
