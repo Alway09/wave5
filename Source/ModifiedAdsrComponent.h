@@ -31,6 +31,8 @@ public:
     void resized() override;
 
     void setSizes();
+    
+    juce::Rectangle<int> getCompBounds() const;
 
     void prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& adsrAPVTS, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment);
 

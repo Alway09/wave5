@@ -28,6 +28,10 @@
               resource="0" file="Source/OscillatorsBlockComponent.cpp"/>
         <FILE id="aaXKdk" name="OscillatorsBlockComponent.h" compile="0" resource="0"
               file="Source/OscillatorsBlockComponent.h"/>
+        <FILE id="kG6jpz" name="OscPropertiesComponent.cpp" compile="1" resource="0"
+              file="Source/OscPropertiesComponent.cpp"/>
+        <FILE id="Amkfrr" name="OscPropertiesComponent.h" compile="0" resource="0"
+              file="Source/OscPropertiesComponent.h"/>
         <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"
               file="Source/ModifiedAdsrComponent.h"/>
         <FILE id="Msn69F" name="ModifiedAdsrComponent.cpp" compile="1" resource="0"

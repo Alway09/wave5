@@ -57,6 +57,8 @@ void ModifiedAdsrComponent::paint (juce::Graphics& g)
 
     g.drawRect(attackSlider.getBounds());
     g.drawRect(decaySlider.getBounds());
+    
+    g.drawRect(getLocalBounds());
 }
 
 void ModifiedAdsrComponent::setSizes() {
@@ -96,6 +98,23 @@ void ModifiedAdsrComponent::setSizes() {
     height = slidersAreaBounds.getHeight();
 
     envelopeBounds = juce::Rectangle<int>(x, y, width, height);
+}
+
+juce::Rectangle<int> ModifiedAdsrComponent::getCompBounds() const{
+    juce::Rectangle<int> bounds;
+    
+    bounds.setX(0);
+    bounds.setY(0);
+    
+    bounds.setWidth(UI::GLOBAL::paddingFromStoke +
+                    slidersAreaBounds.getWidth() +
+                    UI::GLOBAL::paddingComponentsInside +
+                    envelopeBounds.getWidth() +
+                    UI::GLOBAL::paddingFromStoke);
+    
+    bounds.setHeight(slidersAreaBounds.getHeight());
+    
+    return bounds;
 }
 
 void ModifiedAdsrComponent::resized()

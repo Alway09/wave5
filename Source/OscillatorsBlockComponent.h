@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "ModifiedAdsrComponent.h"
+#include "OscPropertiesComponent.h"
 
 //==============================================================================
 /*
@@ -12,7 +13,9 @@ private:
     class PageComponent : public juce::Component
     {
     public:
-        PageComponent(juce::AudioProcessorValueTreeState& apvts, const juce::StringArray& idList);
+        PageComponent(juce::AudioProcessorValueTreeState& apvts,
+                      const juce::StringArray& idList,
+                      const juce::String& waveChooseId);
         ~PageComponent();
         
         void paint (juce::Graphics&) override;
@@ -22,6 +25,7 @@ private:
         //juce::AudioProcessorValueTreeState& apvts;
         
         ModifiedAdsrComponent adsrComponent;
+        OscPropertiesComponent oscPropertiesComponent;
         
     };
     

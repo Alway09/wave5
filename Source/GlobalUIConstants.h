@@ -42,4 +42,8 @@ namespace UI {
     
         const int toggleWidth = 30;
     }
+
+    namespace OSC_PROPERTIES{
+        const int height = 80;
+    }
 }

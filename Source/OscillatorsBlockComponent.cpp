@@ -15,9 +15,15 @@
 OscillatorsBlockComponent::OscillatorsBlockComponent(juce::AudioProcessorValueTreeState& apvts) :
     juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
-    addTab("OSC 1", UI::GLOBAL::backColour, new PageComponent(apvts, STR_CONST::ADSR::firstAdsrParameters), true);
-    addTab("OSC 2", UI::GLOBAL::backColour, new PageComponent(apvts, STR_CONST::ADSR::secondAdsrParameters), true);
-    addTab("OSC 3", UI::GLOBAL::backColour, new PageComponent(apvts, STR_CONST::ADSR::thirdAdsrParameters), true);
+    addTab("OSC 1", UI::GLOBAL::backColour, new PageComponent(apvts,
+                                                              STR_CONST::ADSR::firstAdsrParameters,
+                                                              STR_CONST::ADSR::firstOscWaveCoose), true);
+    addTab("OSC 2", UI::GLOBAL::backColour, new PageComponent(apvts,
+                                                              STR_CONST::ADSR::secondAdsrParameters,
+                                                              STR_CONST::ADSR::secondOscWaveCoose), true);
+    addTab("OSC 3", UI::GLOBAL::backColour, new PageComponent(apvts,
+                                                              STR_CONST::ADSR::thirdAdsrParameters,
+                                                              STR_CONST::ADSR::thirdOscWaveCoose), true);
     
     // for OSC 1
     juce::ToggleButton* toggle = new juce::ToggleButton();
@@ -66,14 +72,12 @@ void OscillatorsBlockComponent::popupMenuClickOnTab (int tabIndex, const juce::S
     
 }
 
-/*void OscillatorsBlockComponent::resized(){
-    //getTabContentComponent(0)->setBounds(getLocalBounds().withY(50));
-}*/
-
 OscillatorsBlockComponent::PageComponent::PageComponent(juce::AudioProcessorValueTreeState& apvts,
-                                                        const juce::StringArray& idList)
-: juce::Component(), adsrComponent(apvts, idList)
+                                                        const juce::StringArray& idList,
+                                                        const juce::String& waveChooseId)
+: juce::Component(), adsrComponent(apvts, idList), oscPropertiesComponent(apvts, waveChooseId)
 {
+    addAndMakeVisible(oscPropertiesComponent);
     addAndMakeVisible(adsrComponent);
 }
 
@@ -81,13 +85,21 @@ OscillatorsBlockComponent::PageComponent::~PageComponent(){};
 
 
 void OscillatorsBlockComponent::PageComponent::paint (juce::Graphics& g){
-    g.drawRect(getLocalBounds());
+    //g.drawRect(getLocalBounds());
 }
 
 void OscillatorsBlockComponent::PageComponent::resized(){
     auto localBounds = getLocalBounds();
+    auto properties = localBounds.removeFromTop(UI::OSC_PROPERTIES::height);
+    //properties.setX(UI::GLOBAL::paddingFromStoke);
     /*localBounds.setWidth(localBounds.getWidth() - 2 * UI::GLOBAL::strokeLineWigthInside -
                          2 * UI::GLOBAL::paddingFromStoke);*/
     
+    //adsrComponent.setBounds(adsrComponent.getCompBounds());
+    //localBounds = adsrComponent.getCompBounds().withX(localBounds.getX()).withY(localBounds.getY());
+    //DBG(adsrComponent.getCompBounds().getWidth());
+    //DBG(localBounds.getWidth());
+    
+    oscPropertiesComponent.setBounds(properties);
     adsrComponent.setBounds(localBounds);
 }
