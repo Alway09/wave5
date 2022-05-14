@@ -17,13 +17,16 @@ OscillatorsBlockComponent::OscillatorsBlockComponent(juce::AudioProcessorValueTr
 {
     addTab("OSC 1", UI::GLOBAL::backColour, new PageComponent(apvts,
                                                               STR_CONST::ADSR::firstAdsrParameters,
-                                                              STR_CONST::ADSR::firstOscWaveCoose), true);
+                                                              STR_CONST::ADSR::firstOscWaveCoose,
+                                                              STR_CONST::ADSR::firstOscGain), true);
     addTab("OSC 2", UI::GLOBAL::backColour, new PageComponent(apvts,
                                                               STR_CONST::ADSR::secondAdsrParameters,
-                                                              STR_CONST::ADSR::secondOscWaveCoose), true);
+                                                              STR_CONST::ADSR::secondOscWaveCoose,
+                                                              STR_CONST::ADSR::secondOscGain), true);
     addTab("OSC 3", UI::GLOBAL::backColour, new PageComponent(apvts,
                                                               STR_CONST::ADSR::thirdAdsrParameters,
-                                                              STR_CONST::ADSR::thirdOscWaveCoose), true);
+                                                              STR_CONST::ADSR::thirdOscWaveCoose,
+                                                              STR_CONST::ADSR::thirdOscGain), true);
     
     // for OSC 1
     juce::ToggleButton* toggle = new juce::ToggleButton();
@@ -74,8 +77,9 @@ void OscillatorsBlockComponent::popupMenuClickOnTab (int tabIndex, const juce::S
 
 OscillatorsBlockComponent::PageComponent::PageComponent(juce::AudioProcessorValueTreeState& apvts,
                                                         const juce::StringArray& idList,
-                                                        const juce::String& waveChooseId)
-: juce::Component(), adsrComponent(apvts, idList), oscPropertiesComponent(apvts, waveChooseId)
+                                                        const juce::String& waveChooseId,
+                                                        const juce::String& gainId)
+: juce::Component(), adsrComponent(apvts, idList), oscPropertiesComponent(apvts, waveChooseId, gainId)
 {
     addAndMakeVisible(oscPropertiesComponent);
     addAndMakeVisible(adsrComponent);

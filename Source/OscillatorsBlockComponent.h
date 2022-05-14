@@ -15,7 +15,8 @@ private:
     public:
         PageComponent(juce::AudioProcessorValueTreeState& apvts,
                       const juce::StringArray& idList,
-                      const juce::String& waveChooseId);
+                      const juce::String& waveChooseId,
+                      const juce::String& gainId);
         ~PageComponent();
         
         void paint (juce::Graphics&) override;

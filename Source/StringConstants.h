@@ -10,6 +10,7 @@ namespace STR_CONST{
         };
     
         const juce::String firstOscOn = "OSCON1";
+        const juce::String firstOscGain = "GAINOSC1";
         const juce::String firstOscWaveCoose = "WAVECHOOSEOSC1";
     
         const juce::StringArray secondAdsrParameters = {
@@ -20,6 +21,7 @@ namespace STR_CONST{
         };
     
         const juce::String secondOscOn = "OSCON2";
+        const juce::String secondOscGain = "GAINOSC2";
         const juce::String secondOscWaveCoose = "WAVECHOOSEOSC2";
         
         const juce::StringArray thirdAdsrParameters = {
@@ -30,6 +32,7 @@ namespace STR_CONST{
         };
     
         const juce::String thirdOscOn = "OSCON3";
+        const juce::String thirdOscGain = "GAINOSC3";
         const juce::String thirdOscWaveCoose = "WAVECHOOSEOSC3";
         
         //const juce::String adsrStateId = "ADSRSTATE";
@@ -41,6 +44,6 @@ namespace STR_CONST{
             "Release"
         };
     
-    const juce::StringArray oscWavesVariants = {"Sine", "Square", "Saw", "Triangle", "Noise"};
+        const juce::StringArray oscWavesVariants = {"Sine", "Square", "Saw", "Triangle", "Noise"};
     }
 }

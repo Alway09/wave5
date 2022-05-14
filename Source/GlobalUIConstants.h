@@ -45,5 +45,6 @@ namespace UI {
 
     namespace OSC_PROPERTIES{
         const int height = 80;
+        const int buttonSize = 60;
     }
 }

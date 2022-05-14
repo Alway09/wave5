@@ -30,15 +30,22 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     spec.sampleRate = sampleRate;
     spec.numChannels = outputChannels;
 
-    if(firstOscIsTurnedOn)
+    if(firstOscIsTurnedOn){
         firstOsc.prepareToPlay(spec);
+        firstOscGain.prepare(spec);
+    }
+        
     
-    if(secondOscIsTurnedOn)
+    if(secondOscIsTurnedOn){
         secondOsc.prepareToPlay(spec);
+        secondOscGain.prepare(spec);
+    }
     
-    if(thirdOscIsTurnedOn)
+    if(thirdOscIsTurnedOn){
         thirdOsc.prepareToPlay(spec);
-    
+        thirdOscGain.prepare(spec);
+    }
+            
     //filterAdsr.setSampleRate(sampleRate);
     //filter.prepareToPlay(sampleRate, samplesPerBlock, outputChannels);
     firstAdsr.setSampleRate(sampleRate);
@@ -72,18 +79,24 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     
     if(firstOscIsTurnedOn){
         firstOsc.getNextAudioBlock(firstAudioBlock);
+        juce::dsp::ProcessContextReplacing<float> firstContext(firstAudioBlock);
+        firstOscGain.process(firstContext); // ?????????
         firstAdsr.applyEnvelopeToBuffer(firstVoiceBuffer, 0, firstVoiceBuffer.getNumSamples());
     }
         
     
     if(secondOscIsTurnedOn){
         secondOsc.getNextAudioBlock(secondAudioBlock);
+        juce::dsp::ProcessContextReplacing<float> secondContext(secondAudioBlock);
+        secondOscGain.process(secondContext);
         secondAdsr.applyEnvelopeToBuffer(secondVoiceBuffer, 0, secondVoiceBuffer.getNumSamples());
     }
         
     
     if(thirdOscIsTurnedOn){
         thirdOsc.getNextAudioBlock(thirdAudioBlock);
+        juce::dsp::ProcessContextReplacing<float> thirdContext(thirdAudioBlock);
+        thirdOscGain.process(thirdContext);
         thirdAdsr.applyEnvelopeToBuffer(thirdVoiceBuffer, 0, thirdVoiceBuffer.getNumSamples());
     }
     

@@ -43,6 +43,10 @@ public:
     void setFirstOscState(bool state){ firstOscIsTurnedOn = state; };
     void setSecondOscState(bool state){ secondOscIsTurnedOn = state; };
     void setThirdOscState(bool state){ thirdOscIsTurnedOn = state; };
+    
+    juce::dsp::Gain<float>& getFirstOscGain(){ return firstOscGain; };
+    juce::dsp::Gain<float>& getSecondOscGain(){ return secondOscGain; };
+    juce::dsp::Gain<float>& getThirdOscGain(){ return thirdOscGain; };
 
 private:
     juce::AudioBuffer<float> firstVoiceBuffer;
@@ -52,6 +56,10 @@ private:
     OscData firstOsc;
     OscData secondOsc;
     OscData thirdOsc;
+    
+    juce::dsp::Gain<float> firstOscGain;
+    juce::dsp::Gain<float> secondOscGain;
+    juce::dsp::Gain<float> thirdOscGain;
     
     ModifiedAdsrData firstAdsr;
     ModifiedAdsrData secondAdsr;
