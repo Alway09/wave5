@@ -14,11 +14,12 @@
 #include "SynthSound.h"
 #include "OscData.h"
 #include "ModifiedAdsrData.h"
+#include "LFOData.h"
 
 //==============================================================================
 /*
 */
-class SynthVoice  : public juce::SynthesiserVoice
+class SynthVoice  : public juce::SynthesiserVoice, public juce::Timer
 {
 public:
     SynthVoice();
@@ -31,6 +32,7 @@ public:
     void pitchWheelMoved(int newPitchWheelValue) override;
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
+    void timerCallback () override { ++workingTime; }
 
     OscData& getFirstOscillator() { return firstOsc; }
     OscData& getSecondOscillator() { return secondOsc; }
@@ -47,6 +49,9 @@ public:
     juce::dsp::Gain<float>& getFirstOscGain(){ return firstOscGain; };
     juce::dsp::Gain<float>& getSecondOscGain(){ return secondOscGain; };
     juce::dsp::Gain<float>& getThirdOscGain(){ return thirdOscGain; };
+    
+    LFOData& getFirstLFO(){ return firstLFO; };
+    uint64_t getWorkingTime() const { return workingTime; }
 
 private:
     juce::AudioBuffer<float> firstVoiceBuffer;
@@ -64,10 +69,18 @@ private:
     ModifiedAdsrData firstAdsr;
     ModifiedAdsrData secondAdsr;
     ModifiedAdsrData thirdAdsr;
+    
+    //juce::AudioPlayHead::CurrentPositionInfo hostInfo;
+    
+    LFOData firstLFO;
 
     bool isPrepared{ false };
     
     bool firstOscIsTurnedOn{ true };
     bool secondOscIsTurnedOn{ true };
     bool thirdOscIsTurnedOn{ true };
+    
+    uint64_t workingTime = 0; // in milliseconds
+    
+    bool firstLFOIsTurnedOn{ true };
 };

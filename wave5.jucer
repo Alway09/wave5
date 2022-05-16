@@ -83,9 +83,9 @@
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" vst3BinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/VST3"
-                       osxArchitecture="64BitIntel" osxCompatibility="10.11 SDK" vstBinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/VST"
+                       osxCompatibility="10.11 SDK" vstBinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/VST"
                        auBinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/AU"
-                       macOSDeploymentTarget="10.11"/>
+                       macOSDeploymentTarget="10.11" osxArchitecture="64BitIntel"/>
         <CONFIGURATION isDebug="0" name="Release" osxArchitecture="Native" osxCompatibility="10.11 SDK"
                        macOSDeploymentTarget="10.11"/>
       </CONFIGURATIONS>

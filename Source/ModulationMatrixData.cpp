@@ -17,6 +17,21 @@ void ModulationatrixData::applyEnvelopes(juce::AudioPlayHead *playHead){
     }
 }
 
+void ModulationatrixData::applyEnvelopesForVoice(SynthVoice* voice){
+    uint64_t workingTime = voice->getWorkingTime();
+    if(workingTime != 0){
+        //DBG(voice->getFirstLFO().getEnvelopeValue(workingTime));
+        for(auto ID : modulatedParameters){
+            auto& param = *apvts->getParameter(ID);
+            
+            //DBG(initalValues[ID] * LFO1.getEnvelopeValue(playHead));
+            auto& range = param.getNormalisableRange();
+            float delta = LFO1.getEnvelopeValue(workingTime) * range.getRange().getLength() * modulationDepthLFO1[ID];
+            param.setValueNotifyingHost(range.convertTo0to1(initalValues[ID] + delta));
+        }
+    }
+}
+
 void ModulationatrixData::restoreValues(){
     for(auto ID : modulatedParameters){
         auto& param = *apvts->getParameter(ID);

@@ -34,7 +34,6 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
         firstOsc.prepareToPlay(spec);
         firstOscGain.prepare(spec);
     }
-        
     
     if(secondOscIsTurnedOn){
         secondOsc.prepareToPlay(spec);
@@ -44,6 +43,10 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     if(thirdOscIsTurnedOn){
         thirdOsc.prepareToPlay(spec);
         thirdOscGain.prepare(spec);
+    }
+    
+    if(firstLFOIsTurnedOn){
+        firstLFO.setSampleRate(sampleRate);
     }
             
     //filterAdsr.setSampleRate(sampleRate);
@@ -124,6 +127,8 @@ void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesiser
     secondAdsr.noteOn();
     thirdAdsr.noteOn();
     //filterAdsr.noteOn();
+    
+    startTimer(1);
 }
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff)
@@ -132,6 +137,9 @@ void SynthVoice::stopNote(float velocity, bool allowTailOff)
     secondAdsr.noteOff();
     thirdAdsr.noteOff();
     //filterAdsr.noteOff();
+    
+    stopTimer();
+    workingTime = 0;
 
     if (!allowTailOff || (!firstAdsr.isActive() && !secondAdsr.isActive() && !thirdAdsr.isActive()))
         clearCurrentNote();

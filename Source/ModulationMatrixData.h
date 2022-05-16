@@ -1,6 +1,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "LFOData.h"
+#include "SynthVoice.h"
 
 class ModulationatrixData : public juce::AudioProcessorValueTreeState::Listener
 {
@@ -12,7 +13,7 @@ public:
         modulatedParameters.add(paramId);
         initalValues[paramId] = apvts->getRawParameterValue(paramId)->load();
         DBG(apvts->getRawParameterValue(paramId)->load());
-        modulationDepthLFO1[paramId] = 0.01f;
+        modulationDepthLFO1[paramId] = 0.3f;
         //apvts->addParameterListener(paramId, this);
     };
     
@@ -26,11 +27,16 @@ public:
     
     void applyEnvelopes(juce::AudioPlayHead *playHead);
     
+    void applyEnvelopesForVoice(SynthVoice* voice);
+    
 private:
     LFOData LFO1;
+    
     juce::StringArray modulatedParameters;
     juce::AudioProcessorValueTreeState* apvts;
+    
     std::map<juce::String, float> initalValues;
     std::map<juce::String, float> modulationDepthLFO1;
+    
     double sampleRate = 44100.0;
 };

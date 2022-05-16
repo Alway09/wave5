@@ -96,7 +96,7 @@ void Wave5AudioProcessor::changeProgramName (int index, const juce::String& newN
 void Wave5AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
-    modulationMatrix.setSampleRate(sampleRate);
+    //modulationMatrix.setSampleRate(sampleRate);
 
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
@@ -185,20 +185,21 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 updateAdsr(voice->getFirstAdsr(), STR_CONST::ADSR::firstAdsrParameters);
                 updateAdsr(voice->getSecondAdsr(), STR_CONST::ADSR::secondAdsrParameters);
                 updateAdsr(voice->getThirdAdsr(), STR_CONST::ADSR::thirdAdsrParameters);
-                // Etc...
+                // LFO
+                juce::AudioPlayHead::CurrentPositionInfo info;
+                getPlayHead()->getCurrentPosition(info);
+                voice->getFirstLFO().updateHostInfo(info);
+                
+                modulationMatrix.applyEnvelopesForVoice(voice);
             }
             
         }
     }
 
-    juce::AudioPlayHead::CurrentPositionInfo info;
-    getPlayHead()->getCurrentPosition(info);
-    //DBG(lfo.getEnvelopeValue(getPlayHead()));
-    //if(info.isPlaying){
-        modulationMatrix.applyEnvelopes(getPlayHead());
-    //}else{
-        //modulationMatrix.restoreValues();
-    //}
+    //juce::AudioPlayHead::CurrentPositionInfo info;
+    //getPlayHead()->getCurrentPosition(info);
+    //modulationMatrix.applyEnvelopes(getPlayHead());
+
     
     //lfo.getEnvelopeValue(getPlayHead());
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
@@ -252,7 +253,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstOscGain,
         "OSC 1 Gain",
-        juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), 0.0f));
+        juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), -30.0f));
     
     // for OSC 2
     params.push_back(std::make_unique<juce::AudioParameterFloat>(

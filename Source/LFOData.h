@@ -28,12 +28,17 @@ public:
     
     float getEnvelopeValue(juce::AudioPlayHead* playHead);
     
+    float getEnvelopeValue(uint64_t voiceWorkingTime);
+    void updateHostInfo(juce::AudioPlayHead::CurrentPositionInfo& newInfo){ info = newInfo; };
+    
     void begin();
     void end();
     
 private:
     bool isRunning = false;
     double sampleRate = 44100.0;
+    
+    juce::AudioPlayHead::CurrentPositionInfo info;
 
     std::vector<PeriodType> periodsVect;
 };
