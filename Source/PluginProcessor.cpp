@@ -11,7 +11,8 @@ Wave5AudioProcessor::Wave5AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), apvts(*this, nullptr, "Parameters", createParams())
+                       ), apvts(*this, nullptr, "Parameters", createParams()),
+                        modulationMatrix(&apvts)
 #endif
 {
     synth.addSound(new SynthSound());
@@ -22,6 +23,8 @@ Wave5AudioProcessor::Wave5AudioProcessor()
         //voice->getAdsr().setChangingStateAction(&apvts, STR_CONST::ADSR::adsrStateId);
         synth.addVoice(voice);
     }
+    
+    modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain);
 }
 
 Wave5AudioProcessor::~Wave5AudioProcessor()
@@ -93,6 +96,7 @@ void Wave5AudioProcessor::changeProgramName (int index, const juce::String& newN
 void Wave5AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
+    modulationMatrix.setSampleRate(sampleRate);
 
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
@@ -187,6 +191,16 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         }
     }
 
+    juce::AudioPlayHead::CurrentPositionInfo info;
+    getPlayHead()->getCurrentPosition(info);
+    //DBG(lfo.getEnvelopeValue(getPlayHead()));
+    //if(info.isPlaying){
+        modulationMatrix.applyEnvelopes(getPlayHead());
+    //}else{
+        //modulationMatrix.restoreValues();
+    //}
+    
+    //lfo.getEnvelopeValue(getPlayHead());
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 

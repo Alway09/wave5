@@ -9,8 +9,14 @@
         <FILE id="vsdk1y" name="OscData.h" compile="0" resource="0" file="Source/OscData.h"/>
         <FILE id="gR1GoQ" name="ModifiedAdsrData.cpp" compile="1" resource="0"
               file="Source/ModifiedAdsrData.cpp"/>
+        <FILE id="cBOfdq" name="LFOData.cpp" compile="1" resource="0" file="Source/LFOData.cpp"/>
         <FILE id="Pov9Vk" name="ModifiedAdsrData.h" compile="0" resource="0"
               file="Source/ModifiedAdsrData.h"/>
+        <FILE id="M6GUKc" name="ModulationMatrixData.cpp" compile="1" resource="0"
+              file="Source/ModulationMatrixData.cpp"/>
+        <FILE id="We9mhS" name="ModulationMatrixData.h" compile="0" resource="0"
+              file="Source/ModulationMatrixData.h"/>
+        <FILE id="HeNK2F" name="LFOData.h" compile="0" resource="0" file="Source/LFOData.h"/>
         <FILE id="wpKx1P" name="OscData.cpp" compile="1" resource="0" file="Source/OscData.cpp"/>
       </GROUP>
       <GROUP id="{8C3E6C96-EEBA-2BD5-E15D-4A48D96B562C}" name="UI">
@@ -77,7 +83,7 @@
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" vst3BinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/VST3"
-                       osxArchitecture="Native" osxCompatibility="10.11 SDK" vstBinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/VST"
+                       osxArchitecture="64BitIntel" osxCompatibility="10.11 SDK" vstBinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/VST"
                        auBinaryLocation="$(HOME)/Documents/Ableton stuff/Plugins/AU"
                        macOSDeploymentTarget="10.11"/>
         <CONFIGURATION isDebug="0" name="Release" osxArchitecture="Native" osxCompatibility="10.11 SDK"

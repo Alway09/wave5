@@ -13,6 +13,7 @@
 #include "SynthVoice.h"
 #include "ModifiedAdsrData.h"
 #include "StringConstants.h"
+#include "ModulationMatrixData.h"
 
 //==============================================================================
 /**
@@ -67,6 +68,7 @@ public:
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //ParametersIDs paramsIDs;
+    ModulationatrixData modulationMatrix;
     
     juce::Synthesiser synth;
     unsigned int numberOfVoices = 4;

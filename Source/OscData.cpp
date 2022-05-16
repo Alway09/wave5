@@ -42,6 +42,12 @@ void OscData::setWaveType(const int choice)
         // Saw wave
         initialise([](float x) { return x / juce::MathConstants<float>::pi; });
         break;
+            
+    case 3:
+        //initialise([](float x){ return x; });
+        break;
+    case 4:
+        break;
 
     default:
         jassertfalse;   // You're not supposed to be here!
