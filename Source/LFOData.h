@@ -11,8 +11,10 @@
 #pragma once
 #include <JuceHeader.h>
 
-// second - start and end of period, third - range of period
-using PeriodType = std::pair<std::pair<float, float>, std::pair<float, float>>;
+//first - left and right dot ids, second - start and end of period, third - range of period
+using PeriodType = std::tuple<std::pair<int, int>, std::pair<float, float>, std::pair<float, float>>;
+// left and right dot ids and index in vector
+//using IDElem = std::pair<std::pair<int, int>, int>;
 
 class LFOData
 {
@@ -26,10 +28,17 @@ public:
         sampleRate = newSampleRate;
     }
     
-    float getEnvelopeValue(juce::AudioPlayHead* playHead);
+    //float getEnvelopeValue(juce::AudioPlayHead* playHead);
+    
+    void deletePeriod(int leftID, int rightID);
+    
+    void updatePeriod(int leftID, int rightID, float xStart, float xEnd, float yStart, float yEnd);
     
     float getEnvelopeValue(uint64_t voiceWorkingTime);
-    void updateHostInfo(juce::AudioPlayHead::CurrentPositionInfo& newInfo){ info = newInfo; };
+    //void updateHostInfo(juce::AudioPlayHead::CurrentPositionInfo& newInfo){ info = newInfo; };
+    juce::AudioPlayHead::CurrentPositionInfo& getBPMInfo() {return info;}
+    
+    void addPeriod(int leftID, int rightID, float xStart, float xEnd, float yStart, float yEnd);
     
     void begin();
     void end();
@@ -40,5 +49,7 @@ private:
     
     juce::AudioPlayHead::CurrentPositionInfo info;
 
+    //std::vector<std::vector<std::pair<float, float>>[3]> periodsVect;
     std::vector<PeriodType> periodsVect;
+    //std::vector<IDElem> periodsIDs; // crashes because unactual indexes
 };

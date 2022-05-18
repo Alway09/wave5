@@ -23,6 +23,10 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
     if(adsrParams){
         delete adsrParams;
     }
+    
+    if(lfoParams){
+        delete lfoParams;
+    }
 }
 
 void EnvelopeVisualComponent::setEnvelopeAsADSR(APVTS* apvtsListenTo,
@@ -65,6 +69,17 @@ void EnvelopeVisualComponent::timerCallback(){
         //adsrParams->apvts->addParameterListener(adsrParams->adsrStateId, this);// listen ADSR sstate
         
         adsrIsSettedUp = true;
+        stopTimer();
+    }
+    
+    if(isLFO && !lfoIsSettedIp){
+        DBG("Callback");
+        DBG(lfoParams->lfoNumber);
+        addDot(0, getHeight() / 2, false, true, false);
+        addDot(getWidth(), getHeight() / 2, false, true, false);
+        
+        lfoIsSettedIp = true;
+        stopTimer();
     }
 };
 
@@ -213,6 +228,51 @@ void EnvelopeVisualComponent::updateLine(int leftId, int rightId){
         line = new juce::Line<float>(dotsVector[getDotIndex(leftId)]->getCentrePosition().toFloat(),
                                      dotsVector[getDotIndex(rightId)]->getCentrePosition().toFloat());
         elem->second = line;
+        
+        if(isLFO){
+            auto iter = lfoParams->voices.begin();
+            while(iter != lfoParams->voices.end()){
+                auto voice = iter->second->load();
+                
+                MovingDot* leftDot = dotsVector[getDotIndex(leftId)];
+                MovingDot* rightDot = dotsVector[getDotIndex(rightId)];
+                
+                switch (lfoParams->lfoNumber) {
+                    case 1:
+                        voice->getFirstLFO().updatePeriod(leftId,
+                                                          rightId,
+                                                          leftDot->getCentrePosition().getX() / (float)getWidth(),
+                                                          rightDot->getCentrePosition().getX() / (float)getWidth(),
+                                                          1.f - leftDot->getCentrePosition().getY() / (float)getHeight(),
+                                                          1.f - rightDot->getCentrePosition().getY() / (float)getHeight());
+                        break;
+                        
+                    case 2:
+                        voice->getSecondLFO().updatePeriod(leftId,
+                                                          rightId,
+                                                          leftDot->getCentrePosition().getX() / (float)getWidth(),
+                                                          rightDot->getCentrePosition().getX() / (float)getWidth(),
+                                                          1.f - leftDot->getCentrePosition().getY() / (float)getHeight(),
+                                                          1.f - rightDot->getCentrePosition().getY() / (float)getHeight());
+                        break;
+                        
+                    case 3:
+                        voice->getThirdLFO().updatePeriod(leftId,
+                                                          rightId,
+                                                          leftDot->getCentrePosition().getX() / (float)getWidth(),
+                                                          rightDot->getCentrePosition().getX() / (float)getWidth(),
+                                                          1.f - leftDot->getCentrePosition().getY() / (float)getHeight(),
+                                                          1.f - rightDot->getCentrePosition().getY() / (float)getHeight());
+                        break;
+                        
+                    default:
+                        jassertfalse;
+                        break;
+                }
+                
+                ++iter;
+            }
+        }
     }
 }
 
@@ -325,12 +385,87 @@ void EnvelopeVisualComponent::addLine(EnvelopeVisualComponent::MovingDot const *
                             new juce::Line<float>(leftDot->getCentrePosition().toFloat(),
                                                   rightDot->getCentrePosition().toFloat()));
     linesVector.push_back(elem);
+    
+    if(isLFO){
+        auto iter = lfoParams->voices.begin();
+        while(iter != lfoParams->voices.end()){
+            auto voice = iter->second->load();
+            
+            //float xS =
+            DBG("Before adding");
+            DBG(lfoParams->lfoNumber);
+            
+            switch (lfoParams->lfoNumber) {
+                case 1:
+                    voice->getFirstLFO().addPeriod(leftDot->getId(),
+                                                   rightDot->getId(),
+                                                   leftDot->getCentrePosition().getX() / (float)getWidth(),
+                                                   rightDot->getCentrePosition().getX() / (float)getWidth(),
+                                                   1.f - leftDot->getCentrePosition().getY() / (float)getHeight(),
+                                                   1.f - rightDot->getCentrePosition().getY() / (float)getHeight());
+                    DBG("1 added");
+                    break;
+                    
+                case 2:
+                    voice->getSecondLFO().addPeriod(leftDot->getId(),
+                                                    rightDot->getId(),
+                                                    leftDot->getCentrePosition().getX() / (float)getWidth(),
+                                                    rightDot->getCentrePosition().getX() / (float)getWidth(),
+                                                    1.f - leftDot->getCentrePosition().getY() / (float)getHeight(),
+                                                    1.f - rightDot->getCentrePosition().getY() / (float)getHeight());
+                    DBG("2 added");
+                    break;
+                    
+                case 3:
+                    voice->getThirdLFO().addPeriod(leftDot->getId(),
+                                                   rightDot->getId(),
+                                                   leftDot->getCentrePosition().getX() / (float)getWidth(),
+                                                   rightDot->getCentrePosition().getX() / (float)getWidth(),
+                                                   1.f - leftDot->getCentrePosition().getY() / (float)getHeight(),
+                                                   1.f - rightDot->getCentrePosition().getY() / (float)getHeight());
+                    break;
+                    
+                default:
+                    jassertfalse;
+                    break;
+            }
+            
+            ++iter;
+        }
+    }
 
 }
 
 void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
     auto line = lineBetween(leftId, rightId);
     if(line){
+        
+        if(isLFO){
+            auto iter = lfoParams->voices.begin();
+            while(iter != lfoParams->voices.end()){
+                auto voice = iter->second->load();
+                switch (lfoParams->lfoNumber) {
+                    case 1:
+                        voice->getFirstLFO().deletePeriod(leftId, rightId);
+                        break;
+                        
+                    case 2:
+                        voice->getSecondLFO().deletePeriod(leftId, rightId);
+                        break;
+                        
+                    case 3:
+                        voice->getThirdLFO().deletePeriod(leftId, rightId);
+                        break;
+                        
+                    default:
+                        jassertfalse;
+                        break;
+                }
+                
+                ++iter;
+            }
+        }
+        
         auto elem = getLineElement(line);
         delete elem->second;
         linesVector.erase(elem);
@@ -363,7 +498,7 @@ int EnvelopeVisualComponent::addDot(int x, int y,
     dot->setCentrePosition(juce::Point<int>(x, y));
     dot->addMouseListener(this, false);
     addAndMakeVisible(dot);
-    
+            
     if(leftDot && rightDot){
         removeLine(leftDot->getId(), rightDot->getId());
     }
@@ -374,7 +509,6 @@ int EnvelopeVisualComponent::addDot(int x, int y,
     
     if(rightDot){
         addLine(dot, rightDot);
-        
     }
     
     repaint();
@@ -516,6 +650,19 @@ void EnvelopeVisualComponent::updateAdsr(int movingDotId, bool updateFromHost){
         
         updateLine(adsrParams->sustainDotId, adsrParams->releaseDotId);
     }
+}
+
+void EnvelopeVisualComponent::setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber){
+    lfoParams = new LFOParameters;
+    lfoParams->voices = voices;
+    lfoParams->lfoNumber = lfoNumber;
+    
+    DBG("Init");
+    DBG(lfoParams->lfoNumber);
+    
+    isLFO = true;
+    
+    startTimer(200);
 }
 
 //######################################################################

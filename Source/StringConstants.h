@@ -46,4 +46,10 @@ namespace STR_CONST{
     
         const juce::StringArray oscWavesVariants = {"Sine", "Square", "Saw", "Triangle", "Noise"};
     }
+
+    namespace LFO{
+        const juce::String firstLFOOn = "LFOON1";
+        const juce::String secondLFOOn = "LFOON2";
+        const juce::String thirdLFOOn = "LFOON3";
+    }
 }

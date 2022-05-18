@@ -2,6 +2,7 @@
 #include <JuceHeader.h>
 #include "LFOData.h"
 #include "SynthVoice.h"
+#include "StringConstants.h"
 
 class ModulationatrixData : public juce::AudioProcessorValueTreeState::Listener
 {
@@ -12,31 +13,33 @@ public:
     void addModulatedParameter(const juce::String& paramId){
         modulatedParameters.add(paramId);
         initalValues[paramId] = apvts->getRawParameterValue(paramId)->load();
-        DBG(apvts->getRawParameterValue(paramId)->load());
+        //DBG(apvts->getRawParameterValue(paramId)->load());
+        
         modulationDepthLFO1[paramId] = 0.3f;
-        //apvts->addParameterListener(paramId, this);
+        modulationDepthLFO2[paramId] = 0.3f;
+        modulationDepthLFO3[paramId] = 0.3f;
     };
-    
-    void setSampleRate(double newSampleRate){
-        LFO1.setSampleRate(newSampleRate);
-    }
     
     void restoreValues();
     
     void parameterChanged(const juce::String &parameterID, float newValue) override;
     
-    void applyEnvelopes(juce::AudioPlayHead *playHead);
+    void addVoice(SynthVoice* voice, int voiceId){ voices[voiceId] = voice; }
     
-    void applyEnvelopesForVoice(SynthVoice* voice);
+    std::atomic<SynthVoice*>& getVoice(int voiceId){ return voices[voiceId]; }
+    
+    void applyEnvelopesForVoice(int voiceId);
     
 private:
-    LFOData LFO1;
-    
     juce::StringArray modulatedParameters;
     juce::AudioProcessorValueTreeState* apvts;
     
+    std::map<int, std::atomic<SynthVoice*>> voices;
+    
     std::map<juce::String, float> initalValues;
     std::map<juce::String, float> modulationDepthLFO1;
+    std::map<juce::String, float> modulationDepthLFO2;
+    std::map<juce::String, float> modulationDepthLFO3;
     
     double sampleRate = 44100.0;
 };

@@ -22,6 +22,7 @@ Wave5AudioProcessor::Wave5AudioProcessor()
         //voice->getAdsr().attachADSRState(apvts, STR_CONST::ADSR::adsrStateId);
         //voice->getAdsr().setChangingStateAction(&apvts, STR_CONST::ADSR::adsrStateId);
         synth.addVoice(voice);
+        modulationMatrix.addVoice(voice, i);
     }
     
     modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain);
@@ -169,6 +170,10 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 auto& secondOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::secondOscOn);
                 auto& thirdOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::thirdOscOn);
                 
+                auto& firstLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
+                auto& secondLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
+                auto& thirdLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
+                
                 voice->getFirstOscillator().setWaveType(firstWaveTypeParam->getIndex());
                 voice->setFirstOscState(firstOscState.load());
                 voice->getFirstOscGain().setGainDecibels(firstOscGain.load());
@@ -186,22 +191,20 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 updateAdsr(voice->getSecondAdsr(), STR_CONST::ADSR::secondAdsrParameters);
                 updateAdsr(voice->getThirdAdsr(), STR_CONST::ADSR::thirdAdsrParameters);
                 // LFO
-                juce::AudioPlayHead::CurrentPositionInfo info;
-                getPlayHead()->getCurrentPosition(info);
-                voice->getFirstLFO().updateHostInfo(info);
                 
-                modulationMatrix.applyEnvelopesForVoice(voice);
+                voice->setFirstLFOState(firstLFOState.load());
+                voice->setSecondLFOState(secondLFOState.load());
+                voice->setThirdLFOState(thirdLFOState.load());
+                
+                if(getPlayHead()){
+                    getPlayHead()->getCurrentPosition(voice->getFirstLFO().getBPMInfo());
+                    modulationMatrix.applyEnvelopesForVoice(i);
+                }
             }
             
         }
     }
 
-    //juce::AudioPlayHead::CurrentPositionInfo info;
-    //getPlayHead()->getCurrentPosition(info);
-    //modulationMatrix.applyEnvelopes(getPlayHead());
-
-    
-    //lfo.getEnvelopeValue(getPlayHead());
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
@@ -326,6 +329,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::ADSR::thirdOscGain,
         "OSC 3 Gain",
         juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), 0.0f));
+    
+    // ---------LFO---------
+    // for LFO 1
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::LFO::firstLFOOn,
+        "LFO 1 On",
+        true));
+    
+    // for LFO 2
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::LFO::secondLFOOn,
+        "LFO 2 On",
+        false));
+    
+    // for LFO 3
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::LFO::thirdLFOOn,
+        "LFO 3 On",
+        false));
 
     return { params.begin(), params.end() };
 }

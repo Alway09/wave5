@@ -64,14 +64,16 @@ public:
     juce::Synthesiser& getSynthesizer() { return synth; }
 
     juce::AudioProcessorValueTreeState apvts;
+    
+    ModulationatrixData modulationMatrix;
+    juce::Synthesiser synth;
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //ParametersIDs paramsIDs;
-    ModulationatrixData modulationMatrix;
     
-    juce::Synthesiser synth;
-    unsigned int numberOfVoices = 4;
+    
+    unsigned int numberOfVoices = 1;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessor)
 };

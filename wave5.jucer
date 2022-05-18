@@ -20,6 +20,13 @@
         <FILE id="wpKx1P" name="OscData.cpp" compile="1" resource="0" file="Source/OscData.cpp"/>
       </GROUP>
       <GROUP id="{8C3E6C96-EEBA-2BD5-E15D-4A48D96B562C}" name="UI">
+        <FILE id="HQG6z5" name="LFOBlockComponent.cpp" compile="1" resource="0"
+              file="Source/LFOBlockComponent.cpp"/>
+        <FILE id="pICOsk" name="LFOBlockComponent.h" compile="0" resource="0"
+              file="Source/LFOBlockComponent.h"/>
+        <FILE id="pIJ8Nz" name="LFOComponent.cpp" compile="1" resource="0"
+              file="Source/LFOComponent.cpp"/>
+        <FILE id="ZHZXUV" name="LFOComponent.h" compile="0" resource="0" file="Source/LFOComponent.h"/>
         <FILE id="s2675N" name="CustomRotarySlider.cpp" compile="1" resource="0"
               file="Source/CustomRotarySlider.cpp"/>
         <FILE id="fOAspt" name="CustomRotarySlider.h" compile="0" resource="0"

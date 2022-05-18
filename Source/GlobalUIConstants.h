@@ -43,6 +43,14 @@ namespace UI {
         const int toggleWidth = 30;
     }
 
+    namespace LFO{
+        const int blockWidth = 300;
+        const int blockHeight = 200;
+    
+        const int envWidth = 290;
+        const int envHeight = 150;
+    }
+
     namespace OSC_PROPERTIES{
         const int height = 80;
         const int buttonSize = 60;

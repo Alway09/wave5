@@ -51,6 +51,13 @@ public:
     juce::dsp::Gain<float>& getThirdOscGain(){ return thirdOscGain; };
     
     LFOData& getFirstLFO(){ return firstLFO; };
+    LFOData& getSecondLFO(){ return secondLFO; };
+    LFOData& getThirdLFO(){ return thirdLFO; };
+    
+    void setFirstLFOState(bool state){ firstLFOIsTurnedOn = state; }
+    void setSecondLFOState(bool state){ secondLFOIsTurnedOn = state; }
+    void setThirdLFOState(bool state){ thirdLFOIsTurnedOn = state; }
+    
     uint64_t getWorkingTime() const { return workingTime; }
 
 private:
@@ -73,6 +80,8 @@ private:
     //juce::AudioPlayHead::CurrentPositionInfo hostInfo;
     
     LFOData firstLFO;
+    LFOData secondLFO;
+    LFOData thirdLFO;
 
     bool isPrepared{ false };
     
@@ -80,7 +89,9 @@ private:
     bool secondOscIsTurnedOn{ true };
     bool thirdOscIsTurnedOn{ true };
     
-    uint64_t workingTime = 0; // in milliseconds
+    bool firstLFOIsTurnedOn { true };
+    bool secondLFOIsTurnedOn { true };
+    bool thirdLFOIsTurnedOn { true };
     
-    bool firstLFOIsTurnedOn{ true };
+    uint64_t workingTime = 0; // in milliseconds/10
 };

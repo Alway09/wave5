@@ -12,6 +12,7 @@
 #include "GlobalUIConstants.h"
 #include "PluginProcessor.h"
 #include "OscillatorsBlockComponent.h"
+#include "LFOBlockComponent.h"
 
 //==============================================================================
 /**
@@ -32,6 +33,8 @@ private:
     Wave5AudioProcessor& audioProcessor;
     //ModifiedAdsrComponent adsrComponent;
     OscillatorsBlockComponent oscBlock;
+    LFOBlockComponent lfoBlock;
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessorEditor)
 };

@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "GlobalUIConstants.h"
+#include "SynthVoice.h"
 
 // left ID, right ID and line between them
 using LinesVectorElement = std::pair<std::pair<int, int>, juce::Line<float>*>;
@@ -78,6 +79,12 @@ private:
         int currentPosition = 0;
     };
     
+    struct LFOParameters{
+        std::map<int, std::atomic<SynthVoice*>* > voices;
+        int lfoNumber = 0; // 1 2 or 3
+        //unsigned int periodsIdCounter = 0;
+    };
+    
 public:
     EnvelopeVisualComponent();
     ~EnvelopeVisualComponent() override;
@@ -96,6 +103,8 @@ public:
     
     // sets envelope as ADSR
     void setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo);
+    
+    void setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber);
     
     // calling when attack, decay, sustain, or release value changed
     // sets ADSR dots
@@ -140,6 +149,10 @@ private:
     bool adsrIsSettedUp = false;
     
     ADSRParameters* adsrParams = nullptr;
+    
+    LFOParameters* lfoParams = nullptr;
+    bool isLFO = false;
+    bool lfoIsSettedIp = false;
     
     int dotsIdCounted = 1;
     double widthInSeconds = 6.0;

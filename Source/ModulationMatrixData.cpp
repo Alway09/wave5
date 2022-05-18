@@ -6,27 +6,48 @@ ModulationatrixData::ModulationatrixData(juce::AudioProcessorValueTreeState* tre
     
 }
 
-void ModulationatrixData::applyEnvelopes(juce::AudioPlayHead *playHead){
-    for(auto ID : modulatedParameters){
-        auto& param = *apvts->getParameter(ID);
-        
-        //DBG(initalValues[ID] * LFO1.getEnvelopeValue(playHead));
-        auto& range = param.getNormalisableRange();
-        float delta = LFO1.getEnvelopeValue(playHead) * range.getRange().getLength() * modulationDepthLFO1[ID];
-        param.setValueNotifyingHost(range.convertTo0to1(initalValues[ID] + delta));
-    }
-}
-
-void ModulationatrixData::applyEnvelopesForVoice(SynthVoice* voice){
-    uint64_t workingTime = voice->getWorkingTime();
+void ModulationatrixData::applyEnvelopesForVoice(int voiceId){
+    auto voiceIter = voices.find(voiceId);
+    if(voiceIter == voices.end())
+        return;
+    
+    uint64_t workingTime = voiceIter->second.load()->getWorkingTime();
     if(workingTime != 0){
-        //DBG(voice->getFirstLFO().getEnvelopeValue(workingTime));
+        
         for(auto ID : modulatedParameters){
             auto& param = *apvts->getParameter(ID);
             
-            //DBG(initalValues[ID] * LFO1.getEnvelopeValue(playHead));
             auto& range = param.getNormalisableRange();
-            float delta = LFO1.getEnvelopeValue(workingTime) * range.getRange().getLength() * modulationDepthLFO1[ID];
+           
+            float delta = 0;
+            
+            if(apvts->getRawParameterValue(STR_CONST::LFO::firstLFOOn)->load() > 0.9f){
+                delta += voiceIter->second.load()->getFirstLFO().getEnvelopeValue(workingTime) *
+                           range.getRange().getLength() *
+                           modulationDepthLFO1[ID];
+                DBG(1);
+                DBG(delta);
+            }
+            
+            if(apvts->getRawParameterValue(STR_CONST::LFO::secondLFOOn)->load() > 0.9f){
+                delta += voiceIter->second.load()->getSecondLFO().getEnvelopeValue(workingTime) *
+                           range.getRange().getLength() *
+                           modulationDepthLFO2[ID];
+                DBG(2);
+                DBG(voiceIter->second.load()->getSecondLFO().getEnvelopeValue(workingTime));
+                DBG(delta);
+            }
+            
+            if(apvts->getRawParameterValue(STR_CONST::LFO::thirdLFOOn)->load() > 0.9f){
+                delta += voiceIter->second.load()->getThirdLFO().getEnvelopeValue(workingTime) *
+                           range.getRange().getLength() *
+                           modulationDepthLFO3[ID];
+                
+                DBG(3);
+                DBG(delta);
+            }
+            
+            
             param.setValueNotifyingHost(range.convertTo0to1(initalValues[ID] + delta));
         }
     }

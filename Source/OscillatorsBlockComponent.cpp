@@ -94,16 +94,7 @@ void OscillatorsBlockComponent::PageComponent::paint (juce::Graphics& g){
 
 void OscillatorsBlockComponent::PageComponent::resized(){
     auto localBounds = getLocalBounds();
-    auto properties = localBounds.removeFromTop(UI::OSC_PROPERTIES::height);
-    //properties.setX(UI::GLOBAL::paddingFromStoke);
-    /*localBounds.setWidth(localBounds.getWidth() - 2 * UI::GLOBAL::strokeLineWigthInside -
-                         2 * UI::GLOBAL::paddingFromStoke);*/
-    
-    //adsrComponent.setBounds(adsrComponent.getCompBounds());
-    //localBounds = adsrComponent.getCompBounds().withX(localBounds.getX()).withY(localBounds.getY());
-    //DBG(adsrComponent.getCompBounds().getWidth());
-    //DBG(localBounds.getWidth());
-    
+    auto properties = localBounds.removeFromTop(UI::OSC_PROPERTIES::height);    
     oscPropertiesComponent.setBounds(properties);
     adsrComponent.setBounds(localBounds);
 }

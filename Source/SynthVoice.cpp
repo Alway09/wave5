@@ -14,9 +14,6 @@
 //==============================================================================
 SynthVoice::SynthVoice()
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
 }
 
 SynthVoice::~SynthVoice()
@@ -48,16 +45,19 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     if(firstLFOIsTurnedOn){
         firstLFO.setSampleRate(sampleRate);
     }
+    
+    if(secondLFOIsTurnedOn){
+        secondLFO.setSampleRate(sampleRate);
+    }
+    
+    if(thirdLFOIsTurnedOn){
+        thirdLFO.setSampleRate(sampleRate);
+    }
             
-    //filterAdsr.setSampleRate(sampleRate);
-    //filter.prepareToPlay(sampleRate, samplesPerBlock, outputChannels);
     firstAdsr.setSampleRate(sampleRate);
     secondAdsr.setSampleRate(sampleRate);
     thirdAdsr.setSampleRate(sampleRate);
-    //gain.prepare(spec);
-
-    //gain.setGainLinear(0.3f);
-
+    
     isPrepared = true;
 }
 
@@ -71,7 +71,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     firstVoiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
     secondVoiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
     thirdVoiceBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
-    //filterAdsr.applyEnvelopeToBuffer(outputBuffer, 0, numSamples);
+    
     firstVoiceBuffer.clear();
     secondVoiceBuffer.clear();
     thirdVoiceBuffer.clear();
@@ -128,7 +128,7 @@ void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesiser
     thirdAdsr.noteOn();
     //filterAdsr.noteOn();
     
-    startTimer(1);
+    startTimer(10);
 }
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff)
