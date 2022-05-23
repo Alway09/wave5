@@ -13,6 +13,7 @@
 #include "PluginProcessor.h"
 #include "OscillatorsBlockComponent.h"
 #include "LFOBlockComponent.h"
+#include "CustomLookAndFeel.h"
 
 //==============================================================================
 /**
@@ -34,6 +35,8 @@ private:
     //ModifiedAdsrComponent adsrComponent;
     OscillatorsBlockComponent oscBlock;
     LFOBlockComponent lfoBlock;
+    
+    CustomLookAndFeel* lookAndFeel;
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessorEditor)

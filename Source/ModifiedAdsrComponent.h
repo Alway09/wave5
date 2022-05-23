@@ -32,9 +32,15 @@ public:
 
     void setSizes();
     
+    void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel);
+    
     juce::Rectangle<int> getCompBounds() const;
 
-    void prepareSlider(juce::Slider& slider, juce::AudioProcessorValueTreeState& adsrAPVTS, juce::String paramId, std::unique_ptr<SliderAttachment>& attachment);
+    void prepareSlider(juce::Slider& slider,
+                       juce::AudioProcessorValueTreeState& adsrAPVTS,
+                       juce::String paramId,
+                       std::unique_ptr<SliderAttachment>& attachment,
+                       juce::Label& sliderLabel);
 
 private:
     //juce::String name;
@@ -45,6 +51,11 @@ private:
     CustomRotarySlider decaySlider;
     CustomRotarySlider sustainSlider;
     CustomRotarySlider releaseSlider;
+    
+    juce::Label attackLabel;
+    juce::Label decayLabel;
+    juce::Label sustainLabel;
+    juce::Label releaseLabel;
 
     std::unique_ptr<SliderAttachment> attackAttachment;
     std::unique_ptr<SliderAttachment> decayAttachment;

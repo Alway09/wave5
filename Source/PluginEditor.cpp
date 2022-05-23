@@ -13,8 +13,11 @@
 Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), oscBlock(p.apvts), lfoBlock(p.apvts)
 {
-    setSize (800, 800);
-
+    setSize (UI::GLOBAL::pluginWidth, UI::GLOBAL::pluginHeight);
+    
+    lookAndFeel = new CustomLookAndFeel();
+    oscBlock.setCustomLookAndFeel(lookAndFeel);
+    lfoBlock.setCustomLookAndFeel(lookAndFeel);
     //addAndMakeVisible(adsrComponent);
     addAndMakeVisible(oscBlock);
     addAndMakeVisible(lfoBlock);
@@ -26,6 +29,7 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
 
 Wave5AudioProcessorEditor::~Wave5AudioProcessorEditor()
 {
+    delete lookAndFeel;
 }
 
 //==============================================================================
@@ -39,5 +43,6 @@ void Wave5AudioProcessorEditor::resized()
     //adsrComponent.setBounds(getLocalBounds());
     auto oscBlockBounds = juce::Rectangle<int>(0, 0, UI::OSC_BLOCK::blockWidth, UI::OSC_BLOCK::blockHeight);
     oscBlock.setBounds(oscBlockBounds);
+    
     lfoBlock.setBounds(juce::Rectangle<int>(UI::OSC_BLOCK::blockWidth, 0, UI::LFO::blockWidth, UI::LFO::blockHeight));
 }

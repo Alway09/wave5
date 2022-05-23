@@ -13,58 +13,69 @@
 
 //==============================================================================
 OscillatorsBlockComponent::OscillatorsBlockComponent(juce::AudioProcessorValueTreeState& apvts) :
-    juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
+    juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop),
+    firstPageComponent(apvts,
+                       STR_CONST::ADSR::firstAdsrParameters,
+                       STR_CONST::ADSR::firstOscWaveCoose,
+                       STR_CONST::ADSR::firstOscGain),
+    secondPageComponent(apvts,
+                        STR_CONST::ADSR::secondAdsrParameters,
+                        STR_CONST::ADSR::secondOscWaveCoose,
+                        STR_CONST::ADSR::secondOscGain),
+    thirdPageComponent(apvts,
+                       STR_CONST::ADSR::thirdAdsrParameters,
+                       STR_CONST::ADSR::thirdOscWaveCoose,
+                       STR_CONST::ADSR::thirdOscGain)
 {
-    addTab("OSC 1", UI::GLOBAL::backColour, new PageComponent(apvts,
-                                                              STR_CONST::ADSR::firstAdsrParameters,
-                                                              STR_CONST::ADSR::firstOscWaveCoose,
-                                                              STR_CONST::ADSR::firstOscGain), true);
-    addTab("OSC 2", UI::GLOBAL::backColour, new PageComponent(apvts,
-                                                              STR_CONST::ADSR::secondAdsrParameters,
-                                                              STR_CONST::ADSR::secondOscWaveCoose,
-                                                              STR_CONST::ADSR::secondOscGain), true);
-    addTab("OSC 3", UI::GLOBAL::backColour, new PageComponent(apvts,
-                                                              STR_CONST::ADSR::thirdAdsrParameters,
-                                                              STR_CONST::ADSR::thirdOscWaveCoose,
-                                                              STR_CONST::ADSR::thirdOscGain), true);
+    addTab("OSC 1", UI::GLOBAL::backColour, &firstPageComponent, true);
+    addTab("OSC 2", UI::GLOBAL::backColour, &secondPageComponent, true);
+    addTab("OSC 3", UI::GLOBAL::backColour, &thirdPageComponent, true);
     
     // for OSC 1
-    juce::ToggleButton* toggle = new juce::ToggleButton();
+    firstToggle = new juce::ToggleButton();
     firstOscStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts,
             STR_CONST::ADSR::firstOscOn,
-            *toggle);
-    //toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
-    toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
-    
-    getTabbedButtonBar().getTabButton(0)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
+            *firstToggle);
+    firstToggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, UI::OSC_BLOCK::toggleHeight);
+    getTabbedButtonBar().getTabButton(0)->setExtraComponent(firstToggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
     // for OSC 2
-    toggle = new juce::ToggleButton();
+    secondToggle = new juce::ToggleButton();
     secondOscStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts,
             STR_CONST::ADSR::secondOscOn,
-            *toggle);
-    //toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
-    toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
+            *secondToggle);
+    secondToggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, UI::OSC_BLOCK::toggleHeight);
     
-    getTabbedButtonBar().getTabButton(1)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
+    getTabbedButtonBar().getTabButton(1)->setExtraComponent(secondToggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
     // for OSC 3
-    toggle = new juce::ToggleButton();
+    thirdToggle = new juce::ToggleButton();
     thirdOscStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts,
             STR_CONST::ADSR::thirdOscOn,
-            *toggle);
-    //toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
-    toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
+            *thirdToggle);
     
-    getTabbedButtonBar().getTabButton(2)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
+    thirdToggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, UI::OSC_BLOCK::toggleHeight);
+    
+    getTabbedButtonBar().getTabButton(2)->setExtraComponent(thirdToggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
 }
 
 OscillatorsBlockComponent::~OscillatorsBlockComponent()
 {
+    //delete firstToggle;
+}
+
+void OscillatorsBlockComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
+    firstPageComponent.setCustomLookAndFeel(lookAndFeel);
+    secondPageComponent.setCustomLookAndFeel(lookAndFeel);
+    thirdPageComponent.setCustomLookAndFeel(lookAndFeel);
+    
+    firstToggle->setLookAndFeel(lookAndFeel);
+    secondToggle->setLookAndFeel(lookAndFeel);
+    thirdToggle->setLookAndFeel(lookAndFeel);
 }
 
 void OscillatorsBlockComponent::currentTabChanged (int newCurrentTabIndex, const juce::String &newCurrentTabName){
@@ -97,4 +108,9 @@ void OscillatorsBlockComponent::PageComponent::resized(){
     auto properties = localBounds.removeFromTop(UI::OSC_PROPERTIES::height);    
     oscPropertiesComponent.setBounds(properties);
     adsrComponent.setBounds(localBounds);
+}
+
+void OscillatorsBlockComponent::PageComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
+    adsrComponent.setCustomLookAndFeel(lookAndFeel);
+    oscPropertiesComponent.setCustomLookAndFeel(lookAndFeel);
 }

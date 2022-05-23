@@ -22,6 +22,8 @@ private:
         void paint (juce::Graphics&) override;
         void resized() override;
         
+        void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel);
+        
     private:
         //juce::AudioProcessorValueTreeState& apvts;
         
@@ -39,8 +41,18 @@ public:
     
     void currentTabChanged (int newCurrentTabIndex, const juce::String &newCurrentTabName) override;
     void popupMenuClickOnTab (int tabIndex, const juce::String &tabName) override;
+    
+    void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel);
 
 private:
+    
+    PageComponent firstPageComponent;
+    PageComponent secondPageComponent;
+    PageComponent thirdPageComponent;
+    
+    juce::ToggleButton* firstToggle;
+    juce::ToggleButton* secondToggle;
+    juce::ToggleButton* thirdToggle;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> firstOscStateAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> secondOscStateAttachment;

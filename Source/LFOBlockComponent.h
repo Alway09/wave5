@@ -15,6 +15,7 @@
 #include "GlobalUIConstants.h"
 #include "SynthVoice.h"
 #include "StringConstants.h"
+#include "CustomLookAndFeel.h"
 
 //==============================================================================
 /*
@@ -50,11 +51,21 @@ public:
         pageTwo.addVoice(voice, voiceId);
         pageThree.addVoice(voice, voiceId);
     }
+    
+    void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
+        firstToggle->setLookAndFeel(lookAndFeel);
+        secondToggle->setLookAndFeel(lookAndFeel);
+        thirdToggle->setLookAndFeel(lookAndFeel);
+    }
 
 private:
     PageComponent pageOne;
     PageComponent pageTwo;
     PageComponent pageThree;
+    
+    juce::ToggleButton* firstToggle;
+    juce::ToggleButton* secondToggle;
+    juce::ToggleButton* thirdToggle;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> firstLFOStateAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> secondLFOStateAttachment;

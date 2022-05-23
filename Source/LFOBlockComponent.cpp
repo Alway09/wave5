@@ -19,32 +19,32 @@ juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop), pageOne(1)
     addTab("LFO 2", UI::GLOBAL::backColour, &pageTwo, false);
     addTab("LFO 3", UI::GLOBAL::backColour, &pageThree, false);
     
-    juce::ToggleButton* toggle = new juce::ToggleButton();
+    firstToggle = new juce::ToggleButton();
     firstLFOStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts,
             STR_CONST::LFO::firstLFOOn,
-            *toggle);
-    toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
+            *firstToggle);
+    firstToggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, UI::OSC_BLOCK::toggleHeight);
     
-    getTabbedButtonBar().getTabButton(0)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
+    getTabbedButtonBar().getTabButton(0)->setExtraComponent(firstToggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
-    toggle = new juce::ToggleButton();
+    secondToggle = new juce::ToggleButton();
     secondLFOStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts,
             STR_CONST::LFO::secondLFOOn,
-            *toggle);
-    toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
+            *secondToggle);
+    secondToggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, UI::OSC_BLOCK::toggleHeight);
     
-    getTabbedButtonBar().getTabButton(1)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
+    getTabbedButtonBar().getTabButton(1)->setExtraComponent(secondToggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
     
-    toggle = new juce::ToggleButton();
+    thirdToggle = new juce::ToggleButton();
     thirdLFOStateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts,
             STR_CONST::LFO::thirdLFOOn,
-            *toggle);
-    toggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
+            *thirdToggle);
+    thirdToggle->setBounds(0, 0, UI::OSC_BLOCK::toggleWidth, 10);
     
-    getTabbedButtonBar().getTabButton(2)->setExtraComponent(toggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
+    getTabbedButtonBar().getTabButton(2)->setExtraComponent(thirdToggle, juce::TabBarButton::ExtraComponentPlacement::afterText);
 }
 
 LFOBlockComponent::~LFOBlockComponent()
@@ -74,5 +74,7 @@ void LFOBlockComponent::PageComponent::paint (juce::Graphics& g){
 }
 
 void LFOBlockComponent::PageComponent::resized(){
-    lfo.setBounds(juce::Rectangle<int>(0, 0, UI::LFO::envWidth, UI::LFO::envHeight));
+    lfo.setBounds(juce::Rectangle<int>(0, 0,
+                                       UI::LFO::envWidth + UI::GLOBAL::paddingFromStoke * 2,
+                                       UI::LFO::envHeight + UI::GLOBAL::paddingFromStoke * 2));
 }

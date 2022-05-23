@@ -5,6 +5,18 @@
               cppLanguageStandard="17" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="nlbqct" name="wave5">
     <GROUP id="{A564B8E3-0814-10CF-D162-A47A9F97DA3A}" name="Source">
+      <GROUP id="{605839CF-C714-26E2-9CC6-49EDA4922576}" name="Resources">
+        <FILE id="xa3QIi" name="Noise Wave.png" compile="0" resource="1" file="Images/Noise Wave.png"
+              xcodeResource="1"/>
+        <FILE id="wvlkDe" name="Saw Wave.png" compile="0" resource="1" file="Images/Saw Wave.png"
+              xcodeResource="1"/>
+        <FILE id="l82dqr" name="Sine Wave.png" compile="0" resource="1" file="Images/Sine Wave.png"
+              xcodeResource="1"/>
+        <FILE id="gcFUZK" name="Square Wave.png" compile="0" resource="1" file="Images/Square Wave.png"
+              xcodeResource="1"/>
+        <FILE id="tY8WiN" name="Triange Wave.png" compile="0" resource="1"
+              file="Images/Triange Wave.png" xcodeResource="1"/>
+      </GROUP>
       <GROUP id="{244EE145-9A84-6309-8B1A-877AE529B6CD}" name="Data">
         <FILE id="vsdk1y" name="OscData.h" compile="0" resource="0" file="Source/OscData.h"/>
         <FILE id="gR1GoQ" name="ModifiedAdsrData.cpp" compile="1" resource="0"
@@ -43,6 +55,10 @@
               file="Source/OscillatorsBlockComponent.h"/>
         <FILE id="kG6jpz" name="OscPropertiesComponent.cpp" compile="1" resource="0"
               file="Source/OscPropertiesComponent.cpp"/>
+        <FILE id="Gv2nzD" name="CustomLookAndFeel.h" compile="0" resource="0"
+              file="Source/CustomLookAndFeel.h"/>
+        <FILE id="i8Nw9E" name="CustomLookAndFeel.cpp" compile="1" resource="0"
+              file="Source/CustomLookAndFeel.cpp"/>
         <FILE id="Amkfrr" name="OscPropertiesComponent.h" compile="0" resource="0"
               file="Source/OscPropertiesComponent.h"/>
         <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"

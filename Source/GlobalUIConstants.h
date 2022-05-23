@@ -1,10 +1,14 @@
 #pragma once
 #include <JuceHeader.h>
+#include "CustomLookAndFeel.h"
 
 namespace UI {
 	namespace GLOBAL
 	{
 		const float scale = 1.0f;
+    
+        const int pluginWidth = 800;
+        const int pluginHeight = 350;
 
 		const int sliderComponentWidth = 60;
 		const int sliderComponentHeight = 60;
@@ -12,6 +16,9 @@ namespace UI {
 
 		const int sliderTextBoxWidth = 50;
 		const int sliderTextBoxHeight = 25;
+    
+        //const int sliderLabelWidth = 60;
+        const int sliderLabelHeight = 25;
 
 		const juce::Colour backColour(196, 196, 196);
 		const juce::Colour strokeLineColour(0, 0, 0);
@@ -20,7 +27,7 @@ namespace UI {
 		const int strokeLineWigthOutside = 3;
 
 		const int paddingFromStoke = 7;
-		const int paddingComponentsInside = 10;
+		const int paddingComponentsInside = 7;
 	}
 
 	namespace ADSR
@@ -37,22 +44,23 @@ namespace UI {
 	}
 
     namespace OSC_BLOCK{
-        const int blockWidth = 500;
-        const int blockHeight = 300;
+        const int blockWidth = 400;
+        const int blockHeight = 350;
     
         const int toggleWidth = 30;
+        const int toggleHeight = 1;
     }
 
     namespace LFO{
-        const int blockWidth = 300;
-        const int blockHeight = 200;
+        const int blockWidth = 400;
+        const int blockHeight = 350;
     
-        const int envWidth = 290;
-        const int envHeight = 150;
+        const int envWidth = 385;
+        const int envHeight = 300;
     }
 
     namespace OSC_PROPERTIES{
-        const int height = 80;
-        const int buttonSize = 60;
+        const int height = 110;
+        const int buttonSize = 40;
     }
 }

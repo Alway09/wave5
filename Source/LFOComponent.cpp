@@ -36,7 +36,10 @@ void LFOComponent::paint (juce::Graphics& g)
 }
 
 void LFOComponent::setSizes(){
-    envBounds = juce::Rectangle<int>(0, 0, UI::LFO::envWidth, UI::LFO::envHeight);
+    int x = UI::GLOBAL::paddingFromStoke;
+    int y = UI::GLOBAL::paddingFromStoke;
+    
+    envBounds = juce::Rectangle<int>(x, y, UI::LFO::envWidth, UI::LFO::envHeight);
 }
 
 
