@@ -19,7 +19,7 @@
 //==============================================================================
 /*
 */
-class SynthVoice  : public juce::SynthesiserVoice, public juce::Timer
+class SynthVoice  : public juce::SynthesiserVoice//, public juce::Timer
 {
 public:
     SynthVoice();
@@ -32,7 +32,6 @@ public:
     void pitchWheelMoved(int newPitchWheelValue) override;
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
-    void timerCallback () override { ++workingTime; }
 
     OscData& getFirstOscillator() { return firstOsc; }
     OscData& getSecondOscillator() { return secondOsc; }
@@ -49,16 +48,6 @@ public:
     juce::dsp::Gain<float>& getFirstOscGain(){ return firstOscGain; };
     juce::dsp::Gain<float>& getSecondOscGain(){ return secondOscGain; };
     juce::dsp::Gain<float>& getThirdOscGain(){ return thirdOscGain; };
-    
-    LFOData& getFirstLFO(){ return firstLFO; };
-    LFOData& getSecondLFO(){ return secondLFO; };
-    LFOData& getThirdLFO(){ return thirdLFO; };
-    
-    void setFirstLFOState(bool state){ firstLFOIsTurnedOn = state; }
-    void setSecondLFOState(bool state){ secondLFOIsTurnedOn = state; }
-    void setThirdLFOState(bool state){ thirdLFOIsTurnedOn = state; }
-    
-    uint64_t getWorkingTime() const { return workingTime; }
 
 private:
     juce::AudioBuffer<float> firstVoiceBuffer;
@@ -76,12 +65,6 @@ private:
     ModifiedAdsrData firstAdsr;
     ModifiedAdsrData secondAdsr;
     ModifiedAdsrData thirdAdsr;
-    
-    //juce::AudioPlayHead::CurrentPositionInfo hostInfo;
-    
-    LFOData firstLFO;
-    LFOData secondLFO;
-    LFOData thirdLFO;
 
     bool isPrepared{ false };
     
@@ -89,9 +72,5 @@ private:
     bool secondOscIsTurnedOn{ true };
     bool thirdOscIsTurnedOn{ true };
     
-    bool firstLFOIsTurnedOn { true };
-    bool secondLFOIsTurnedOn { true };
-    bool thirdLFOIsTurnedOn { true };
-    
-    uint64_t workingTime = 0; // in milliseconds/10
+    double rampDuration = 0.005;
 };

@@ -102,7 +102,7 @@
             }
         }
         
-        int getState(){
+        /*int getState(){
             int stateId = 0;
             switch (state) {
                 case State::attack:
@@ -114,7 +114,7 @@
             }
             
             return stateId;
-        }
+        }*/
 
     private:
         //==============================================================================

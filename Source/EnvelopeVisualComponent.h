@@ -79,11 +79,11 @@ private:
         int currentPosition = 0;
     };
     
-    struct LFOParameters{
+    /*struct LFOParameters{
         std::map<int, std::atomic<SynthVoice*>* > voices;
         int lfoNumber = 0; // 1 2 or 3
         //unsigned int periodsIdCounter = 0;
-    };
+    };*/
     
 public:
     EnvelopeVisualComponent();
@@ -104,7 +104,7 @@ public:
     // sets envelope as ADSR
     void setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo);
     
-    void setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber);
+    //void setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber);
     
     // calling when attack, decay, sustain, or release value changed
     // sets ADSR dots
@@ -150,9 +150,9 @@ private:
     
     ADSRParameters* adsrParams = nullptr;
     
-    LFOParameters* lfoParams = nullptr;
-    bool isLFO = false;
-    bool lfoIsSettedIp = false;
+    //LFOParameters* lfoParams = nullptr;
+    //bool isLFO = false;
+    //bool lfoIsSettedIp = false;
     
     int dotsIdCounted = 1;
     double widthInSeconds = 6.0;

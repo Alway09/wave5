@@ -61,17 +61,21 @@ public:
 
     void updateAdsr(ModifiedAdsrData& adsr, const juce::StringArray& idList);
 
-    juce::Synthesiser& getSynthesizer() { return synth; }
+    //juce::Synthesiser& getSynthesizer() { return synth; }
+    
+    void updateLFO(bool voiceIsActive);
 
     juce::AudioProcessorValueTreeState apvts;
-    
-    ModulationatrixData modulationMatrix;
-    juce::Synthesiser synth;
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //ParametersIDs paramsIDs;
     
+    std::vector<LFOData> LFOvector;
+    std::vector<bool> LFOstates;
+    
+    ModulationatrixData modulationMatrix;
+    juce::Synthesiser synth;
     
     unsigned int numberOfVoices = 1;
     //==============================================================================

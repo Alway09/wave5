@@ -25,7 +25,7 @@ LFOComponent::~LFOComponent()
 }
 
 void LFOComponent::timerCallback(){
-    envelope.setEnvelopeAsLFO(voices, lfoNumber);
+    //envelope.setEnvelopeAsLFO(voices, lfoNumber);
     stopTimer();
 }
 

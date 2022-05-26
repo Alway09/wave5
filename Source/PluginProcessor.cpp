@@ -22,10 +22,21 @@ Wave5AudioProcessor::Wave5AudioProcessor()
         //voice->getAdsr().attachADSRState(apvts, STR_CONST::ADSR::adsrStateId);
         //voice->getAdsr().setChangingStateAction(&apvts, STR_CONST::ADSR::adsrStateId);
         synth.addVoice(voice);
-        modulationMatrix.addVoice(voice, i);
+        //modulationMatrix.addVoice(voice, i);
     }
     
-    modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain);
+    LFOvector.push_back(LFOData("LFO 1"));
+    //LFOvector.push_back(LFOData());
+    //LFOvector.push_back(LFOData());
+    
+    LFOstates.push_back(false);
+    LFOstates.push_back(false);
+    LFOstates.push_back(false);
+    
+    LFOvector[0].addPeriod(1, 2, 0.f, 0.5f, 0.f, 1.f);
+    LFOvector[0].addPeriod(2, 3, 0.5f, 1.f, 1.f, 0.f);
+    
+    modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain, "LFO 1");
 }
 
 Wave5AudioProcessor::~Wave5AudioProcessor()
@@ -97,7 +108,7 @@ void Wave5AudioProcessor::changeProgramName (int index, const juce::String& newN
 void Wave5AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
-    //modulationMatrix.setSampleRate(sampleRate);
+    //modulationMatrix.prepare(sampleRate);
 
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
@@ -155,6 +166,8 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         {
             if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
             {
+                //voice->updateState();
+                
                 // Osc
                 auto& firstOscGain = *apvts.getRawParameterValue(STR_CONST::ADSR::firstOscGain);
                 auto& secondOscGain = *apvts.getRawParameterValue(STR_CONST::ADSR::secondOscGain);
@@ -190,22 +203,46 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 updateAdsr(voice->getFirstAdsr(), STR_CONST::ADSR::firstAdsrParameters);
                 updateAdsr(voice->getSecondAdsr(), STR_CONST::ADSR::secondAdsrParameters);
                 updateAdsr(voice->getThirdAdsr(), STR_CONST::ADSR::thirdAdsrParameters);
+                
                 // LFO
                 
-                voice->setFirstLFOState(firstLFOState.load());
-                voice->setSecondLFOState(secondLFOState.load());
-                voice->setThirdLFOState(thirdLFOState.load());
+                //voice->setFirstLFOState(firstLFOState.load());
+                //voice->setSecondLFOState(secondLFOState.load());
+                //voice->setThirdLFOState(thirdLFOState.load());
                 
-                if(getPlayHead()){
-                    getPlayHead()->getCurrentPosition(voice->getFirstLFO().getBPMInfo());
-                    modulationMatrix.applyEnvelopesForVoice(i);
-                }
+                LFOstates[0] = firstLFOState.load();
+                LFOstates[1] = secondLFOState.load();
+                LFOstates[2] = thirdLFOState.load();
+                
+                updateLFO(voice->isVoiceActive());
+                /*if(voice->isVoiceActive()){
+                    DBG("true");
+                }else{
+                    DBG("false");
+                }*/
+                modulationMatrix.applyLFO(LFOvector);
             }
             
         }
     }
 
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+}
+
+void Wave5AudioProcessor::updateLFO(bool voiceIsActive){
+    if(getPlayHead()){
+        auto lfoIter = LFOvector.begin();
+        
+        int i = 0;
+        while(lfoIter != LFOvector.end()){
+            getPlayHead()->getCurrentPosition(lfoIter->getPlayHeadInfo());
+            lfoIter->setEnable(LFOstates[i]);
+            lfoIter->turnInState(voiceIsActive);
+            
+            ++i;
+            ++lfoIter;
+        }
+    }
 }
 
 void Wave5AudioProcessor::updateAdsr(ModifiedAdsrData& adsr, const juce::StringArray& idList) {

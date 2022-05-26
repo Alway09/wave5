@@ -6,7 +6,43 @@ ModulationatrixData::ModulationatrixData(juce::AudioProcessorValueTreeState* tre
     
 }
 
-void ModulationatrixData::applyEnvelopesForVoice(int voiceId){
+void ModulationatrixData::applyLFO(std::vector<LFOData>& LFOvector){
+    auto parameterIter = modulatedParameters.begin();
+    while(parameterIter != modulatedParameters.end()){
+        
+        auto& param = *apvts->getParameter(*parameterIter);
+        auto& paramRange = param.getNormalisableRange();
+        float delta = 0;
+        
+        auto lfoIter = LFOvector.begin();
+        while(lfoIter != LFOvector.end()){
+            if(lfoIter->isEnable()){
+                delta += lfoIter->getEnvelopeValue() *
+                         paramRange.getRange().getLength() *
+                         modulationDepth[lfoIter->getName()][*parameterIter];
+            }
+            
+            ++lfoIter;
+        }
+        
+        //targetValues[*parameterIter].setTargetValue(paramRange.convertTo0to1(initalValues[*parameterIter] + delta));
+        
+        //param.setValueNotifyingHost(targetValues[*parameterIter].getNextValue());
+        param.setValueNotifyingHost(paramRange.convertTo0to1(initalValues[*parameterIter] + delta));
+        
+        ++parameterIter;
+    }
+}
+
+/*void ModulationatrixData::prepare(double sampleRate){
+    auto valuesIter = targetValues.begin();
+    while(valuesIter != targetValues.end()){
+        valuesIter->second.reset(sampleRate, smoothSeconds);
+        ++valuesIter;
+    }
+}*/
+
+/*void ModulationatrixData::applyEnvelopesForVoice(int voiceId){
     auto voiceIter = voices.find(voiceId);
     if(voiceIter == voices.end())
         return;
@@ -51,7 +87,7 @@ void ModulationatrixData::applyEnvelopesForVoice(int voiceId){
             param.setValueNotifyingHost(range.convertTo0to1(initalValues[ID] + delta));
         }
     }
-}
+}*/
 
 void ModulationatrixData::restoreValues(){
     for(auto ID : modulatedParameters){

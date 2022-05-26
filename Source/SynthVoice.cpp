@@ -14,6 +14,9 @@
 //==============================================================================
 SynthVoice::SynthVoice()
 {
+    firstOscGain.setRampDurationSeconds(rampDuration);
+    secondOscGain.setRampDurationSeconds(rampDuration);
+    thirdOscGain.setRampDurationSeconds(rampDuration);
 }
 
 SynthVoice::~SynthVoice()
@@ -40,18 +43,6 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     if(thirdOscIsTurnedOn){
         thirdOsc.prepareToPlay(spec);
         thirdOscGain.prepare(spec);
-    }
-    
-    if(firstLFOIsTurnedOn){
-        firstLFO.setSampleRate(sampleRate);
-    }
-    
-    if(secondLFOIsTurnedOn){
-        secondLFO.setSampleRate(sampleRate);
-    }
-    
-    if(thirdLFOIsTurnedOn){
-        thirdLFO.setSampleRate(sampleRate);
     }
             
     firstAdsr.setSampleRate(sampleRate);
@@ -119,30 +110,38 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
 
 void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition)
 {
-    firstOsc.setWaveFrequency(midiNoteNumber);
-    secondOsc.setWaveFrequency(midiNoteNumber);
-    thirdOsc.setWaveFrequency(midiNoteNumber);
+    if(firstOscIsTurnedOn){
+        firstOsc.setWaveFrequency(midiNoteNumber);
+        firstAdsr.noteOn();
+    }
     
-    firstAdsr.noteOn();
-    secondAdsr.noteOn();
-    thirdAdsr.noteOn();
-    //filterAdsr.noteOn();
+    if(secondOscIsTurnedOn){
+        secondOsc.setWaveFrequency(midiNoteNumber);
+        secondAdsr.noteOn();
+    }
     
-    startTimer(10);
+    if(thirdOscIsTurnedOn){
+        thirdOsc.setWaveFrequency(midiNoteNumber);
+        thirdAdsr.noteOn();
+    }
+
 }
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff)
 {
-    firstAdsr.noteOff();
-    secondAdsr.noteOff();
-    thirdAdsr.noteOff();
-    //filterAdsr.noteOff();
+    if(firstOscIsTurnedOn)
+        firstAdsr.noteOff();
     
-    stopTimer();
-    workingTime = 0;
+    if(secondOscIsTurnedOn)
+        secondAdsr.noteOff();
+    
+    if(thirdOscIsTurnedOn)
+        thirdAdsr.noteOff();
 
-    if (!allowTailOff || (!firstAdsr.isActive() && !secondAdsr.isActive() && !thirdAdsr.isActive()))
+    if (!allowTailOff)
         clearCurrentNote();
+    
+        
 }
 
 bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound)

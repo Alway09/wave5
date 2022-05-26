@@ -22,9 +22,9 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
     addAndMakeVisible(oscBlock);
     addAndMakeVisible(lfoBlock);
     
-    for(int i = 0; i < audioProcessor.synth.getNumVoices(); ++i){
+    /*for(int i = 0; i < audioProcessor.synth.getNumVoices(); ++i){
         lfoBlock.addVoice(&audioProcessor.modulationMatrix.getVoice(i), i);
-    }
+    }*/
 }
 
 Wave5AudioProcessorEditor::~Wave5AudioProcessorEditor()

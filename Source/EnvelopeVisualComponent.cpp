@@ -24,9 +24,9 @@ EnvelopeVisualComponent::~EnvelopeVisualComponent()
         delete adsrParams;
     }
     
-    if(lfoParams){
+    /*if(lfoParams){
         delete lfoParams;
-    }
+    }*/
 }
 
 void EnvelopeVisualComponent::setEnvelopeAsADSR(APVTS* apvtsListenTo,
@@ -72,7 +72,7 @@ void EnvelopeVisualComponent::timerCallback(){
         stopTimer();
     }
     
-    if(isLFO && !lfoIsSettedIp){
+    /*if(isLFO && !lfoIsSettedIp){
         DBG("Callback");
         DBG(lfoParams->lfoNumber);
         addDot(0, getHeight() / 2, false, true, false);
@@ -80,7 +80,7 @@ void EnvelopeVisualComponent::timerCallback(){
         
         lfoIsSettedIp = true;
         stopTimer();
-    }
+    }*/
 };
 
 void EnvelopeVisualComponent::setupAdsr(){
@@ -229,7 +229,7 @@ void EnvelopeVisualComponent::updateLine(int leftId, int rightId){
                                      dotsVector[getDotIndex(rightId)]->getCentrePosition().toFloat());
         elem->second = line;
         
-        if(isLFO){
+        /*if(isLFO){
             auto iter = lfoParams->voices.begin();
             while(iter != lfoParams->voices.end()){
                 auto voice = iter->second->load();
@@ -272,7 +272,7 @@ void EnvelopeVisualComponent::updateLine(int leftId, int rightId){
                 
                 ++iter;
             }
-        }
+        }*/
     }
 }
 
@@ -380,13 +380,15 @@ LinesVector::iterator EnvelopeVisualComponent::getLineElement(juce::Line<float>*
     return linesVector.end();
 }
 
-void EnvelopeVisualComponent::addLine(EnvelopeVisualComponent::MovingDot const * leftDot, EnvelopeVisualComponent::MovingDot const * rightDot){
+void EnvelopeVisualComponent::addLine(EnvelopeVisualComponent::MovingDot const * leftDot,
+                                      EnvelopeVisualComponent::MovingDot const * rightDot)
+{
     LinesVectorElement elem(std::make_pair(leftDot->getId(), rightDot->getId()),
                             new juce::Line<float>(leftDot->getCentrePosition().toFloat(),
                                                   rightDot->getCentrePosition().toFloat()));
     linesVector.push_back(elem);
     
-    if(isLFO){
+    /*if(isLFO){
         auto iter = lfoParams->voices.begin();
         while(iter != lfoParams->voices.end()){
             auto voice = iter->second->load();
@@ -432,7 +434,7 @@ void EnvelopeVisualComponent::addLine(EnvelopeVisualComponent::MovingDot const *
             
             ++iter;
         }
-    }
+    }*/
 
 }
 
@@ -440,7 +442,7 @@ void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
     auto line = lineBetween(leftId, rightId);
     if(line){
         
-        if(isLFO){
+        /*if(isLFO){
             auto iter = lfoParams->voices.begin();
             while(iter != lfoParams->voices.end()){
                 auto voice = iter->second->load();
@@ -464,7 +466,7 @@ void EnvelopeVisualComponent::removeLine(int leftId, int rightId){
                 
                 ++iter;
             }
-        }
+        }*/
         
         auto elem = getLineElement(line);
         delete elem->second;
@@ -652,7 +654,7 @@ void EnvelopeVisualComponent::updateAdsr(int movingDotId, bool updateFromHost){
     }
 }
 
-void EnvelopeVisualComponent::setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber){
+/*void EnvelopeVisualComponent::setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber){
     lfoParams = new LFOParameters;
     lfoParams->voices = voices;
     lfoParams->lfoNumber = lfoNumber;
@@ -663,7 +665,7 @@ void EnvelopeVisualComponent::setEnvelopeAsLFO(std::map<int, std::atomic<SynthVo
     isLFO = true;
     
     startTimer(200);
-}
+}*/
 
 //######################################################################
 //######################################################################

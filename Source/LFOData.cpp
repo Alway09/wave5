@@ -1,6 +1,6 @@
 #include "LFOData.h"
 
-LFOData::LFOData(){
+LFOData::LFOData(const juce::String& name) : lfoName(name){
 
 }
 
@@ -50,40 +50,77 @@ void LFOData::updatePeriod(int leftID, int rightID, float xStart, float xEnd, fl
         
 }
 
-float LFOData::getEnvelopeValue(uint64_t voiceWorkingTime){
+float LFOData::getEnvelopeValue(){
     float envelopeVal = 0;
         
-    float currentLFOPos = info.bpm / 60.f * (voiceWorkingTime / 100.f);
-    
-    currentLFOPos = std::fmod(currentLFOPos, 1.0);
-
-    std::vector<PeriodType>::iterator periodIter = periodsVect.begin();
-    while (periodIter != periodsVect.end())
-    {
-        if(currentLFOPos >= std::get<1>(*periodIter).first &&
-           currentLFOPos < std::get<1>(*periodIter).second)
-        {
-            float currentRate = std::get<2>(*periodIter).first +
-                                (std::get<2>(*periodIter).second - std::get<2>(*periodIter).first) *
-                                (currentLFOPos - std::get<1>(*periodIter).first) /
-                                (std::get<1>(*periodIter).second - std::get<1>(*periodIter).first);
-            
-            //DBG(currentRate);
-            //DBG("-----");
-            
-            envelopeVal = currentRate;
-            break;
+    if(LFOisEnable){
+        float currentLFOPos = 0;
+        
+        if(currentRateMode == RateMode::BPM){
+            currentLFOPos = info.bpm / 60.f * (workingTime / 100.f);
+        }else if(currentRateMode == RateMode::HZ){
+            currentLFOPos = workingTime / 100.f;
+        }else{
+            jassertfalse;
         }
-        ++periodIter;
+        
+        if(currentTriggerMode == TriggerMode::Trig){
+            currentLFOPos = std::fmod(currentLFOPos, 1.0);
+        }else if(currentTriggerMode == TriggerMode::Env){
+            currentLFOPos = std::fmin(currentLFOPos, 1.0);
+        }else if (currentTriggerMode == TriggerMode::OFF){
+            
+        }else{
+            jassertfalse;
+        }
+        
+        //currentLFOPos = !isEnvelope ? std::fmod(currentLFOPos, 1.0) : std::fmin(currentLFOPos, 1.0);
+
+        std::vector<PeriodType>::iterator periodIter = periodsVect.begin();
+        while (periodIter != periodsVect.end())
+        {
+            if(currentLFOPos >= std::get<1>(*periodIter).first &&
+               currentLFOPos < std::get<1>(*periodIter).second)
+            {
+                float currentRate = std::get<2>(*periodIter).first +
+                                    (std::get<2>(*periodIter).second - std::get<2>(*periodIter).first) *
+                                    (currentLFOPos - std::get<1>(*periodIter).first) /
+                                    (std::get<1>(*periodIter).second - std::get<1>(*periodIter).first);
+                
+                //DBG(currentRate);
+                //DBG("-----");
+                
+                envelopeVal = currentRate;
+                break;
+            }
+            ++periodIter;
+        }
     }
     
     return envelopeVal;
 }
 
+void LFOData::timerCallback(){
+    ++workingTime;
+}
+
 void LFOData::begin(){
-    
+    if(LFOisEnable && !isRunning){
+        startTimer(10);
+        isRunning = true;
+    }
 }
 
 void LFOData::end(){
-    
+    stopTimer();
+    workingTime = 0;
+    isRunning = false;
+}
+
+void LFOData::turnInState(bool state){
+    if(state){
+        begin();
+    }else{
+        end();
+    }
 }
