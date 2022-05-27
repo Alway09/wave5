@@ -26,31 +26,35 @@ private:
     class PageComponent : public juce::Component
     {
     public:
-        PageComponent(int lfoNum);
+        PageComponent(LFOData* lfo);
         ~PageComponent();
         
         void paint (juce::Graphics&) override;
         void resized() override;
         
-        void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){lfo.addVoice(voice, voiceId);}
+        //void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){lfo.addVoice(voice, voiceId);}
         
     private:
-        LFOComponent lfo;
+        LFOComponent lfoComponent;
     };
     
 public:
-    LFOBlockComponent(juce::AudioProcessorValueTreeState& apvts);
+    LFOBlockComponent(juce::AudioProcessorValueTreeState& apvts,
+                      LFOData* firstLFO,
+                      LFOData* secondLFO,
+                      LFOData* thirdLFO);
+    
     ~LFOBlockComponent() override;
     
     void currentTabChanged (int newCurrentTabIndex, const juce::String &newCurrentTabName) override;
     void popupMenuClickOnTab (int tabIndex, const juce::String &tabName) override;
     
     //void setFirstLFOVoices(std::atomic<SynthVoice*>& voice);
-    void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){
+    /*void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){
         pageOne.addVoice(voice, voiceId);
         pageTwo.addVoice(voice, voiceId);
         pageThree.addVoice(voice, voiceId);
-    }
+    }*/
     
     void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
         firstToggle->setLookAndFeel(lookAndFeel);

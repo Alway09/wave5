@@ -17,7 +17,7 @@ void ModulationatrixData::applyLFO(std::vector<LFOData>& LFOvector){
         auto lfoIter = LFOvector.begin();
         while(lfoIter != LFOvector.end()){
             if(lfoIter->isEnable()){
-                delta += lfoIter->getEnvelopeValue() *
+                delta += lfoIter->calculateEnvelopeValue() *
                          paramRange.getRange().getLength() *
                          modulationDepth[lfoIter->getName()][*parameterIter];
             }

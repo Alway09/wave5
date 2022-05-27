@@ -15,9 +15,10 @@
 
 //==============================================================================
 ModifiedAdsrComponent::ModifiedAdsrComponent(juce::AudioProcessorValueTreeState& apvts,
-                                             const juce::StringArray& idList)
+                                             const juce::StringArray& _idList)
     : juce::Component(),
-    attackSlider("Attack"), decaySlider("Decay"), sustainSlider("Sustain"), releaseSlider("Release")
+    attackSlider("Attack"), decaySlider("Decay"), sustainSlider("Sustain"), releaseSlider("Release"),
+    idList(_idList)
 {
     //updateParameters(apvts, idArray);
 
@@ -26,18 +27,51 @@ ModifiedAdsrComponent::ModifiedAdsrComponent(juce::AudioProcessorValueTreeState&
     prepareSlider(sustainSlider, apvts, idList[2], sustainAttachment, sustainLabel);
     prepareSlider(releaseSlider, apvts, idList[3], releaseAttachment, releaseLabel);
     
-    envelope.setEnvelopeAsADSR(&apvts, idList);
+    //envelope.setEnvelopeAsADSR(&apvts, idList);
+    
+    /*attackSlider.setValue(1.0);
+    decaySlider.setValue(1.0);
+    sustainSlider.setValue(1.0);
+    releaseSlider.setValue(1.0);*/
+
+    envelope.setAPVTS(&apvts);
+    addAndMakeVisible(envelope);
+    
+    startTimer(200);
+}
+
+ModifiedAdsrComponent::~ModifiedAdsrComponent()
+{
+}
+
+void ModifiedAdsrComponent::timerCallback(){
+    
+    envelope.addDot(0, envelope.getHeight(), false, true, true);
+    int decayDot = envelope.addDot(1, 0, false, false, true);
+    int sustainDot = envelope.addDot(2, 0, false, false, false);
+    int releaseDot = envelope.addDot(3, envelope.getHeight(), false, false, true);
+    
+    envelope.setDotRelativeToParameter(idList[0],
+                                       decayDot,
+                                       EnvelopeVisualComponent::DotRelationDirection::Horizontal);
+    envelope.setDotRelativeToParameter(idList[1],
+                                       sustainDot,
+                                       EnvelopeVisualComponent::DotRelationDirection::Horizontal);
+    envelope.setDotRelativeToParameter(idList[2],
+                                       sustainDot,
+                                       EnvelopeVisualComponent::DotRelationDirection::Vertical);
+    envelope.setDotRelativeToParameter(idList[3],
+                                       releaseDot,
+                                       EnvelopeVisualComponent::DotRelationDirection::Horizontal);
+    
+    //envelope.setp
     
     attackSlider.setValue(1.0);
     decaySlider.setValue(1.0);
     sustainSlider.setValue(1.0);
     releaseSlider.setValue(1.0);
-
-    addAndMakeVisible(envelope);
-}
-
-ModifiedAdsrComponent::~ModifiedAdsrComponent()
-{
+    
+    stopTimer();
 }
 
 void ModifiedAdsrComponent::prepareSlider(juce::Slider& slider,

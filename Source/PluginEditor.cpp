@@ -11,7 +11,8 @@
 
 //==============================================================================
 Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), oscBlock(p.apvts), lfoBlock(p.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), oscBlock(p.apvts),
+      lfoBlock(p.apvts, &p.LFOvector[0], &p.LFOvector[1], &p.LFOvector[2])
 {
     setSize (UI::GLOBAL::pluginWidth, UI::GLOBAL::pluginHeight);
     

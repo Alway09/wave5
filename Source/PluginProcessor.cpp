@@ -26,15 +26,15 @@ Wave5AudioProcessor::Wave5AudioProcessor()
     }
     
     LFOvector.push_back(LFOData("LFO 1"));
-    //LFOvector.push_back(LFOData());
-    //LFOvector.push_back(LFOData());
+    LFOvector.push_back(LFOData("LFO 2"));
+    LFOvector.push_back(LFOData("LFO 3"));
     
     LFOstates.push_back(false);
     LFOstates.push_back(false);
     LFOstates.push_back(false);
     
-    LFOvector[0].addPeriod(1, 2, 0.f, 0.5f, 0.f, 1.f);
-    LFOvector[0].addPeriod(2, 3, 0.5f, 1.f, 1.f, 0.f);
+    //LFOvector[0].addPeriod(1, 2, 0.f, 0.5f, 0.f, 1.f);
+    //LFOvector[0].addPeriod(2, 3, 0.5f, 1.f, 1.f, 0.f);
     
     modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain, "LFO 1");
 }
@@ -161,13 +161,12 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         buffer.clear (i, 0, buffer.getNumSamples());
 
     // Update voice
+    bool voicesIsActive = false;
     {
         for (int i = 0; i < synth.getNumVoices(); ++i)
         {
             if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
             {
-                //voice->updateState();
-                
                 // Osc
                 auto& firstOscGain = *apvts.getRawParameterValue(STR_CONST::ADSR::firstOscGain);
                 auto& secondOscGain = *apvts.getRawParameterValue(STR_CONST::ADSR::secondOscGain);
@@ -182,10 +181,6 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 auto& firstOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::firstOscOn);
                 auto& secondOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::secondOscOn);
                 auto& thirdOscState = *apvts.getRawParameterValue(STR_CONST::ADSR::thirdOscOn);
-                
-                auto& firstLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
-                auto& secondLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
-                auto& thirdLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
                 
                 voice->getFirstOscillator().setWaveType(firstWaveTypeParam->getIndex());
                 voice->setFirstOscState(firstOscState.load());
@@ -205,27 +200,26 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 updateAdsr(voice->getThirdAdsr(), STR_CONST::ADSR::thirdAdsrParameters);
                 
                 // LFO
+                voicesIsActive = voice->isVoiceActive() || voicesIsActive;
                 
-                //voice->setFirstLFOState(firstLFOState.load());
-                //voice->setSecondLFOState(secondLFOState.load());
-                //voice->setThirdLFOState(thirdLFOState.load());
-                
-                LFOstates[0] = firstLFOState.load();
-                LFOstates[1] = secondLFOState.load();
-                LFOstates[2] = thirdLFOState.load();
-                
-                updateLFO(voice->isVoiceActive());
-                /*if(voice->isVoiceActive()){
-                    DBG("true");
-                }else{
-                    DBG("false");
-                }*/
                 modulationMatrix.applyLFO(LFOvector);
             }
             
         }
     }
+    
+    // LFO
+    auto& firstLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
+    auto& secondLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
+    auto& thirdLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
+    LFOstates[0] = firstLFOState.load();
+    LFOstates[1] = secondLFOState.load();
+    LFOstates[2] = thirdLFOState.load();
+    
+    updateLFO(voicesIsActive);
 
+    
+    
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 

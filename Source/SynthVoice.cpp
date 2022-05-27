@@ -12,7 +12,7 @@
 #include "SynthVoice.h"
 
 //==============================================================================
-SynthVoice::SynthVoice()
+SynthVoice::SynthVoice()/* : firstAdsr("ADSR 1"), secondAdsr("ADSR 2"), thirdAdsr("ADSR 3")*/
 {
     firstOscGain.setRampDurationSeconds(rampDuration);
     secondOscGain.setRampDurationSeconds(rampDuration);
@@ -45,6 +45,10 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
         thirdOscGain.prepare(spec);
     }
             
+    //firstAdsr.setSampleRate(sampleRate);
+    //secondAdsr.setSampleRate(sampleRate);
+    //thirdAdsr.setSampleRate(sampleRate);
+    
     firstAdsr.setSampleRate(sampleRate);
     secondAdsr.setSampleRate(sampleRate);
     thirdAdsr.setSampleRate(sampleRate);
@@ -76,6 +80,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
         juce::dsp::ProcessContextReplacing<float> firstContext(firstAudioBlock);
         firstOscGain.process(firstContext); // ?????????
         firstAdsr.applyEnvelopeToBuffer(firstVoiceBuffer, 0, firstVoiceBuffer.getNumSamples());
+        //firstAdsr.applyEnvelopeToBuffer(firstContext);
     }
         
     
@@ -84,6 +89,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
         juce::dsp::ProcessContextReplacing<float> secondContext(secondAudioBlock);
         secondOscGain.process(secondContext);
         secondAdsr.applyEnvelopeToBuffer(secondVoiceBuffer, 0, secondVoiceBuffer.getNumSamples());
+        //secondAdsr.applyEnvelopeToBuffer(secondContext);
     }
         
     
@@ -92,6 +98,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
         juce::dsp::ProcessContextReplacing<float> thirdContext(thirdAudioBlock);
         thirdOscGain.process(thirdContext);
         thirdAdsr.applyEnvelopeToBuffer(thirdVoiceBuffer, 0, thirdVoiceBuffer.getNumSamples());
+        //thirdAdsr.applyEnvelopeToBuffer(thirdContext);
     }
     
     //filter.process(synthBuffer);

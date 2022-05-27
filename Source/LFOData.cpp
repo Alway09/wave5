@@ -10,6 +10,9 @@ LFOData::~LFOData(){
 
 void LFOData::addPeriod(int leftID, int rightID, float xStart, float xEnd, float yStart, float yEnd){
     
+    //DBG(xStart);
+    //DBG(xEnd);
+    
     periodsVect.push_back(std::make_tuple(std::make_pair(leftID, rightID),
                                           std::make_pair(xStart, xEnd),
                                           std::make_pair(yStart, yEnd)
@@ -50,10 +53,16 @@ void LFOData::updatePeriod(int leftID, int rightID, float xStart, float xEnd, fl
         
 }
 
-float LFOData::getEnvelopeValue(){
-    float envelopeVal = 0;
+float LFOData::calculateEnvelopeValue(){
+    //float envelopeVal = 0;
         
     if(LFOisEnable){
+        
+        if(workingTime == 0){
+            envelopeVal = 0;
+            return 0;
+        }
+        
         float currentLFOPos = 0;
         
         if(currentRateMode == RateMode::BPM){

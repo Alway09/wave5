@@ -20,7 +20,7 @@
 class LFOComponent  : public juce::Component, juce::Timer
 {
 public:
-    LFOComponent(int lfoNum);
+    LFOComponent(LFOData* lfo);
     ~LFOComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -28,17 +28,20 @@ public:
     
     void timerCallback() override;
     
-    void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){ voices[voiceId] = voice; }
+    //void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){ voices[voiceId] = voice; }
     
     void setSizes();
 
 private:
+    
+    LFOData* relativeLFO;
+    
     EnvelopeVisualComponent envelope;
-    int lfoNumber = 0;
+    //int lfoNumber = 0;
     
     juce::Rectangle<int> envBounds;
     
-    std::map<int, std::atomic<SynthVoice*>* > voices;
+    //std::map<int, std::atomic<SynthVoice*>* > voices;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LFOComponent)
 };

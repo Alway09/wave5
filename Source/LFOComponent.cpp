@@ -12,9 +12,10 @@
 #include "LFOComponent.h"
 
 //==============================================================================
-LFOComponent::LFOComponent(int lfoNum) : lfoNumber(lfoNum)
+LFOComponent::LFOComponent(LFOData* lfo) : relativeLFO(lfo)
 {
     //envelope.setEnvelopeAsLFO();
+    envelope.setReltiveLFO(relativeLFO);
     addAndMakeVisible(envelope);
     
     startTimer(200);
@@ -25,7 +26,9 @@ LFOComponent::~LFOComponent()
 }
 
 void LFOComponent::timerCallback(){
-    //envelope.setEnvelopeAsLFO(voices, lfoNumber);
+    envelope.addDot(0, getHeight() / 2, false, true, false);
+    envelope.addDot(getWidth(), getHeight() / 2, false, true, false);
+    
     stopTimer();
 }
 

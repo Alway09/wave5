@@ -21,7 +21,7 @@
 
 using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
-class ModifiedAdsrComponent  : public juce::Component
+class ModifiedAdsrComponent  : public juce::Component, juce::Timer
 {
 public:
     ModifiedAdsrComponent(juce::AudioProcessorValueTreeState& adsr, const juce::StringArray& idList);
@@ -31,6 +31,8 @@ public:
     void resized() override;
 
     void setSizes();
+    
+    void timerCallback() override;
     
     void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel);
     
@@ -44,6 +46,8 @@ public:
 
 private:
     //juce::String name;
+    
+    //juce::AudioProcessorValueTreeState* a
 
     EnvelopeVisualComponent envelope;
 
@@ -65,6 +69,8 @@ private:
     juce::Rectangle<int> slidersAreaBounds;
     juce::Rectangle<int> sliderBounds;
     juce::Rectangle<int> envelopeBounds;
+    
+    juce::StringArray idList;
     
     //float widthInSeconds = 5.0f;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModifiedAdsrComponent)

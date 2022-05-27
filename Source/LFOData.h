@@ -24,10 +24,10 @@ public:
     
     void timerCallback() override;
     
-    void setSampleRate(float newSampleRate){
+    /*void setSampleRate(float newSampleRate){
         jassert(newSampleRate > 0.f);
         sampleRate = newSampleRate;
-    }
+    }*/
     
     const juce::String& getName() const {return lfoName; }
     
@@ -37,14 +37,14 @@ public:
     void deletePeriod(int leftID, int rightID);
     void updatePeriod(int leftID, int rightID, float xStart, float xEnd, float yStart, float yEnd);
     
-    float getEnvelopeValue();
+    float calculateEnvelopeValue();
+    float getEnvelopeValue() const { return envelopeVal; }
     
     juce::AudioPlayHead::CurrentPositionInfo& getPlayHeadInfo() { return info; }
     
     void setEnable(bool enable){ LFOisEnable = enable; }
     void turnInState(bool state);
     bool isEnable() const { return LFOisEnable; }
-    //void setEnvelopeMode(bool isEnable){ isEnvelope = isEnable; }
     
     void begin();
     void end();
@@ -53,7 +53,7 @@ private:
     //bool isRunning = false;
     
     juce::String lfoName;
-    double sampleRate = 44100.0;
+    //double sampleRate = 44100.0;
     
     enum class RateMode{HZ, BPM};
     RateMode currentRateMode = RateMode::BPM;
@@ -69,6 +69,7 @@ private:
     unsigned int workingTime{ 0 };
     bool isRunning{ false };
     
+    float envelopeVal = 0;
     //bool isEnvelope{ true };
     
     //bool isHZRate{ false };

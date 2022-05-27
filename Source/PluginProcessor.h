@@ -65,19 +65,20 @@ public:
     
     void updateLFO(bool voiceIsActive);
 
+    std::vector<LFOData> LFOvector;
     juce::AudioProcessorValueTreeState apvts;
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //ParametersIDs paramsIDs;
     
-    std::vector<LFOData> LFOvector;
+    
     std::vector<bool> LFOstates;
     
     ModulationatrixData modulationMatrix;
     juce::Synthesiser synth;
     
-    unsigned int numberOfVoices = 1;
+    unsigned int numberOfVoices = 3;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessor)
 };

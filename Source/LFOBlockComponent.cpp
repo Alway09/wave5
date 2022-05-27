@@ -12,8 +12,15 @@
 #include "LFOBlockComponent.h"
 
 //==============================================================================
-LFOBlockComponent::LFOBlockComponent(juce::AudioProcessorValueTreeState& apvts) :
-juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop), pageOne(1), pageTwo(2), pageThree(3)
+LFOBlockComponent::LFOBlockComponent(juce::AudioProcessorValueTreeState& apvts,
+                                     LFOData* firstLFO,
+                                     LFOData* secondLFO,
+                                     LFOData* thirdLFO) :
+
+juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop),
+    pageOne(firstLFO),
+    pageTwo(secondLFO),
+    pageThree(thirdLFO)
 {
     addTab("LFO 1", UI::GLOBAL::backColour, &pageOne, false);
     addTab("LFO 2", UI::GLOBAL::backColour, &pageTwo, false);
@@ -59,9 +66,9 @@ void LFOBlockComponent::popupMenuClickOnTab (int tabIndex, const juce::String &t
     
 }
 
-LFOBlockComponent::PageComponent::PageComponent(int lfoNum) : lfo(lfoNum)
+LFOBlockComponent::PageComponent::PageComponent(LFOData* lfo) : lfoComponent(lfo)
 {
-    addAndMakeVisible(lfo);
+    addAndMakeVisible(lfoComponent);
 }
 
 LFOBlockComponent::PageComponent::~PageComponent(){
@@ -74,7 +81,7 @@ void LFOBlockComponent::PageComponent::paint (juce::Graphics& g){
 }
 
 void LFOBlockComponent::PageComponent::resized(){
-    lfo.setBounds(juce::Rectangle<int>(0, 0,
+    lfoComponent.setBounds(juce::Rectangle<int>(0, 0,
                                        UI::LFO::envWidth + UI::GLOBAL::paddingFromStoke * 2,
                                        UI::LFO::envHeight + UI::GLOBAL::paddingFromStoke * 2));
 }

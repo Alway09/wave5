@@ -14,6 +14,7 @@
 #include "SynthSound.h"
 #include "OscData.h"
 #include "ModifiedAdsrData.h"
+#include "AdsrData.h"
 #include "LFOData.h"
 
 //==============================================================================
@@ -65,6 +66,10 @@ private:
     ModifiedAdsrData firstAdsr;
     ModifiedAdsrData secondAdsr;
     ModifiedAdsrData thirdAdsr;
+    
+    //AdsrData firstAdsr;
+    //AdsrData secondAdsr;
+    //AdsrData thirdAdsr;
 
     bool isPrepared{ false };
     

@@ -13,7 +13,7 @@ using APVTS = juce::AudioProcessorValueTreeState;
 //==============================================================================
 
 
-class EnvelopeVisualComponent  : public juce::Component, public juce::Timer, public APVTS::Listener
+class EnvelopeVisualComponent  : public juce::Component, public APVTS::Listener
 {
 private:
     class MovingDot : public juce::Component
@@ -54,40 +54,11 @@ private:
         juce::Rectangle<int> dotBounds;
     };
     
-    struct ADSRParameters{
-        double attackTimeSeconds = 1.0;
-        double decayTimeSeconds = 1.0;
-        double sustainLevel = 1.0; // 0.0 to 1.0
-        double releaseTimeSeconds = 1.0;
-        
-        int attackDotId = 0;
-        int decayDotId = 0;
-        int sustainDotId = 0;
-        int releaseDotId = 0;
-        
-        APVTS* apvts;
-        
-        /* in this list MUST be
-           0 index - attack
-           1 index - decay
-           2 index - sustain
-           3 index - release
-         */
-        juce::StringArray idList;
-        //juce::String adsrStateId;
-                        
-        int currentPosition = 0;
-    };
-    
-    /*struct LFOParameters{
-        std::map<int, std::atomic<SynthVoice*>* > voices;
-        int lfoNumber = 0; // 1 2 or 3
-        //unsigned int periodsIdCounter = 0;
-    };*/
-    
 public:
     EnvelopeVisualComponent();
     ~EnvelopeVisualComponent() override;
+    
+    enum class DotRelationDirection{ Vertical, Horizontal };
     
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -101,25 +72,21 @@ public:
     int addDot(int x, int y, bool removable, bool withConstantX, bool withConstantY);
     void removeDot(int ID);
     
-    // sets envelope as ADSR
-    void setEnvelopeAsADSR(APVTS* apvtsListenTo, juce::StringArray paramsIDsListenTo);
+    void setDotRelativeToParameter(const juce::String& paramId, int dotId, DotRelationDirection direction);
     
-    //void setEnvelopeAsLFO(std::map<int, std::atomic<SynthVoice*>* >& voices, int lfoNumber);
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
     
-    // calling when attack, decay, sustain, or release value changed
-    // sets ADSR dots
-    //void sliderValueChanged (juce::Slider *slider) override;
-    void parameterChanged(const juce::String &parameterID, float newValue) override;
+    void setReltiveLFO(LFOData* lfo){ relativeLFO = lfo; }
     
-    // starts evnelope period
-    void startEnvelope();
-    
-    // stops envelope period
-    void stopEnvelope();
+    void setAPVTS(APVTS* tree){ apvts = tree; }
     
 private:
     // return dot index in dotsVector member
     int getDotIndex(int ID);
+    
+    void moveRightDots(MovingDot* dot, int deltaX);
+    
+    void updateRelativeValue(MovingDot* dot, juce::Point<int> dotPreviousePosition);
     
     // return pointer on nearest left dot, if it exist
     MovingDot* getLeftDot(int x, int y);
@@ -128,7 +95,7 @@ private:
     MovingDot* getRightDot(int x, int y);
     
     // the handler to keep the dot inside the component
-    juce::Point<int> stayPointInsideComponent(MovingDot* dot, juce::Point<int> eventPos);
+    juce::Point<int> stayPointInsideComponent(juce::Point<int> eventPos);
     
     // the handler, observing order of dots
     juce::Point<int> complyOrder(MovingDot* dot, juce::Point<int> eventPos);
@@ -140,22 +107,14 @@ private:
     juce::Line<float>* lineBetween(int leftId, int rightId);
     LinesVector::iterator getLineElement(juce::Line<float>*);
 
-    //for ADSR
-    void setupAdsr();
-    void updateAdsr(int movingDotId, bool updateFromHost = true);
-    void updateApvtsValues(int ID);
-    void timerCallback() override;
-    bool isADSR = false;
-    bool adsrIsSettedUp = false;
+    APVTS* apvts = nullptr;
     
-    ADSRParameters* adsrParams = nullptr;
+    LFOData* relativeLFO = nullptr;
     
-    //LFOParameters* lfoParams = nullptr;
-    //bool isLFO = false;
-    //bool lfoIsSettedIp = false;
+    std::map<juce::String, std::pair<int, DotRelationDirection>> dotsRelativeToParameters;
     
     int dotsIdCounted = 1;
-    double widthInSeconds = 6.0;
+    float widthFactor = 10.f;
 
     std::vector<MovingDot*> dotsVector;
     LinesVector linesVector;
