@@ -1,4 +1,4 @@
-#include "AdsrData.h"
+/*#include "AdsrData.h"
 
 AdsrData::AdsrData(const juce::String& name) : LFOData(name)
 {
@@ -21,7 +21,7 @@ void AdsrData::applyEnvelopeToBuffer(juce::dsp::ProcessContextReplacing<float>& 
     gain.process(context);
 }
 
-/*void AdsrData::setPeriod(State period, int leftId, int rightId){
+void AdsrData::setPeriod(State period, int leftId, int rightId){
     
     if(period == State::attack){
         attackPeriod.first = leftId;

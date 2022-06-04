@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin editor.
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -14,6 +6,7 @@
 #include "OscillatorsBlockComponent.h"
 #include "LFOBlockComponent.h"
 #include "CustomLookAndFeel.h"
+#include "ModulationMatrixComponent.h"
 
 //==============================================================================
 /**
@@ -35,6 +28,9 @@ private:
     //ModifiedAdsrComponent adsrComponent;
     OscillatorsBlockComponent oscBlock;
     LFOBlockComponent lfoBlock;
+    
+    ModulationMatrixComponent matrixComponent;
+    juce::Viewport matrixViewport;
     
     CustomLookAndFeel* lookAndFeel;
     

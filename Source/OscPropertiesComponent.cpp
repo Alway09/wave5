@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "OscPropertiesComponent.h"
 #include "StringConstants.h"
+#include "BinaryData.h"
 
 //==============================================================================
 OscPropertiesComponent::OscPropertiesComponent(juce::AudioProcessorValueTreeState& apvts,
@@ -57,12 +58,18 @@ void OscPropertiesComponent::prepareButton(juce::ImageButton& button, juce::Imag
 {
     image = juce::ImageFileFormat::loadFrom(juce::File(imageName));
     
+    button.setToggleable(true);
+    
     button.setImages(false, true, true,
                      image, 1.f, juce::Colours::transparentWhite,
-                     image, 0.5f, juce::Colours::transparentWhite,
-                     image, 1.f, juce::Colours::transparentWhite);
+                     image, 0.6f, juce::Colours::transparentWhite,
+                     image, 0.3f, juce::Colours::transparentWhite);
     
     addAndMakeVisible(button);
+}
+
+void OscPropertiesComponent::buttonClicked(juce::Button * button){
+    
 }
 
 void OscPropertiesComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){

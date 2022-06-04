@@ -66,10 +66,10 @@ void ModifiedAdsrComponent::timerCallback(){
     
     //envelope.setp
     
-    attackSlider.setValue(1.0);
+    attackSlider.setValue(0.0);
     decaySlider.setValue(1.0);
     sustainSlider.setValue(1.0);
-    releaseSlider.setValue(1.0);
+    releaseSlider.setValue(0.1);
     
     stopTimer();
 }

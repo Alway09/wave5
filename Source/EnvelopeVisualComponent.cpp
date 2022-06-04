@@ -62,7 +62,6 @@ void EnvelopeVisualComponent::mouseDrag(const juce::MouseEvent& event) {
         
         if(!dotsRelativeToParameters.empty()){
             updateRelativeValue(dot, dotPos);
-            
         }
             
         
@@ -431,11 +430,12 @@ void EnvelopeVisualComponent::parameterChanged(const juce::String &parameterID, 
         float y = juce::jmap(newValue, range.getStart(), range.getEnd(), 0.f, (float)getHeight());
         
         dotPos.setY(getHeight() - y);
-        updateLine(dot->getId(), dot->getRightId());
+        //updateLine(dot->getId(), dot->getRightId());
     }
     
     dot->setCentrePosition(dotPos);
     updateLine(dot->getLeftId(), dot->getId());
+    updateLine(dot->getId(), dot->getRightId());
     repaint();
 }
 

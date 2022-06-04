@@ -53,25 +53,35 @@ void LFOData::updatePeriod(int leftID, int rightID, float xStart, float xEnd, fl
         
 }
 
-float LFOData::calculateEnvelopeValue(){
+float LFOData::calculateEnvelopeValue(int bufferSize, double sampleRate){
     //float envelopeVal = 0;
         
     if(LFOisEnable){
         
-        if(workingTime == 0){
+        if(currentBuffer == 0){
             envelopeVal = 0;
+            //DBG("----");
             return 0;
         }
         
         float currentLFOPos = 0;
         
+        //DBG(getName());
+        //DBG((int)currentBuffer);
+        //DBG(info.bpm / 60);
+        //DBG(bufferSize);
+        //DBG(info.timeInSamples);
+        
         if(currentRateMode == RateMode::BPM){
-            currentLFOPos = info.bpm / 60.f * (workingTime / 100.f);
+            //currentLFOPos = info.bpm / 60.f * (workingTime / 1000.f)/* * 1.07f*/;
+            currentLFOPos = info.bpm / 60.0 * (double)currentBuffer * (double)bufferSize / sampleRate;
         }else if(currentRateMode == RateMode::HZ){
-            currentLFOPos = workingTime / 100.f;
+            //currentLFOPos = workingTime / 100.f;
         }else{
             jassertfalse;
         }
+        
+        //DBG(currentLFOPos);
         
         if(currentTriggerMode == TriggerMode::Trig){
             currentLFOPos = std::fmod(currentLFOPos, 1.0);
@@ -82,6 +92,8 @@ float LFOData::calculateEnvelopeValue(){
         }else{
             jassertfalse;
         }
+        
+        //DBG(currentLFOPos);
         
         //currentLFOPos = !isEnvelope ? std::fmod(currentLFOPos, 1.0) : std::fmin(currentLFOPos, 1.0);
 
@@ -106,23 +118,27 @@ float LFOData::calculateEnvelopeValue(){
         }
     }
     
+    //DBG(envelopeVal);
     return envelopeVal;
+    //return 0;
 }
 
 void LFOData::timerCallback(){
-    ++workingTime;
+    //++workingTime;
 }
 
 void LFOData::begin(){
     if(LFOisEnable && !isRunning){
-        startTimer(10);
+        //startTimer(1);
         isRunning = true;
     }
+    if(isRunning)
+        ++currentBuffer;
 }
 
 void LFOData::end(){
-    stopTimer();
-    workingTime = 0;
+    //stopTimer();
+    currentBuffer = 0;
     isRunning = false;
 }
 

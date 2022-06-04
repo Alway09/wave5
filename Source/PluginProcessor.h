@@ -67,6 +67,10 @@ public:
 
     std::vector<LFOData> LFOvector;
     juce::AudioProcessorValueTreeState apvts;
+    juce::StringArray allRangedParametersIDs;
+    //ModulationMatrixData modulationMatrix;
+    
+    std::atomic<ModulationMatrixData*> modulationMatrixAtomic;
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
@@ -75,10 +79,12 @@ private:
     
     std::vector<bool> LFOstates;
     
-    ModulationatrixData modulationMatrix;
+    
     juce::Synthesiser synth;
     
     unsigned int numberOfVoices = 3;
+    
+    //int currentBuffer = 0;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessor)
 };

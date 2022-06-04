@@ -26,8 +26,8 @@ LFOComponent::~LFOComponent()
 }
 
 void LFOComponent::timerCallback(){
-    envelope.addDot(0, getHeight() / 2, false, true, false);
-    envelope.addDot(getWidth(), getHeight() / 2, false, true, false);
+    envelope.addDot(0, getHeight(), false, true, false);
+    envelope.addDot(getWidth(), getHeight(), false, true, false);
     
     stopTimer();
 }

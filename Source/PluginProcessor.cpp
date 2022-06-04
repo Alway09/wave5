@@ -11,10 +11,31 @@ Wave5AudioProcessor::Wave5AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), apvts(*this, nullptr, "Parameters", createParams()),
-                        modulationMatrix(&apvts)
+                       ), apvts(*this, nullptr, "Parameters", createParams())
+                        /*modulationMatrix(&apvts)*/
 #endif
 {
+    allRangedParametersIDs.add(juce::String(""));
+    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[0]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[1]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[2]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[3]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::firstOscGain);
+    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[0]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[1]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[2]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[3]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::secondOscGain);
+    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[0]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[1]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[2]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[3]);
+    allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscGain);
+    
+    modulationMatrixAtomic.store(new ModulationMatrixData(&apvts));
+    
+    //DBG("constructor");
+    //DBG(allRangedParametersIDs.size());
     synth.addSound(new SynthSound());
 
     for(int i = 0; i < numberOfVoices; ++i){
@@ -36,11 +57,12 @@ Wave5AudioProcessor::Wave5AudioProcessor()
     //LFOvector[0].addPeriod(1, 2, 0.f, 0.5f, 0.f, 1.f);
     //LFOvector[0].addPeriod(2, 3, 0.5f, 1.f, 1.f, 0.f);
     
-    modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain, "LFO 1");
+    //modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain, "LFO 1");
 }
 
 Wave5AudioProcessor::~Wave5AudioProcessor()
 {
+    delete modulationMatrixAtomic.load();
 }
 
 //==============================================================================
@@ -160,6 +182,15 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    /*int buffersInOneSecond = getSampleRate() / buffer.getNumSamples();
+    if(currentBuffer < buffersInOneSecond){
+        ++currentBuffer;
+    }else{
+        currentBuffer = 0;
+    }
+    DBG(currentBuffer);*/
+    
+    
     // Update voice
     bool voicesIsActive = false;
     {
@@ -202,11 +233,13 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 // LFO
                 voicesIsActive = voice->isVoiceActive() || voicesIsActive;
                 
-                modulationMatrix.applyLFO(LFOvector);
+                modulationMatrixAtomic.load()->applyLFO(LFOvector, buffer.getNumSamples(), getSampleRate());
             }
             
         }
     }
+    
+    //DBG(midiMessages.getFirstEventTime());
     
     // LFO
     auto& firstLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
@@ -251,28 +284,50 @@ void Wave5AudioProcessor::updateAdsr(ModifiedAdsrData& adsr, const juce::StringA
 
 juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createParams() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    
+    float attack_init = 0.f;
+    float decay_init = 0.9f;
+    float sustain_init = 1.f;
+    float release_init = 0.1f;
+    
+    float attack_start = 0.f;
+    float attack_end = 5.f;
+    float decay_start = 0.f;
+    float decay_end = 5.f;
+    float release_start = 0.f;
+    float release_end = 5.f;
+    
+    float sustain_start = 0.f;
+    float sustain_end = 1.f;
+    
+    float adsr_skew = 0.3f;
+    float adsr_step = 0.01f;
 
     // ---------ADSR---------
     // for OSC 1
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstAdsrParameters[0],
         "Attack Time", 
-        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { attack_start, attack_end, adsr_step, adsr_skew }, attack_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[0]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstAdsrParameters[1],
         "Decay Time",
-        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { decay_start, decay_end, adsr_step, adsr_skew }, decay_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[1]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstAdsrParameters[2],
         "Sustain Level",
-        juce::NormalisableRange<float> { 0.0f, 1.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { sustain_start, sustain_end, adsr_step, adsr_skew }, sustain_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[2]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstAdsrParameters[3],
         "Release Time",
-        juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { release_start, release_end, adsr_step, adsr_skew }, release_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[3]);
     
     params.push_back(std::make_unique<juce::AudioParameterBool>(
         STR_CONST::ADSR::firstOscOn,
@@ -288,27 +343,32 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::ADSR::firstOscGain,
         "OSC 1 Gain",
         juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), -30.0f));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::firstOscGain);
     
     // for OSC 2
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::secondAdsrParameters[0],
         "Attack Time",
-        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { attack_start, attack_end, adsr_step, adsr_skew }, attack_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[0]);
     
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::secondAdsrParameters[1],
         "Decay Time",
-        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { decay_start, decay_end, adsr_step, adsr_skew }, decay_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[1]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::secondAdsrParameters[2],
         "Sustain Level",
-        juce::NormalisableRange<float> { 0.0f, 1.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { sustain_start, sustain_end, adsr_step, adsr_skew }, sustain_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[2]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::secondAdsrParameters[3],
         "Release Time",
-        juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { release_start, release_end, adsr_step, adsr_skew }, release_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[3]);
     
     params.push_back(std::make_unique<juce::AudioParameterBool>(
         STR_CONST::ADSR::secondOscOn,
@@ -324,27 +384,32 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::ADSR::secondOscGain,
         "OSC 2 Gain",
         juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), 0.0f));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::secondOscGain);
     
     // for OSC 3
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::thirdAdsrParameters[0],
         "Attack Time",
-        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { attack_start, attack_end, adsr_step, adsr_skew }, attack_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[0]);
     
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::thirdAdsrParameters[1],
         "Decay Time",
-        juce::NormalisableRange<float> { 0.01f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { decay_start, decay_end, adsr_step, adsr_skew }, decay_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[1]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::thirdAdsrParameters[2],
         "Sustain Level",
-        juce::NormalisableRange<float> { 0.0f, 1.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { sustain_start, sustain_end, adsr_step, adsr_skew }, sustain_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[2]);
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::thirdAdsrParameters[3],
         "Release Time",
-        juce::NormalisableRange<float> { 0.0f, 5.0f, 0.01f, 0.3f }, 0.0f));
+        juce::NormalisableRange<float> { release_start, release_end, adsr_step, adsr_skew }, release_init));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[3]);
     
     params.push_back(std::make_unique<juce::AudioParameterBool>(
         STR_CONST::ADSR::thirdOscOn,
@@ -360,6 +425,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::ADSR::thirdOscGain,
         "OSC 3 Gain",
         juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), 0.0f));
+    //allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscGain);
     
     // ---------LFO---------
     // for LFO 1
@@ -379,6 +445,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::LFO::thirdLFOOn,
         "LFO 3 On",
         false));
+    
+    //DBG(allRangedParametersIDs.size());
 
     return { params.begin(), params.end() };
 }

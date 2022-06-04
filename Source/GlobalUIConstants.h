@@ -7,8 +7,8 @@ namespace UI {
 	{
 		const float scale = 1.0f;
     
-        const int pluginWidth = 800;
-        const int pluginHeight = 350;
+        const int pluginWidth = 1000;
+        const int pluginHeight = 700;
 
 		const int sliderComponentWidth = 60;
 		const int sliderComponentHeight = 60;
@@ -44,23 +44,35 @@ namespace UI {
 	}
 
     namespace OSC_BLOCK{
-        const int blockWidth = 400;
+        const int blockWidth = 500;
         const int blockHeight = 350;
     
         const int toggleWidth = 30;
         const int toggleHeight = 1;
     }
 
+    namespace LFO_BLOCK{
+        const int width = 500;
+        const int height = 350;
+    }
+
     namespace LFO{
-        const int blockWidth = 400;
-        const int blockHeight = 350;
+        //const int blockWidth = 500;
+        //const int blockHeight = 350;
     
-        const int envWidth = 385;
+        const int envWidth = 485;
         const int envHeight = 300;
     }
 
     namespace OSC_PROPERTIES{
         const int height = 110;
         const int buttonSize = 40;
+    }
+
+    namespace MODULATION_MATRIX{
+        const int width = 500;
+        const int height = 350;
+    
+        const int labelHeight = 40;
     }
 }

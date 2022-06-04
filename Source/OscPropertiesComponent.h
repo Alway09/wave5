@@ -18,7 +18,7 @@
 //==============================================================================
 /*
 */
-class OscPropertiesComponent  : public juce::Component
+class OscPropertiesComponent  : public juce::Component, public juce::Button::Listener
 {
 public:
     OscPropertiesComponent(juce::AudioProcessorValueTreeState& apvts,
@@ -28,6 +28,9 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+    
+    void buttonClicked(juce::Button *) override;
+    //virtual void buttonStateChanged (Button *)
     
     void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel);
 

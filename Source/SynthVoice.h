@@ -77,5 +77,5 @@ private:
     bool secondOscIsTurnedOn{ true };
     bool thirdOscIsTurnedOn{ true };
     
-    double rampDuration = 0.005;
+    double rampDuration = 0.0005;
 };

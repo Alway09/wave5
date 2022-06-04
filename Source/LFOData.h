@@ -37,7 +37,7 @@ public:
     void deletePeriod(int leftID, int rightID);
     void updatePeriod(int leftID, int rightID, float xStart, float xEnd, float yStart, float yEnd);
     
-    float calculateEnvelopeValue();
+    float calculateEnvelopeValue(int bufferSize, double sampleRate);
     float getEnvelopeValue() const { return envelopeVal; }
     
     juce::AudioPlayHead::CurrentPositionInfo& getPlayHeadInfo() { return info; }
@@ -48,6 +48,8 @@ public:
     
     void begin();
     void end();
+    
+    unsigned int currentBuffer{ 0 };
     
 private:
     //bool isRunning = false;
@@ -66,7 +68,7 @@ private:
     juce::AudioPlayHead::CurrentPositionInfo info;
 
     std::vector<PeriodType> periodsVect;
-    unsigned int workingTime{ 0 };
+    //unsigned int workingTime{ 0 };
     bool isRunning{ false };
     
     float envelopeVal = 0;

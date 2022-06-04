@@ -5,6 +5,11 @@
               cppLanguageStandard="17" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="nlbqct" name="wave5">
     <GROUP id="{A564B8E3-0814-10CF-D162-A47A9F97DA3A}" name="Source">
+      <GROUP id="{8441A37B-276D-129D-AB94-5E62397DE5E5}" name="Synth">
+        <FILE id="nA69og" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
+        <FILE id="h2ikoQ" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
+        <FILE id="x2Qjwv" name="SynthSound.h" compile="0" resource="0" file="Source/SynthSound.h"/>
+      </GROUP>
       <GROUP id="{605839CF-C714-26E2-9CC6-49EDA4922576}" name="Resources">
         <FILE id="xa3QIi" name="Noise Wave.png" compile="0" resource="1" file="Images/Noise Wave.png"
               xcodeResource="1"/>
@@ -34,39 +39,53 @@
         <FILE id="wpKx1P" name="OscData.cpp" compile="1" resource="0" file="Source/OscData.cpp"/>
       </GROUP>
       <GROUP id="{8C3E6C96-EEBA-2BD5-E15D-4A48D96B562C}" name="UI">
-        <FILE id="HQG6z5" name="LFOBlockComponent.cpp" compile="1" resource="0"
-              file="Source/LFOBlockComponent.cpp"/>
-        <FILE id="pICOsk" name="LFOBlockComponent.h" compile="0" resource="0"
-              file="Source/LFOBlockComponent.h"/>
-        <FILE id="pIJ8Nz" name="LFOComponent.cpp" compile="1" resource="0"
-              file="Source/LFOComponent.cpp"/>
-        <FILE id="ZHZXUV" name="LFOComponent.h" compile="0" resource="0" file="Source/LFOComponent.h"/>
-        <FILE id="s2675N" name="CustomRotarySlider.cpp" compile="1" resource="0"
-              file="Source/CustomRotarySlider.cpp"/>
-        <FILE id="fOAspt" name="CustomRotarySlider.h" compile="0" resource="0"
-              file="Source/CustomRotarySlider.h"/>
-        <FILE id="nLWXnO" name="EnvelopeVisualComponent.h" compile="0" resource="0"
-              file="Source/EnvelopeVisualComponent.h"/>
+        <GROUP id="{AFC40C2F-DD2D-6B9B-1DA4-17D53ED0190A}" name="LFO Components">
+          <FILE id="HQG6z5" name="LFOBlockComponent.cpp" compile="1" resource="0"
+                file="Source/LFOBlockComponent.cpp"/>
+          <FILE id="w0NfL6" name="LFOPropertiesComponent.h" compile="0" resource="0"
+                file="Source/LFOPropertiesComponent.h"/>
+          <FILE id="pyDtO7" name="LFOPropertiesComponent.cpp" compile="1" resource="0"
+                file="Source/LFOPropertiesComponent.cpp"/>
+          <FILE id="pIJ8Nz" name="LFOComponent.cpp" compile="1" resource="0"
+                file="Source/LFOComponent.cpp"/>
+          <FILE id="ZHZXUV" name="LFOComponent.h" compile="0" resource="0" file="Source/LFOComponent.h"/>
+          <FILE id="pICOsk" name="LFOBlockComponent.h" compile="0" resource="0"
+                file="Source/LFOBlockComponent.h"/>
+        </GROUP>
+        <GROUP id="{B8838335-C808-1152-3717-85FE3F7875C7}" name="Oscillators Component">
+          <FILE id="aaXKdk" name="OscillatorsBlockComponent.h" compile="0" resource="0"
+                file="Source/OscillatorsBlockComponent.h"/>
+          <FILE id="I9F9vy" name="OscillatorsBlockComponent.cpp" compile="1"
+                resource="0" file="Source/OscillatorsBlockComponent.cpp"/>
+          <FILE id="Amkfrr" name="OscPropertiesComponent.h" compile="0" resource="0"
+                file="Source/OscPropertiesComponent.h"/>
+          <FILE id="Msn69F" name="ModifiedAdsrComponent.cpp" compile="1" resource="0"
+                file="Source/ModifiedAdsrComponent.cpp"/>
+          <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"
+                file="Source/ModifiedAdsrComponent.h"/>
+          <FILE id="kG6jpz" name="OscPropertiesComponent.cpp" compile="1" resource="0"
+                file="Source/OscPropertiesComponent.cpp"/>
+        </GROUP>
+        <GROUP id="{F39A5B93-A23D-7C39-C4AF-E0874ABC4049}" name="Controllers">
+          <FILE id="fOAspt" name="CustomRotarySlider.h" compile="0" resource="0"
+                file="Source/CustomRotarySlider.h"/>
+          <FILE id="YiNCdj" name="EnvelopeVisualComponent.cpp" compile="1" resource="0"
+                file="Source/EnvelopeVisualComponent.cpp"/>
+          <FILE id="i8Nw9E" name="CustomLookAndFeel.cpp" compile="1" resource="0"
+                file="Source/CustomLookAndFeel.cpp"/>
+          <FILE id="Gv2nzD" name="CustomLookAndFeel.h" compile="0" resource="0"
+                file="Source/CustomLookAndFeel.h"/>
+          <FILE id="nLWXnO" name="EnvelopeVisualComponent.h" compile="0" resource="0"
+                file="Source/EnvelopeVisualComponent.h"/>
+          <FILE id="s2675N" name="CustomRotarySlider.cpp" compile="1" resource="0"
+                file="Source/CustomRotarySlider.cpp"/>
+        </GROUP>
         <FILE id="i5QHdi" name="GlobalUIConstants.h" compile="0" resource="0"
               file="Source/GlobalUIConstants.h"/>
-        <FILE id="YiNCdj" name="EnvelopeVisualComponent.cpp" compile="1" resource="0"
-              file="Source/EnvelopeVisualComponent.cpp"/>
-        <FILE id="I9F9vy" name="OscillatorsBlockComponent.cpp" compile="1"
-              resource="0" file="Source/OscillatorsBlockComponent.cpp"/>
-        <FILE id="aaXKdk" name="OscillatorsBlockComponent.h" compile="0" resource="0"
-              file="Source/OscillatorsBlockComponent.h"/>
-        <FILE id="kG6jpz" name="OscPropertiesComponent.cpp" compile="1" resource="0"
-              file="Source/OscPropertiesComponent.cpp"/>
-        <FILE id="Gv2nzD" name="CustomLookAndFeel.h" compile="0" resource="0"
-              file="Source/CustomLookAndFeel.h"/>
-        <FILE id="i8Nw9E" name="CustomLookAndFeel.cpp" compile="1" resource="0"
-              file="Source/CustomLookAndFeel.cpp"/>
-        <FILE id="Amkfrr" name="OscPropertiesComponent.h" compile="0" resource="0"
-              file="Source/OscPropertiesComponent.h"/>
-        <FILE id="ePMYz7" name="ModifiedAdsrComponent.h" compile="0" resource="0"
-              file="Source/ModifiedAdsrComponent.h"/>
-        <FILE id="Msn69F" name="ModifiedAdsrComponent.cpp" compile="1" resource="0"
-              file="Source/ModifiedAdsrComponent.cpp"/>
+        <FILE id="f5U1wa" name="ModulationMatrixComponent.cpp" compile="1"
+              resource="0" file="Source/ModulationMatrixComponent.cpp"/>
+        <FILE id="O1u0F7" name="ModulationMatrixComponent.h" compile="0" resource="0"
+              file="Source/ModulationMatrixComponent.h"/>
       </GROUP>
       <FILE id="W7idD2" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -74,9 +93,6 @@
             file="Source/PluginProcessor.h"/>
       <FILE id="t0HST3" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="x2Qjwv" name="SynthSound.h" compile="0" resource="0" file="Source/SynthSound.h"/>
-      <FILE id="nA69og" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
-      <FILE id="h2ikoQ" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
       <FILE id="fPsLrF" name="StringConstants.h" compile="0" resource="0"
             file="Source/StringConstants.h"/>
       <FILE id="qnGp1Q" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>

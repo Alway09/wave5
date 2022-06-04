@@ -1,5 +1,5 @@
 #pragma once
-#include<JuceHeader.h>
+/*#include<JuceHeader.h>
 #include"LFOData.h"
 
 class AdsrData : public LFOData
@@ -22,7 +22,7 @@ private:
         }
 
         float attackTime = 1.0f, decayTime = 0.1f, sustainLevel = 0.5f, releaseTime = 0.1f;
-    };*/
+    };
     
 public:
     AdsrData(const juce::String& name);
@@ -61,3 +61,4 @@ private:
     
     //float resolution = 6.f; // width in seconds
 };
+*/

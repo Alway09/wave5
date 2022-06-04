@@ -16,6 +16,7 @@
 #include "SynthVoice.h"
 #include "StringConstants.h"
 #include "CustomLookAndFeel.h"
+#include "LFOPropertiesComponent.h"
 
 //==============================================================================
 /*
@@ -36,6 +37,7 @@ private:
         
     private:
         LFOComponent lfoComponent;
+        LFOPropertiesComponent lfoProperties;
     };
     
 public:
