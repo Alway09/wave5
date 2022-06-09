@@ -20,6 +20,12 @@ public:
                            juce::Slider&
                            ) override;
     
+    void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
+                           float sliderPos,
+                           float minSliderPos,
+                           float maxSliderPos,
+                           const juce::Slider::SliderStyle style, juce::Slider& slider) override;
+    
     void drawToggleButton(juce::Graphics&,
                           juce::ToggleButton&,
                           bool shouldDrawButtonAsHighlighted,
@@ -35,6 +41,16 @@ public:
                             const bool hasSubMenu, const juce::String& text,
                             const juce::String& shortcutKeyText,
                             const juce::Drawable* icon, const juce::Colour* const textColourToUse) override;
+    
+    void drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar,
+                       int x, int y, int width, int height,
+                       bool isScrollbarVertical, int thumbStartPosition,
+                       int thumbSize, bool isMouseOver, bool isMouseDown) override;
+    
+    void drawTabAreaBehindFrontButton (juce::TabbedButtonBar& bar, juce::Graphics& g,
+                                       const int w, const int h) override {};
+    
+    void drawTabButton (juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override;
     
     void drawPopupMenuBackground (juce::Graphics& g, int width, int height) override;
     

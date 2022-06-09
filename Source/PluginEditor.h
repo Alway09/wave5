@@ -34,6 +34,7 @@ private:
     
     CustomLookAndFeel* lookAndFeel;
     
-
+    int am_of_parameters = 0;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wave5AudioProcessorEditor)
 };

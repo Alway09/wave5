@@ -15,6 +15,7 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
       lfoBlock(p.apvts, &p.LFOvector[0], &p.LFOvector[1], &p.LFOvector[2]),
       matrixComponent(p.allRangedParametersIDs, p.modulationMatrixAtomic)
 {
+    am_of_parameters = p.allRangedParametersIDs.size();
     //DBG(p.allRangedParametersIDs.size());
     setSize (UI::GLOBAL::pluginWidth, UI::GLOBAL::pluginHeight);
     
@@ -22,11 +23,14 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
     oscBlock.setCustomLookAndFeel(lookAndFeel);
     lfoBlock.setCustomLookAndFeel(lookAndFeel);
     matrixComponent.setCustomLookAndFeel(lookAndFeel);
+    matrixViewport.setLookAndFeel(lookAndFeel);
+    
     
     addAndMakeVisible(oscBlock);
     addAndMakeVisible(lfoBlock);
     //addAndMakeVisible(matrixComponent);
-    matrixViewport.setSize(UI::MODULATION_MATRIX::width, UI::MODULATION_MATRIX::height);
+    matrixViewport.setSize(UI::MODULATION_MATRIX::width - 2 * UI::GLOBAL::paddingFromStoke - 3*UI::GLOBAL::strokeLineWigthInside,
+                           UI::MODULATION_MATRIX::height - 2 * UI::GLOBAL::paddingFromStoke - 2*UI::GLOBAL::strokeLineWigthInside);
     matrixViewport.setViewedComponent(&matrixComponent, false);
     addAndMakeVisible(matrixViewport);
 }
@@ -40,7 +44,13 @@ Wave5AudioProcessorEditor::~Wave5AudioProcessorEditor()
 void Wave5AudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll (UI::GLOBAL::backColour);
-    g.drawRect(matrixViewport.getBounds());
+    g.drawRect(matrixViewport.getBounds().expanded(UI::GLOBAL::strokeLineWigthInside, UI::GLOBAL::strokeLineWigthInside), UI::GLOBAL::strokeLineWigthInside);
+    
+    juce::Rectangle<int> matrixRect(0, UI::OSC_BLOCK::blockHeight - UI::GLOBAL::strokeLineWigthOutside,
+                                    UI::MODULATION_MATRIX::width,
+                                    UI::MODULATION_MATRIX::height + UI::GLOBAL::strokeLineWigthOutside);
+    
+    g.drawRect(matrixRect, UI::GLOBAL::strokeLineWigthOutside);
 }
 
 void Wave5AudioProcessorEditor::resized()
@@ -49,13 +59,15 @@ void Wave5AudioProcessorEditor::resized()
     auto oscBlockBounds = juce::Rectangle<int>(0, 0, UI::OSC_BLOCK::blockWidth, UI::OSC_BLOCK::blockHeight);
     oscBlock.setBounds(oscBlockBounds);
     
-    lfoBlock.setBounds(juce::Rectangle<int>(UI::OSC_BLOCK::blockWidth, 0, UI::LFO_BLOCK::width, UI::LFO_BLOCK::height));
+    lfoBlock.setBounds(juce::Rectangle<int>(UI::OSC_BLOCK::blockWidth - UI::GLOBAL::strokeLineWigthOutside, 0, UI::LFO_BLOCK::width, UI::LFO_BLOCK::height));
     
-    auto matrixRectangle = juce::Rectangle<int>(0, UI::OSC_BLOCK::blockHeight,
-                                                UI::MODULATION_MATRIX::width,
-                                                UI::MODULATION_MATRIX::height);
-    //matrixViewport.setSize(matrixRectangle.getWidth(), matrixRectangle.getHeight());
-    //DBG(matrixViewport.getMaximumVisibleWidth());
-    matrixViewport.setBounds(matrixRectangle);
-    matrixComponent.setBounds(matrixRectangle.withHeight(700));
+    auto matrixBounds = juce::Rectangle<int>(
+                    UI::GLOBAL::paddingFromStoke + 3,
+                    UI::OSC_BLOCK::blockHeight + UI::GLOBAL::paddingFromStoke,
+                    UI::MODULATION_MATRIX::width - 2 * UI::GLOBAL::paddingFromStoke - 3*UI::GLOBAL::strokeLineWigthInside,
+                    UI::MODULATION_MATRIX::height - 2 * UI::GLOBAL::paddingFromStoke - 2*UI::GLOBAL::strokeLineWigthInside);
+
+    matrixViewport.setBounds(matrixBounds);
+    matrixComponent.setBounds(matrixBounds.withHeight((am_of_parameters + 1) * UI::MODULATION_MATRIX::labelHeight).
+                              withWidth(matrixBounds.getWidth() - 8));
 }

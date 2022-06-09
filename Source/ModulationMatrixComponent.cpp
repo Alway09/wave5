@@ -6,7 +6,7 @@ ModulationMatrixComponent::ModulationMatrixComponent(juce::StringArray& paramIDs
     parametersIDs(paramIDs), matrixData(mData)
 {
     //parametersIDs = paramIDs;
-    matrixWidth = UI::MODULATION_MATRIX::width - 20;
+    //matrixWidth = UI::MODULATION_MATRIX::width - 20;
 
     for(int i = 0; i < am_of_coloumns; ++i){
         juce::Label* label = new juce::Label(coloumnNames[i], coloumnNames[i]);
@@ -25,6 +25,8 @@ ModulationMatrixComponent::ModulationMatrixComponent(juce::StringArray& paramIDs
     paramChooser.onChange = [this](){ chooserHandler(); };
     
     paramChooser.addItemList(parametersIDs, 1);
+    paramChooser.setColour(juce::ComboBox::textColourId, juce::Colours::black);
+    paramChooser.setSelectedItemIndex(0);
     addAndMakeVisible(paramChooser);
 }
 
@@ -41,6 +43,9 @@ void ModulationMatrixComponent::chooserHandler(){
                strIter->second[1]->getValue() == 0 &&
                strIter->second[2]->getValue() == 0)
             {
+                
+                //strLabels.find(strIter->first)->first = paramChooser.getItemText(itemIndex);
+                
                 auto labelItem = strLabels.find(strIter->first);
                 if(labelItem != strLabels.end()){
                     delete labelItem->second;
@@ -84,8 +89,11 @@ void ModulationMatrixComponent::chooserHandler(){
         slider1->setTextBoxStyle(juce::Slider::TextBoxAbove, true, labelWidth, UI::MODULATION_MATRIX::labelHeight);
         compBounds.setX(compBounds.getX() + labelWidth);
         slider1->addListener(this);
+        slider1->setLookAndFeel(customLookAndFeel);
         //slider1->setName("LFO1");
         sliders.push_back(slider1);
+        
+        //if(slider1->getSliderStyle() == juce::Slider::SliderStyle::LinearHorizontal){ DBG("bar"); } else {DBG("not bar");}
         
         juce::Slider* slider2 = new juce::Slider();
         slider2->setBounds(compBounds.withWidth(compBounds.getWidth() - 2*UI::GLOBAL::strokeLineWigthInside));
@@ -93,6 +101,7 @@ void ModulationMatrixComponent::chooserHandler(){
         slider2->setTextBoxStyle(juce::Slider::TextBoxAbove, true, labelWidth, UI::MODULATION_MATRIX::labelHeight);
         compBounds.setX(compBounds.getX() + labelWidth);
         slider2->addListener(this);
+        slider2->setLookAndFeel(customLookAndFeel);
         sliders.push_back(slider2);
         
         juce::Slider* slider3 = new juce::Slider();
@@ -101,6 +110,7 @@ void ModulationMatrixComponent::chooserHandler(){
         slider3->setTextBoxStyle(juce::Slider::TextBoxAbove, true, labelWidth, UI::MODULATION_MATRIX::labelHeight);
         compBounds.setX(compBounds.getX() + labelWidth);
         slider3->addListener(this);
+        slider3->setLookAndFeel(customLookAndFeel);
         sliders.push_back(slider3);
         
         addAndMakeVisible(label);
@@ -168,31 +178,42 @@ void ModulationMatrixComponent::sliderValueChanged (juce::Slider *slider){
 
 void ModulationMatrixComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (UI::GLOBAL::backColour);   // clear the background
+    g.fillAll (UI::GLOBAL::backColour);
     
-    for(int i = 0; i <= am_of_coloumns; ++i){
+    for(int i = 0; i < am_of_coloumns; ++i){
         int x = i * labelWidth - UI::GLOBAL::strokeLineWigthInside;
-        juce::Line<float> line(x, 0, x, getMatrixHeight());
+        juce::Line<float> line(x, 0, x, getHeight());
+        g.drawLine(line, UI::GLOBAL::strokeLineWigthInside);
+    }
+    
+    for(int i = 0; i < strings.size(); ++i){
+        int y = (i + 1) * UI::MODULATION_MATRIX::labelHeight;
+        juce::Line<float> line(0, y, getWidth(), y);
         g.drawLine(line, UI::GLOBAL::strokeLineWigthInside);
     }
 }
 
 void ModulationMatrixComponent::resized()
 {
-    labelWidth = matrixWidth / am_of_coloumns;
+    labelWidth = getWidth() / am_of_coloumns;
     
     juce::Rectangle<int> labelBounds(0, 0, labelWidth, UI::MODULATION_MATRIX::labelHeight);
     
-    matrixHeight = labelBounds.getHeight();
+    //matrixHeight = labelBounds.getHeight();
     for(int i = 0; i < am_of_coloumns; ++i){
         header[i]->setBounds(labelBounds);
         labelBounds.setX(labelBounds.getX() + labelWidth);
     }
     
-    juce::Rectangle<int> rect(0, labelBounds.getHeight(), matrixWidth, UI::MODULATION_MATRIX::labelHeight);
+    juce::Rectangle<int> rect(0, labelBounds.getHeight(), getWidth(), UI::MODULATION_MATRIX::labelHeight);
     paramChooser.setBounds(rect);
 }
 
+/*juce::Rectangle<int> ModulationMatrixComponent::getMatrixLocalBounds(){
+    //return juce::Rectangle<int>(0, 0, matrixWidth, matrixHeight + paramChooser.getHeight());
+}*/
+
 void ModulationMatrixComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
     paramChooser.setLookAndFeel(lookAndFeel);
+    customLookAndFeel = lookAndFeel;
 }

@@ -16,7 +16,9 @@ private:
         PageComponent(juce::AudioProcessorValueTreeState& apvts,
                       const juce::StringArray& idList,
                       const juce::String& waveChooseId,
-                      const juce::String& gainId);
+                      const juce::String& gainId,
+                      const juce::String& transposeId,
+                      const juce::String& panId);
         ~PageComponent();
         
         void paint (juce::Graphics&) override;
@@ -36,7 +38,11 @@ public:
     OscillatorsBlockComponent(juce::AudioProcessorValueTreeState& apvts);
     ~OscillatorsBlockComponent() override;
 
-    //void paint (juce::Graphics&) override;
+    void paint (juce::Graphics& g) override{
+        g.setColour(juce::Colours::black);
+        g.drawRect(getLocalBounds().removeFromTop(getTabbedButtonBar().getBounds().getHeight()), UI::GLOBAL::strokeLineWigthOutside);
+        g.drawRect(getLocalBounds(), UI::GLOBAL::strokeLineWigthOutside);
+    }
     //void resized() override;
     
     void currentTabChanged (int newCurrentTabIndex, const juce::String &newCurrentTabName) override;

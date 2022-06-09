@@ -23,7 +23,9 @@ class OscPropertiesComponent  : public juce::Component, public juce::Button::Lis
 public:
     OscPropertiesComponent(juce::AudioProcessorValueTreeState& apvts,
                            const juce::String& chooseId,
-                           const juce::String& gainId);
+                           const juce::String& gainId,
+                           const juce::String& transposeId,
+                           const juce::String& panId);
     ~OscPropertiesComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -57,6 +59,14 @@ private:
     CustomRotarySlider gainSlider;
     juce::Label gainLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
+    
+    CustomRotarySlider transposeSlider;
+    juce::Label transposeLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> transposeAttachment;
+    
+    CustomRotarySlider panSlider;
+    juce::Label panLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> panAttachment;
     
     juce::Rectangle<int> buttonBounds;
     juce::Rectangle<int> sliderBounds;

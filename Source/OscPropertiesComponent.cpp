@@ -16,12 +16,22 @@
 //==============================================================================
 OscPropertiesComponent::OscPropertiesComponent(juce::AudioProcessorValueTreeState& apvts,
                                                const juce::String& chooseId,
-                                               const juce::String& gainId)
-    : gainSlider("Gain")
+                                               const juce::String& gainId,
+                                               const juce::String& transposeId,
+                                               const juce::String& panId)
+    : gainSlider("Gain"), transposeSlider("Trans"), panSlider("Pan")
 {
     gainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts,
                                                                                             gainId,
                                                                                             gainSlider);
+    
+    transposeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts,
+                                                                                                 transposeId,
+                                                                                                 transposeSlider);
+    
+    panAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts,
+                                                                                           panId,
+                                                                                           panSlider);
     
     waveChooser.addItemList(STR_CONST::ADSR::oscWavesVariants, 1);
     waveChooserAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts,
@@ -40,13 +50,29 @@ OscPropertiesComponent::OscPropertiesComponent(juce::AudioProcessorValueTreeStat
     prepareButton(triangleWaveButton, triangleWaveImage, "/Users/alvvay/Documents/JUCE Projects/wave5/Images/Triange Wave.png");
     prepareButton(noiseWaveButton, noiseWaveImage, "/Users/alvvay/Documents/JUCE Projects/wave5/Images/Noise Wave.png");
     
-    
     gainLabel.setText(gainSlider.getName(), juce::NotificationType::dontSendNotification);
     gainLabel.setJustificationType(juce::Justification::centred);
     gainLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     
+    transposeLabel.setText(transposeSlider.getName(), juce::NotificationType::dontSendNotification);
+    transposeLabel.setJustificationType(juce::Justification::centred);
+    transposeLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    
+    panLabel.setText(panSlider.getName(), juce::NotificationType::dontSendNotification);
+    panLabel.setJustificationType(juce::Justification::centred);
+    panLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    
+    gainSlider.setTextValueSuffix(" dB");
+    transposeSlider.setTextValueSuffix(" st");
+    
     addAndMakeVisible(gainSlider);
     addAndMakeVisible(gainLabel);
+    
+    addAndMakeVisible(transposeSlider);
+    addAndMakeVisible(transposeLabel);
+    
+    addAndMakeVisible(panSlider);
+    addAndMakeVisible(panLabel);
 }
 
 OscPropertiesComponent::~OscPropertiesComponent()
@@ -58,7 +84,7 @@ void OscPropertiesComponent::prepareButton(juce::ImageButton& button, juce::Imag
 {
     image = juce::ImageFileFormat::loadFrom(juce::File(imageName));
     
-    button.setToggleable(true);
+    //button.setToggleable(true);
     
     button.setImages(false, true, true,
                      image, 1.f, juce::Colours::transparentWhite,
@@ -74,6 +100,7 @@ void OscPropertiesComponent::buttonClicked(juce::Button * button){
 
 void OscPropertiesComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
     gainSlider.setLookAndFeel(lookAndFeel);
+    transposeSlider.setLookAndFeel(lookAndFeel);
 }
 
 void OscPropertiesComponent::paint(juce::Graphics& g)
@@ -81,7 +108,9 @@ void OscPropertiesComponent::paint(juce::Graphics& g)
     g.setColour(juce::Colours::black);
     g.drawRect(getBounds().reduced(UI::GLOBAL::paddingFromStoke), UI::GLOBAL::strokeLineWigthInside);
     
-    g.drawRect(sineWaveButton.getBounds());
+    //if(sineWaveButton.getToggleState())
+        g.drawRect(sineWaveButton.getBounds());
+    
     g.drawRect(squareWaveButton.getBounds());
     g.drawRect(sawWaveButton.getBounds());
     g.drawRect(triangleWaveButton.getBounds());
@@ -147,4 +176,14 @@ void OscPropertiesComponent::resized(){
     auto localSliderBounds = sliderBounds;
     gainSlider.setBounds(localSliderBounds.removeFromTop(UI::GLOBAL::sliderComponentHeight));
     gainLabel.setBounds(localSliderBounds);
+    
+    localSliderBounds = sliderBounds;
+    localSliderBounds.setX(localSliderBounds.getX() + localSliderBounds.getWidth() + UI::GLOBAL::paddingComponentsInside);
+    transposeSlider.setBounds(localSliderBounds.removeFromTop(UI::GLOBAL::sliderComponentHeight));
+    transposeLabel.setBounds(localSliderBounds);
+
+    localSliderBounds = sliderBounds;
+    localSliderBounds.setX(localSliderBounds.getX() + 2*localSliderBounds.getWidth() + 2*UI::GLOBAL::paddingComponentsInside);
+    panSlider.setBounds(localSliderBounds.removeFromTop(UI::GLOBAL::sliderComponentHeight));
+    panLabel.setBounds(localSliderBounds);
 }

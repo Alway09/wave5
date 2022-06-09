@@ -23,8 +23,10 @@ public:
     
     void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel);
     
-    int getMatrixWidth() const { return matrixWidth; }
-    int getMatrixHeight() const { return std::max(matrixHeight, UI::MODULATION_MATRIX::height); }
+    //int getMatrixWidth() const { return matrixWidth; }
+    //int getMatrixHeight() const { return std::max(matrixHeight, UI::MODULATION_MATRIX::height); }
+    
+    //juce::Rectangle<int> getMatrixLocalBounds();
     
     //juce::Viewport& getViewport() { return viewport; }
 
@@ -34,8 +36,8 @@ private:
     
     //juce::Viewport viewport;
     
-    int matrixWidth = 10;
-    int matrixHeight = 10;
+    //int matrixWidth = 10;
+    //int matrixHeight = 10;
     
     HeadType header;
     juce::StringArray coloumnNames = {"", "LFO 1", "LFO 2", "LFO 3"};
@@ -48,6 +50,7 @@ private:
     
     juce::ComboBox paramChooser;
     
+    CustomLookAndFeel* customLookAndFeel;
     
     const int am_of_coloumns = 4;
     int labelWidth;

@@ -14,7 +14,7 @@ namespace UI {
 		const int sliderComponentHeight = 60;
 		const int sliderComponentPadding = 10;
 
-		const int sliderTextBoxWidth = 50;
+		const int sliderTextBoxWidth = 60;
 		const int sliderTextBoxHeight = 25;
     
         //const int sliderLabelWidth = 60;
@@ -24,7 +24,7 @@ namespace UI {
 		const juce::Colour strokeLineColour(0, 0, 0);
 
 		const int strokeLineWigthInside = 2;
-		const int strokeLineWigthOutside = 3;
+		const int strokeLineWigthOutside = 2;
 
 		const int paddingFromStoke = 7;
 		const int paddingComponentsInside = 7;
@@ -52,8 +52,22 @@ namespace UI {
     }
 
     namespace LFO_BLOCK{
-        const int width = 500;
+        const int width = 502;
         const int height = 350;
+    
+        const int propHeight = 130;
+    
+        
+    
+    //const int pageHeight = 300;
+    }
+
+    namespace LFO_PROPERTIES{
+        const int labelWidth = 70;
+        const int labelHeight = 30;
+    
+        const int toggleWidth = 30;
+        const int toggleHeight = 1;
     }
 
     namespace LFO{
@@ -61,7 +75,7 @@ namespace UI {
         //const int blockHeight = 350;
     
         const int envWidth = 485;
-        const int envHeight = 300;
+        //const int envHeight = 300;
     }
 
     namespace OSC_PROPERTIES{

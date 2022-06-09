@@ -17,19 +17,30 @@ OscillatorsBlockComponent::OscillatorsBlockComponent(juce::AudioProcessorValueTr
     firstPageComponent(apvts,
                        STR_CONST::ADSR::firstAdsrParameters,
                        STR_CONST::ADSR::firstOscWaveCoose,
-                       STR_CONST::ADSR::firstOscGain),
+                       STR_CONST::ADSR::firstOscGain,
+                       STR_CONST::ADSR::firstOscTranspose,
+                       STR_CONST::ADSR::firstOscPan),
     secondPageComponent(apvts,
                         STR_CONST::ADSR::secondAdsrParameters,
                         STR_CONST::ADSR::secondOscWaveCoose,
-                        STR_CONST::ADSR::secondOscGain),
+                        STR_CONST::ADSR::secondOscGain,
+                        STR_CONST::ADSR::secondOscTranspose,
+                        STR_CONST::ADSR::secondOscPan),
     thirdPageComponent(apvts,
                        STR_CONST::ADSR::thirdAdsrParameters,
                        STR_CONST::ADSR::thirdOscWaveCoose,
-                       STR_CONST::ADSR::thirdOscGain)
+                       STR_CONST::ADSR::thirdOscGain,
+                       STR_CONST::ADSR::thirdOscTranspose,
+                       STR_CONST::ADSR::thirdOscPan)
 {
-    addTab("OSC 1", UI::GLOBAL::backColour, &firstPageComponent, true);
-    addTab("OSC 2", UI::GLOBAL::backColour, &secondPageComponent, true);
-    addTab("OSC 3", UI::GLOBAL::backColour, &thirdPageComponent, true);
+    addTab("OSC 1", UI::GLOBAL::backColour, &firstPageComponent, false);
+    addTab("OSC 2", UI::GLOBAL::backColour, &secondPageComponent, false);
+    addTab("OSC 3", UI::GLOBAL::backColour, &thirdPageComponent, false);
+    
+    //setOutline(UI::GLOBAL::strokeLineWigthOutside);
+    //setColour(outlineColourId, juce::Colours::black);
+    
+    //getTabbedButtonBar().getTabButton(0)->setColour(juce::TabbedButtonBar::tabOutlineColourId, juce::Colours::black);
     
     // for OSC 1
     firstToggle = new juce::ToggleButton();
@@ -69,6 +80,8 @@ OscillatorsBlockComponent::~OscillatorsBlockComponent()
 }
 
 void OscillatorsBlockComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
+    setLookAndFeel(lookAndFeel);
+    
     firstPageComponent.setCustomLookAndFeel(lookAndFeel);
     secondPageComponent.setCustomLookAndFeel(lookAndFeel);
     thirdPageComponent.setCustomLookAndFeel(lookAndFeel);
@@ -89,8 +102,10 @@ void OscillatorsBlockComponent::popupMenuClickOnTab (int tabIndex, const juce::S
 OscillatorsBlockComponent::PageComponent::PageComponent(juce::AudioProcessorValueTreeState& apvts,
                                                         const juce::StringArray& idList,
                                                         const juce::String& waveChooseId,
-                                                        const juce::String& gainId)
-: juce::Component(), adsrComponent(apvts, idList), oscPropertiesComponent(apvts, waveChooseId, gainId)
+                                                        const juce::String& gainId,
+                                                        const juce::String& transposeId,
+                                                        const juce::String& panId)
+: juce::Component(), adsrComponent(apvts, idList), oscPropertiesComponent(apvts, waveChooseId, gainId, transposeId, panId)
 {
     addAndMakeVisible(oscPropertiesComponent);
     addAndMakeVisible(adsrComponent);
@@ -111,6 +126,7 @@ void OscillatorsBlockComponent::PageComponent::resized(){
 }
 
 void OscillatorsBlockComponent::PageComponent::setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
+    //setLookAndFeel(lookAndFeel);
     adsrComponent.setCustomLookAndFeel(lookAndFeel);
     oscPropertiesComponent.setCustomLookAndFeel(lookAndFeel);
 }

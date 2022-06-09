@@ -49,6 +49,14 @@ public:
     juce::dsp::Gain<float>& getFirstOscGain(){ return firstOscGain; };
     juce::dsp::Gain<float>& getSecondOscGain(){ return secondOscGain; };
     juce::dsp::Gain<float>& getThirdOscGain(){ return thirdOscGain; };
+    
+    void setFirstTranspose(int newTranspose){ firstTranspose = newTranspose; }
+    void setSecondTranspose(int newTranspose){ secondTranspose = newTranspose; }
+    void setThirdTranspose(int newTranspose){ thirdTranspose = newTranspose; }
+    
+    void setFirstOscPan(float newPan){ firstOscPanner.setPan(newPan); }
+    void setSecondOscPan(float newPan){ secondOscPanner.setPan(newPan); }
+    void setThirdOscPan(float newPan){ thirdOscPanner.setPan(newPan); }
 
 private:
     juce::AudioBuffer<float> firstVoiceBuffer;
@@ -67,9 +75,19 @@ private:
     ModifiedAdsrData secondAdsr;
     ModifiedAdsrData thirdAdsr;
     
+    juce::dsp::Panner<float> firstOscPanner;
+    juce::dsp::Panner<float> secondOscPanner;
+    juce::dsp::Panner<float> thirdOscPanner;
+    
     //AdsrData firstAdsr;
     //AdsrData secondAdsr;
     //AdsrData thirdAdsr;
+    
+    int playingNote = 0;
+    
+    int firstTranspose = 0;
+    int secondTranspose = 0;
+    int thirdTranspose = 0;
 
     bool isPrepared{ false };
     
@@ -77,5 +95,5 @@ private:
     bool secondOscIsTurnedOn{ true };
     bool thirdOscIsTurnedOn{ true };
     
-    double rampDuration = 0.0005;
+    const double rampDuration = 0.0005;
 };

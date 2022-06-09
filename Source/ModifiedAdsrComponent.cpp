@@ -85,13 +85,17 @@ void ModifiedAdsrComponent::prepareSlider(juce::Slider& slider,
     sliderLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
     sliderLabel.setJustificationType(juce::Justification::centred);
     sliderLabel.setText(slider.getName(), juce::NotificationType::dontSendNotification);
+    
+    if(!paramId.contains("SUSTAIN"))
+        slider.setTextValueSuffix(" s");
 
     attachment = std::make_unique<SliderAttachment>(apvts, paramId, slider); 
 }
 
 void ModifiedAdsrComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (UI::GLOBAL::backColour);
+    //g.fillAll (UI::GLOBAL::backColour);
+    g.fillAll(juce::Colours::transparentWhite);
 
     g.setColour(UI::GLOBAL::strokeLineColour);
     g.drawRect(slidersAreaBounds, UI::GLOBAL::strokeLineWigthInside);

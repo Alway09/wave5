@@ -22,6 +22,8 @@ public:
     void setWaveType(const int choice);
     void setWaveFrequency(const int midiNoteNumber);
     void getNextAudioBlock(juce::dsp::AudioBlock<float>& block);
+    
+    int getLastNote() const { return lastMidiNote; }
 
 private:
     //juce::dsp::Oscillator<float> osc{ [](float x) { return std::sin(x); } };

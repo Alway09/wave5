@@ -42,7 +42,7 @@ void LFOComponent::setSizes(){
     int x = UI::GLOBAL::paddingFromStoke;
     int y = UI::GLOBAL::paddingFromStoke;
     
-    envBounds = juce::Rectangle<int>(x, y, UI::LFO::envWidth, UI::LFO::envHeight);
+    envBounds = juce::Rectangle<int>(x, y, UI::LFO_BLOCK::width - 2 * UI::GLOBAL::paddingFromStoke, getHeight() - 2 * UI::GLOBAL::paddingFromStoke);
 }
 
 

@@ -18,9 +18,21 @@ LFOBlockComponent::LFOBlockComponent(juce::AudioProcessorValueTreeState& apvts,
                                      LFOData* thirdLFO) :
 
 juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop),
-    pageOne(firstLFO),
-    pageTwo(secondLFO),
-    pageThree(thirdLFO)
+    pageOne(apvts,
+            firstLFO,
+            STR_CONST::LFO::firstLFORateController,
+            STR_CONST::LFO::firstLFOWorkMode,
+            STR_CONST::LFO::firstLFORateMode),
+    pageTwo(apvts,
+            secondLFO,
+            STR_CONST::LFO::secondLFORateController,
+            STR_CONST::LFO::secondLFOWorkMode,
+            STR_CONST::LFO::secondLFORateMode),
+    pageThree(apvts,
+              thirdLFO,
+              STR_CONST::LFO::thirdLFORateController,
+              STR_CONST::LFO::thirdLFOWorkMode,
+              STR_CONST::LFO::thirdLFORateMode)
 {
     addTab("LFO 1", UI::GLOBAL::backColour, &pageOne, false);
     addTab("LFO 2", UI::GLOBAL::backColour, &pageTwo, false);
@@ -66,9 +78,16 @@ void LFOBlockComponent::popupMenuClickOnTab (int tabIndex, const juce::String &t
     
 }
 
-LFOBlockComponent::PageComponent::PageComponent(LFOData* lfo) : lfoComponent(lfo)
+LFOBlockComponent::PageComponent::PageComponent(juce::AudioProcessorValueTreeState& apvts,
+                                                LFOData* lfo,
+                                                const juce::String& rateControllerId,
+                                                const juce::String& workingModeId,
+                                                const juce::String& rateModeId)
+
+    : lfoComponent(lfo), lfoProperties(apvts, rateControllerId, workingModeId, rateModeId)
 {
     addAndMakeVisible(lfoComponent);
+    addAndMakeVisible(lfoProperties);
 }
 
 LFOBlockComponent::PageComponent::~PageComponent(){
@@ -81,7 +100,11 @@ void LFOBlockComponent::PageComponent::paint (juce::Graphics& g){
 }
 
 void LFOBlockComponent::PageComponent::resized(){
-    lfoComponent.setBounds(juce::Rectangle<int>(0, 0,
-                                       UI::LFO::envWidth + UI::GLOBAL::paddingFromStoke * 2,
-                                       UI::LFO::envHeight + UI::GLOBAL::paddingFromStoke * 2));
+    juce::Rectangle<int> rect = juce::Rectangle<int>(0, 0,
+                                                     UI::LFO::envWidth + UI::GLOBAL::paddingFromStoke * 2,
+                                                     getHeight() - UI::LFO_BLOCK::propHeight + UI::GLOBAL::paddingFromStoke * 2);
+    
+    lfoComponent.setBounds(rect);
+    
+    lfoProperties.setBounds(0, rect.getHeight(), rect.getWidth(), UI::LFO_BLOCK::propHeight);
 }

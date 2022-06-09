@@ -27,7 +27,11 @@ private:
     class PageComponent : public juce::Component
     {
     public:
-        PageComponent(LFOData* lfo);
+        PageComponent(juce::AudioProcessorValueTreeState& apvts,
+                      LFOData* lfo,
+                      const juce::String& rateControllerId,
+                      const juce::String& workingModeId,
+                      const juce::String& rateModeId);
         ~PageComponent();
         
         void paint (juce::Graphics&) override;
@@ -48,20 +52,24 @@ public:
     
     ~LFOBlockComponent() override;
     
+    void paint(juce::Graphics& g) override{
+        g.setColour(juce::Colours::black);
+        g.drawRect(getLocalBounds().removeFromTop(getTabbedButtonBar().getBounds().getHeight()), UI::GLOBAL::strokeLineWigthOutside);
+        g.drawRect(getLocalBounds(), UI::GLOBAL::strokeLineWigthOutside);
+        
+        //g.drawEllipse(7, getHeight() - 100, 100.f, 100.f, 15.f);
+    }
+
+    
     void currentTabChanged (int newCurrentTabIndex, const juce::String &newCurrentTabName) override;
     void popupMenuClickOnTab (int tabIndex, const juce::String &tabName) override;
-    
-    //void setFirstLFOVoices(std::atomic<SynthVoice*>& voice);
-    /*void addVoice(std::atomic<SynthVoice*>* voice, int voiceId){
-        pageOne.addVoice(voice, voiceId);
-        pageTwo.addVoice(voice, voiceId);
-        pageThree.addVoice(voice, voiceId);
-    }*/
     
     void setCustomLookAndFeel(CustomLookAndFeel* lookAndFeel){
         firstToggle->setLookAndFeel(lookAndFeel);
         secondToggle->setLookAndFeel(lookAndFeel);
         thirdToggle->setLookAndFeel(lookAndFeel);
+        
+        setLookAndFeel(lookAndFeel);
     }
 
 private:

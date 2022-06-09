@@ -81,6 +81,10 @@ float LFOData::calculateEnvelopeValue(int bufferSize, double sampleRate){
             jassertfalse;
         }
         
+        currentLFOPos /= 1.f; // rate
+        if(lfoName == "LFO 1")
+            DBG(currentLFOPos);
+        
         //DBG(currentLFOPos);
         
         if(currentTriggerMode == TriggerMode::Trig){
