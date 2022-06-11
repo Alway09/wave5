@@ -57,6 +57,13 @@ public:
     void setFirstOscPan(float newPan){ firstOscPanner.setPan(newPan); }
     void setSecondOscPan(float newPan){ secondOscPanner.setPan(newPan); }
     void setThirdOscPan(float newPan){ thirdOscPanner.setPan(newPan); }
+    
+    void setPortamentoTime(double timeInSeconds){
+        portamentoTime = timeInSeconds;
+        //firstOscFrequency.reset(currentSampleRate, timeInSeconds);
+        //secondOscFrequency.reset(currentSampleRate, timeInSeconds);
+        //thirdOscFrequency.reset(currentSampleRate, timeInSeconds);
+    }
 
 private:
     juce::AudioBuffer<float> firstVoiceBuffer;
@@ -79,9 +86,16 @@ private:
     juce::dsp::Panner<float> secondOscPanner;
     juce::dsp::Panner<float> thirdOscPanner;
     
+    double currentSampleRate = 44100.0;
+    
     //AdsrData firstAdsr;
     //AdsrData secondAdsr;
     //AdsrData thirdAdsr;
+    
+    double portamentoTime = 1.0;
+    juce::SmoothedValue<float> firstOscFrequency;
+    juce::SmoothedValue<float> secondOscFrequency;
+    juce::SmoothedValue<float> thirdOscFrequency;
     
     int playingNote = 0;
     

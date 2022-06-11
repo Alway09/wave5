@@ -3,11 +3,12 @@
 
 //==============================================================================
 LFOPropertiesComponent::LFOPropertiesComponent(APVTS& apvts,
-                                               const juce::String& rateControllerId,
+                                               const juce::String& rateHzControllerId,
+                                               const juce::String& rateBpmControllerId,
                                                const juce::String& workingModeId,
                                                const juce::String& rateModeId)
 
-    : rateSlider("Rate")
+    : rateSliderHz("Hz")
 {
     trigLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     trigLabel.setText("Trig", juce::NotificationType::dontSendNotification);
@@ -24,9 +25,13 @@ LFOPropertiesComponent::LFOPropertiesComponent(APVTS& apvts,
     hzLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     hzLabel.setText("Hz", juce::NotificationType::dontSendNotification);
     
-    rateLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-    rateLabel.setJustificationType(juce::Justification::centred);
-    rateLabel.setText("Rate", juce::NotificationType::dontSendNotification);
+    rateLabelHz.setColour(juce::Label::textColourId, juce::Colours::black);
+    rateLabelHz.setJustificationType(juce::Justification::centred);
+    rateLabelHz.setText("Hz", juce::NotificationType::dontSendNotification);
+    
+    bpmChooserLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    bpmChooserLabel.setJustificationType(juce::Justification::centred);
+    bpmChooserLabel.setText("Bpm", juce::NotificationType::dontSendNotification);
     
     workModeChooser.addItemList(STR_CONST::LFO::LFOWorkModes, 1);
     workModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts,
@@ -38,11 +43,27 @@ LFOPropertiesComponent::LFOPropertiesComponent(APVTS& apvts,
                                                                                                   rateModeId,
                                                                                                   rateModeChooser);
     
+    rateHzAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts,
+                                                                                              rateHzControllerId,
+                                                                                              rateSliderHz);
+    
+    bpmChooser.addItemList(STR_CONST::LFO::LFOBpmRates, 1);
+    bpmChooserAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts,
+                                                                                                    rateBpmControllerId,
+                                                                                                    bpmChooser);
+    
+    bpmChooser.setColour(juce::ComboBox::textColourId, juce::Colours::black);
+    
     trigToggle.addListener(this);
     envToggle.addListener(this);
     offToggle.addListener(this);
     bpmToggle.addListener(this);
     hzToggle.addListener(this);
+    
+    trigToggle.setToggleState(true, juce::NotificationType::dontSendNotification);
+    bpmToggle.setToggleState(true, juce::NotificationType::dontSendNotification);
+    
+    rateSliderHz.setEnabled(false);
     
     addAndMakeVisible(trigToggle);
     addAndMakeVisible(trigLabel);
@@ -54,8 +75,10 @@ LFOPropertiesComponent::LFOPropertiesComponent(APVTS& apvts,
     addAndMakeVisible(bpmLabel);
     addAndMakeVisible(hzLabel);
     addAndMakeVisible(hzToggle);
-    addAndMakeVisible(rateSlider);
-    addAndMakeVisible(rateLabel);
+    addAndMakeVisible(rateSliderHz);
+    addAndMakeVisible(rateLabelHz);
+    addAndMakeVisible(bpmChooser);
+    addAndMakeVisible(bpmChooserLabel);
 }
 
 LFOPropertiesComponent::~LFOPropertiesComponent()
@@ -95,11 +118,15 @@ void LFOPropertiesComponent::buttonClicked(juce::Button* button){
             bpmToggle.setToggleState(true, juce::dontSendNotification);
             hzToggle.setToggleState(false, juce::dontSendNotification);
             rateModeChooser.setSelectedId(1);
+            bpmChooser.setEnabled(true);
+            rateSliderHz.setEnabled(false);
             break;
         case 5:
             bpmToggle.setToggleState(false, juce::dontSendNotification);
             hzToggle.setToggleState(true, juce::dontSendNotification);
             rateModeChooser.setSelectedId(2);
+            bpmChooser.setEnabled(false);
+            rateSliderHz.setEnabled(true);
             break;
 
         default:
@@ -171,7 +198,15 @@ void LFOPropertiesComponent::resized()
     sliderBounds.setY(UI::LFO_BLOCK::propHeight / 2 - sliderBounds.getHeight() / 2);
     
     auto localSliderBounds = sliderBounds;
-    rateSlider.setBounds(localSliderBounds.removeFromTop(UI::GLOBAL::sliderComponentHeight));
-    rateLabel.setBounds(localSliderBounds);
+    rateSliderHz.setBounds(localSliderBounds.removeFromTop(UI::GLOBAL::sliderComponentHeight));
+    rateLabelHz.setBounds(localSliderBounds);
+    
+    sliderBounds.setX(toggleBounds.getX() + 2*UI::LFO_PROPERTIES::labelWidth + 2*UI::GLOBAL::paddingComponentsInside);
+    sliderBounds.setY(UI::LFO_BLOCK::propHeight / 2 - sliderBounds.getHeight() / 2);
+    
+    localSliderBounds = sliderBounds;
+    localSliderBounds.setWidth(localSliderBounds.getWidth() + 20);
+    bpmChooser.setBounds(localSliderBounds.removeFromTop(UI::GLOBAL::sliderComponentHeight).reduced(0, 15));
+    bpmChooserLabel.setBounds(localSliderBounds);
     
 }

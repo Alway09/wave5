@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -14,6 +6,7 @@
 #include "ModifiedAdsrData.h"
 #include "StringConstants.h"
 #include "ModulationMatrixData.h"
+#include "EqualizerData.h"
 
 //==============================================================================
 /**
@@ -66,6 +59,7 @@ public:
     void updateLFO(bool voiceIsActive);
 
     std::vector<LFOData> LFOvector;
+    EqualizerData equalizer;
     juce::AudioProcessorValueTreeState apvts;
     juce::StringArray allRangedParametersIDs;
     //ModulationMatrixData modulationMatrix;
@@ -74,15 +68,13 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
-    //ParametersIDs paramsIDs;
-    
     
     std::vector<bool> LFOstates;
-    
-    
     juce::Synthesiser synth;
     
-    unsigned int numberOfVoices = 3;
+    juce::dsp::Gain<float> globalGain;
+    
+    unsigned int numberOfVoices = 4;
     
     //int currentBuffer = 0;
     //==============================================================================

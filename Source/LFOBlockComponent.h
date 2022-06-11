@@ -29,7 +29,8 @@ private:
     public:
         PageComponent(juce::AudioProcessorValueTreeState& apvts,
                       LFOData* lfo,
-                      const juce::String& rateControllerId,
+                      const juce::String& rateHZControllerId,
+                      const juce::String& rateBpmControllerId,
                       const juce::String& workingModeId,
                       const juce::String& rateModeId);
         ~PageComponent();

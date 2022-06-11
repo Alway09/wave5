@@ -20,17 +20,20 @@ LFOBlockComponent::LFOBlockComponent(juce::AudioProcessorValueTreeState& apvts,
 juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop),
     pageOne(apvts,
             firstLFO,
-            STR_CONST::LFO::firstLFORateController,
+            STR_CONST::LFO::firstLFORateHZController,
+            STR_CONST::LFO::firstLFORateBpmController,
             STR_CONST::LFO::firstLFOWorkMode,
             STR_CONST::LFO::firstLFORateMode),
     pageTwo(apvts,
             secondLFO,
-            STR_CONST::LFO::secondLFORateController,
+            STR_CONST::LFO::secondLFORateHZController,
+            STR_CONST::LFO::secondLFORateBpmController,
             STR_CONST::LFO::secondLFOWorkMode,
             STR_CONST::LFO::secondLFORateMode),
     pageThree(apvts,
               thirdLFO,
-              STR_CONST::LFO::thirdLFORateController,
+              STR_CONST::LFO::thirdLFORateHZController,
+              STR_CONST::LFO::thirdLFORateBpmController,
               STR_CONST::LFO::thirdLFOWorkMode,
               STR_CONST::LFO::thirdLFORateMode)
 {
@@ -80,11 +83,12 @@ void LFOBlockComponent::popupMenuClickOnTab (int tabIndex, const juce::String &t
 
 LFOBlockComponent::PageComponent::PageComponent(juce::AudioProcessorValueTreeState& apvts,
                                                 LFOData* lfo,
-                                                const juce::String& rateControllerId,
+                                                const juce::String& rateHZControllerId,
+                                                const juce::String& rateBpmControllerId,
                                                 const juce::String& workingModeId,
                                                 const juce::String& rateModeId)
 
-    : lfoComponent(lfo), lfoProperties(apvts, rateControllerId, workingModeId, rateModeId)
+    : lfoComponent(lfo), lfoProperties(apvts, rateHZControllerId, rateBpmControllerId, workingModeId, rateModeId)
 {
     addAndMakeVisible(lfoComponent);
     addAndMakeVisible(lfoProperties);

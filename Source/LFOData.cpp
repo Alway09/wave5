@@ -53,6 +53,82 @@ void LFOData::updatePeriod(int leftID, int rightID, float xStart, float xEnd, fl
         
 }
 
+void LFOData::setWoringMode(int index){
+    switch (index) {
+        case 0:
+            currentTriggerMode = TriggerMode::Trig;
+            break;
+        case 1:
+            currentTriggerMode = TriggerMode::Env;
+            break;
+        case 2:
+            currentTriggerMode = TriggerMode::OFF;
+            previouseLFOPos = 0.f;
+            break;
+        default:
+            break;
+    }
+}
+
+void LFOData::setRateMode(int index){
+    switch (index) {
+        case 0:
+            currentRateMode = RateMode::BPM;
+            break;
+        case 1:
+            currentRateMode = RateMode::HZ;
+            break;
+        default:
+            break;
+    }
+}
+
+void LFOData::setBpmRate(int index){
+    switch (index) {
+        case 0:
+            BPMRate = 1.f/64;
+            break;
+        case 1:
+            BPMRate = 1.f/32;
+            break;
+        case 2:
+            BPMRate = 1.f/16;
+            break;
+        case 3:
+            BPMRate = 1.f/8;
+            break;
+        case 4:
+            BPMRate = 1.f/4;
+            break;
+        case 5:
+            BPMRate = 1.f/2;
+            break;
+        case 6:
+            BPMRate = 1.f;
+            break;
+        case 7:
+            BPMRate = 3.f/2;
+            break;
+        case 8:
+            BPMRate = 2.f;
+            break;
+        case 9:
+            BPMRate = 5.f/2;
+            break;
+        case 10:
+            BPMRate = 3.f;
+            break;
+        case 11:
+            BPMRate = 7.f/2;
+            break;
+        case 12:
+            BPMRate = 4.f;
+            break;
+        default:
+            break;
+    }
+}
+
 float LFOData::calculateEnvelopeValue(int bufferSize, double sampleRate){
     //float envelopeVal = 0;
         
@@ -64,7 +140,7 @@ float LFOData::calculateEnvelopeValue(int bufferSize, double sampleRate){
             return 0;
         }
         
-        float currentLFOPos = 0;
+        currentLFOPos = 0.f;
         
         //DBG(getName());
         //DBG((int)currentBuffer);
@@ -74,16 +150,16 @@ float LFOData::calculateEnvelopeValue(int bufferSize, double sampleRate){
         
         if(currentRateMode == RateMode::BPM){
             //currentLFOPos = info.bpm / 60.f * (workingTime / 1000.f)/* * 1.07f*/;
-            currentLFOPos = info.bpm / 60.0 * (double)currentBuffer * (double)bufferSize / sampleRate;
+            currentLFOPos = info.bpm / 60.0 * (double)currentBuffer * (double)bufferSize / sampleRate / BPMRate;
         }else if(currentRateMode == RateMode::HZ){
-            //currentLFOPos = workingTime / 100.f;
+            currentLFOPos = HZRate * (double)currentBuffer * (double)bufferSize / sampleRate;
         }else{
             jassertfalse;
         }
         
-        currentLFOPos /= 1.f; // rate
-        if(lfoName == "LFO 1")
-            DBG(currentLFOPos);
+        //currentLFOPos /= 1.f; // bpm rate
+        //if(lfoName == "LFO 1")
+            //DBG(currentLFOPos);
         
         //DBG(currentLFOPos);
         
@@ -92,14 +168,15 @@ float LFOData::calculateEnvelopeValue(int bufferSize, double sampleRate){
         }else if(currentTriggerMode == TriggerMode::Env){
             currentLFOPos = std::fmin(currentLFOPos, 1.0);
         }else if (currentTriggerMode == TriggerMode::OFF){
-            
+            currentLFOPos = std::fmod(currentLFOPos + previouseLFOPos, 1.0);
+            //DBG("off");
+            //previouseLFOPos = currentLFOPos;
         }else{
             jassertfalse;
         }
         
-        //DBG(currentLFOPos);
-        
-        //currentLFOPos = !isEnvelope ? std::fmod(currentLFOPos, 1.0) : std::fmin(currentLFOPos, 1.0);
+        //DBG(lfoName);
+        //DBG(previouseLFOPos);
 
         std::vector<PeriodType>::iterator periodIter = periodsVect.begin();
         while (periodIter != periodsVect.end())
@@ -142,6 +219,8 @@ void LFOData::begin(){
 
 void LFOData::end(){
     //stopTimer();
+    previouseLFOPos = currentLFOPos;
+    //DBG(currentLFOPos);
     currentBuffer = 0;
     isRunning = false;
 }

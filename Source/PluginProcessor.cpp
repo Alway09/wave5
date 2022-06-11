@@ -11,7 +11,7 @@ Wave5AudioProcessor::Wave5AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), apvts(*this, nullptr, "Parameters", createParams())
+                       ),equalizer(&apvts), apvts(*this, nullptr, "Parameters", createParams())
                         /*modulationMatrix(&apvts)*/
 #endif
 {
@@ -37,6 +37,10 @@ Wave5AudioProcessor::Wave5AudioProcessor()
     allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscGain);
     allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscTranspose);
     allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscPan);
+    allRangedParametersIDs.add(STR_CONST::EQ::lowCutFreq);
+    allRangedParametersIDs.add(STR_CONST::EQ::peakFreq);
+    allRangedParametersIDs.add(STR_CONST::EQ::lowCutFreq);
+    allRangedParametersIDs.add(STR_CONST::EQ::peakGain);
     
     modulationMatrixAtomic.store(new ModulationMatrixData(&apvts));
     
@@ -64,6 +68,8 @@ Wave5AudioProcessor::Wave5AudioProcessor()
     //LFOvector[0].addPeriod(2, 3, 0.5f, 1.f, 1.f, 0.f);
     
     //modulationMatrix.addModulatedParameter(STR_CONST::ADSR::firstOscGain, "LFO 1");
+    
+    globalGain.setRampDurationSeconds(0.0005);
 }
 
 Wave5AudioProcessor::~Wave5AudioProcessor()
@@ -136,7 +142,7 @@ void Wave5AudioProcessor::changeProgramName (int index, const juce::String& newN
 void Wave5AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
-    //modulationMatrix.prepare(sampleRate);
+    equalizer.prepareToPlay(sampleRate, samplesPerBlock);
 
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
@@ -145,6 +151,13 @@ void Wave5AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
             voice->prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
         }
     }
+    
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    
+    globalGain.prepare(spec);
 }
 
 void Wave5AudioProcessor::releaseResources()
@@ -218,6 +231,10 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 auto& secondOscPan = *apvts.getRawParameterValue(STR_CONST::ADSR::secondOscPan);
                 auto& thirdOscPan = *apvts.getRawParameterValue(STR_CONST::ADSR::thirdOscPan);
                 
+                auto& portamentoTime = *apvts.getRawParameterValue(STR_CONST::glideTime);
+                
+                voice->setPortamentoTime(portamentoTime.load());
+                
                 voice->getFirstOscillator().setWaveType(firstWaveTypeParam->getIndex());
                 voice->setFirstOscState(firstOscState.load());
                 voice->getFirstOscGain().setGainDecibels(firstOscGain.load());
@@ -259,6 +276,10 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     auto& secondLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
     auto& thirdLFOState = *apvts.getRawParameterValue(STR_CONST::LFO::firstLFOOn);
     
+    auto& firstLFOHzRate= *apvts.getRawParameterValue(STR_CONST::LFO::firstLFORateHZController);
+    auto& secondLFOHzRate= *apvts.getRawParameterValue(STR_CONST::LFO::secondLFORateHZController);
+    auto& thirdLFOHzRate= *apvts.getRawParameterValue(STR_CONST::LFO::thirdLFORateHZController);
+    
     juce::AudioParameterChoice* firstLFOworkingMode = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::firstLFOWorkMode));
     juce::AudioParameterChoice* secondLFOworkingMode = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::secondLFOWorkMode));
     juce::AudioParameterChoice* thirdLFOworkingMode = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::thirdLFOWorkMode));
@@ -267,7 +288,27 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     juce::AudioParameterChoice* secondLFOrateMode = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::firstLFORateMode));
     juce::AudioParameterChoice* thirdLFOrateMode = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::firstLFORateMode));
     
+    juce::AudioParameterChoice* firstLFOBPMRate = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::firstLFORateBpmController));
+    juce::AudioParameterChoice* secondLFOBPMRate = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::secondLFORateBpmController));
+    juce::AudioParameterChoice* thirdLFOBPMRate = static_cast<juce::AudioParameterChoice*>(apvts.getParameter(STR_CONST::LFO::thirdLFORateBpmController));
+    
     //DBG(firstLFOrateMode->getIndex());
+    
+    LFOvector[0].setWoringMode(firstLFOworkingMode->getIndex());
+    LFOvector[1].setWoringMode(secondLFOworkingMode->getIndex());
+    LFOvector[2].setWoringMode(thirdLFOworkingMode->getIndex());
+    
+    LFOvector[0].setRateMode(firstLFOrateMode->getIndex());
+    LFOvector[1].setRateMode(secondLFOrateMode->getIndex());
+    LFOvector[2].setRateMode(thirdLFOrateMode->getIndex());
+    
+    LFOvector[0].setHzRate(firstLFOHzRate.load());
+    LFOvector[1].setHzRate(secondLFOHzRate.load());
+    LFOvector[2].setHzRate(thirdLFOHzRate.load());
+    
+    LFOvector[0].setBpmRate(firstLFOBPMRate->getIndex());
+    LFOvector[1].setBpmRate(secondLFOBPMRate->getIndex());
+    LFOvector[2].setBpmRate(thirdLFOBPMRate->getIndex());
     
     LFOstates[0] = firstLFOState.load();
     LFOstates[1] = secondLFOState.load();
@@ -276,6 +317,15 @@ void Wave5AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     updateLFO(voicesIsActive);
 
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    
+    equalizer.process(buffer);
+    
+    auto& globalGainVal = *apvts.getRawParameterValue(STR_CONST::globalVolume);
+    
+    globalGain.setGainDecibels(globalGainVal.load());
+    juce::dsp::AudioBlock<float> audioBlock(buffer);
+    juce::dsp::ProcessContextReplacing<float> context(audioBlock);
+    globalGain.process(context);
 }
 
 void Wave5AudioProcessor::updateLFO(bool voiceIsActive){
@@ -327,6 +377,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
     
     int tr_min = -24;
     int tr_max = 24;
+    
+    float lfoHzStart = 0.01f;
+    float lfoHzEnd = 60.f;
+    float lfoHzInit = 1.f;
+    float lfoHzStep = 0.01f;
+    float lfoHzSkew = 1.f;
+    
+    /*float lfoBpmStart = 1.f / 64;
+    float lfoBpmEnd = 4.f;*/
 
     // ---------ADSR---------
     // for OSC 1
@@ -363,7 +422,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         STR_CONST::ADSR::firstOscGain,
         "OSC 1 Gain",
-        juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), -30.0f));
+        juce::NormalisableRange<float>(-48.0f, 6.0f, 0.1f, 0.3f), 0.0f));
     
     params.push_back(std::make_unique<juce::AudioParameterInt>(
         STR_CONST::ADSR::firstOscTranspose,
@@ -481,6 +540,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         "LFO1 Rate Mode",
         STR_CONST::LFO::LFORateModes, 0));
     
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::LFO::firstLFORateHZController,
+        "LFO1 Rate Hz",
+        juce::NormalisableRange<float> { lfoHzStart, lfoHzEnd, lfoHzStep, lfoHzSkew }, lfoHzInit));
+    
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        STR_CONST::LFO::firstLFORateBpmController,
+        "LFO1 Rate Bpm",
+        STR_CONST::LFO::LFOBpmRates, 0));
+    
     // for LFO 2
     params.push_back(std::make_unique<juce::AudioParameterBool>(
         STR_CONST::LFO::secondLFOOn,
@@ -496,6 +565,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         STR_CONST::LFO::secondLFORateMode,
         "LFO2 Rate Mode",
         STR_CONST::LFO::LFORateModes, 0));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::LFO::secondLFORateHZController,
+        "LFO2 Rate Hz",
+        juce::NormalisableRange<float> { lfoHzStart, lfoHzEnd, lfoHzStep, lfoHzSkew }, lfoHzInit));
+    
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        STR_CONST::LFO::secondLFORateBpmController,
+        "LFO2 Rate Bpm",
+        STR_CONST::LFO::LFOBpmRates, 0));
     
     // for LFO 3
     params.push_back(std::make_unique<juce::AudioParameterBool>(
@@ -513,8 +592,91 @@ juce::AudioProcessorValueTreeState::ParameterLayout Wave5AudioProcessor::createP
         "LFO3 Rate Mode",
         STR_CONST::LFO::LFORateModes, 0));
     
-    //DBG(allRangedParametersIDs.size());
-
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::LFO::thirdLFORateHZController,
+        "LFO3 Rate Hz",
+        juce::NormalisableRange<float> { lfoHzStart, lfoHzEnd, lfoHzStep, lfoHzSkew }, lfoHzInit));
+    
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        STR_CONST::LFO::thirdLFORateBpmController,
+        "LFO3 Rate Bpm",
+        STR_CONST::LFO::LFOBpmRates, 0));
+    
+    // ---------EQUALIZER---------
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::EQ::lowCutFreq,
+        "LowCut Freq",
+        juce::NormalisableRange<float> { 20.f, 20000.f, 1.f, 0.25f }, 20.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::EQ::highCutFreq,
+        "HighCut Freq",
+        juce::NormalisableRange<float> { 20.f, 20000.f, 1.f, 0.25f }, 20000.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::EQ::peakFreq,
+        "Peak Freq",
+        juce::NormalisableRange<float> { 20.f, 20000.f, 1.f, 0.25f }, 750.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::EQ::peakGain,
+        "Peak Gain",
+        juce::NormalisableRange<float> { -24.f, 24.f, 0.5f, 1.f }, 0.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::EQ::peakQuality,
+        "Peak Quality",
+        juce::NormalisableRange<float> { 0.1f, 10.f, 0.05f, 0.25f }, 1.f));
+    
+    juce::StringArray strArr;
+    for (int i = 0; i < 4; ++i) {
+        juce::String str;
+        str << (12 + i * 12);
+        str << " db/Oct";
+        strArr.add(str);
+    }
+    
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        STR_CONST::EQ::lowCutSlope,
+        "LowCut Slope",
+        strArr, 0));
+    
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        STR_CONST::EQ::highCutSlope,
+        "HighCut Slope",
+        strArr, 0));
+    
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::EQ::lowCutBypassed,
+        "LowCut Bypassed",
+        false));
+    
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::EQ::highCutBypassed,
+        "HighCut Bypassed",
+        false));
+    
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::EQ::highCutBypassed,
+        "HighCut Bypassed",
+        false));
+    
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        STR_CONST::EQ::peakBypassed,
+        "Peak Bypassed",
+        false));
+    
+    //------------------------------
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::glideTime,
+        "Glide Time",
+        juce::NormalisableRange<float> { 0.f, 10.f, 0.01f, 1.f }, 0.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        STR_CONST::globalVolume,
+        "Global Volume",
+        juce::NormalisableRange<float> { -48.f, 6.f, 0.01f, 0.3f }, -6.f));
+    
     return { params.begin(), params.end() };
 }
 

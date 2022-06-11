@@ -10,6 +10,8 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include <random>
+#include <ctime>
 
 
 class OscData : public juce::dsp::Oscillator<float>
@@ -20,10 +22,11 @@ public:
 
     void prepareToPlay(juce::dsp::ProcessSpec& spec);
     void setWaveType(const int choice);
-    void setWaveFrequency(const int midiNoteNumber);
+    //void setWaveFrequency(const int midiNoteNumber);
+    void setWaveFrequency(double frequencyInHz);
     void getNextAudioBlock(juce::dsp::AudioBlock<float>& block);
     
-    int getLastNote() const { return lastMidiNote; }
+    //int getLastNote() const { return lastMidiNote; }
 
 private:
     //juce::dsp::Oscillator<float> osc{ [](float x) { return std::sin(x); } };

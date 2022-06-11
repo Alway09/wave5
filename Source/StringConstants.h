@@ -1,6 +1,11 @@
 #pragma once
 
 namespace STR_CONST{
+
+const juce::String glideTime = "GLIDETIME";
+const juce::String globalVolume = "GLOBALVOLUME";
+
+
     namespace ADSR{
         const juce::StringArray firstAdsrParameters = {
             "ATTACKTIME1",
@@ -8,6 +13,8 @@ namespace STR_CONST{
             "SUSTAINLEVEL1",
             "RELEASETIME1"
         };
+    
+        
     
         const juce::String firstOscOn = "OSCON1";
         const juce::String firstOscGain = "GAINOSC1";
@@ -59,6 +66,17 @@ namespace STR_CONST{
         const juce::StringArray LFOWorkModes = {"Trig", "Env", "Off"};
         const juce::StringArray LFORateModes = {"BPM", "Hz"};
     
+        const juce::StringArray LFOBpmRates =
+        {
+            "1/64", "1/32",
+            "1/16", "1/8",
+            "1/4", "1/2",
+            "1", "3/2",
+            "2", "5/2",
+            "3", "7/2",
+            "4"
+        };
+    
         const juce::String firstLFOWorkMode = "LFOWMOD1";
         const juce::String secondLFOWorkMode = "LFOWMOD2";
         const juce::String thirdLFOWorkMode = "LFOWMOD3";
@@ -67,9 +85,13 @@ namespace STR_CONST{
         const juce::String secondLFORateMode = "LFORMODE2";
         const juce::String thirdLFORateMode = "LFORMODE3";
     
-        const juce::String firstLFORateController = "LFORCONTR1";
-        const juce::String secondLFORateController = "LFORCONTR2";
-        const juce::String thirdLFORateController = "LFORCONTR3";
+        const juce::String firstLFORateHZController = "LFOHZRCONTR1";
+        const juce::String secondLFORateHZController = "LFOHZRCONTR2";
+        const juce::String thirdLFORateHZController = "LFOHZRCONTR3";
+    
+        const juce::String firstLFORateBpmController = "LFOBPMRCONTR1";
+        const juce::String secondLFORateBpmController = "LFOBPMRCONTR2";
+        const juce::String thirdLFORateBpmController = "LFOBPMRCONTR3";
     
         const juce::String firstLFOOn = "LFOON1";
         const juce::String firstLFORate = "LFORATE1";
@@ -77,5 +99,19 @@ namespace STR_CONST{
         const juce::String secondLFORate = "LFORATE2";
         const juce::String thirdLFOOn = "LFOON3";
         const juce::String thirdLFORate = "LFORATE3";
+    }
+
+    namespace EQ
+    {
+        const juce::String lowCutFreq = "LOWCUTFREQ";
+        const juce::String highCutFreq = "HIGHCUTFREQ";
+        const juce::String peakFreq = "PEAKFREQ";
+        const juce::String peakGain = "PEAKGAIN";
+        const juce::String peakQuality = "PEAKQUALITY";
+        const juce::String lowCutSlope = "LOWCUTSLOPE";
+        const juce::String highCutSlope = "HIGHCUTSLOPE";
+        const juce::String lowCutBypassed = "LOWCUTBYPASSED";
+        const juce::String peakBypassed = "PEAKBYPASSED";
+        const juce::String highCutBypassed = "HIGHCUTBYPASSED";
     }
 }

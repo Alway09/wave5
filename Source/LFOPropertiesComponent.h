@@ -14,7 +14,8 @@ class LFOPropertiesComponent  : public juce::Component, public juce::ToggleButto
 {
 public:
     LFOPropertiesComponent(APVTS& apvts,
-                           const juce::String& rateControllerId,
+                           const juce::String& rateHZControllerId,
+                           const juce::String& rateBpmControllerId,
                            const juce::String& workingModeId,
                            const juce::String& rateModeId);
     ~LFOPropertiesComponent() override;
@@ -28,7 +29,7 @@ public:
         offToggle.setLookAndFeel(lookAndFeel);
         bpmToggle.setLookAndFeel(lookAndFeel);
         hzToggle.setLookAndFeel(lookAndFeel);
-        rateSlider.setLookAndFeel(lookAndFeel);
+        rateSliderHz.setLookAndFeel(lookAndFeel);
     }
     
     void buttonClicked(juce::Button *) override;
@@ -49,11 +50,15 @@ private:
     juce::ToggleButton hzToggle;
     juce::Label hzLabel;
     
-    CustomRotarySlider rateSlider;
-    juce::Label rateLabel;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rateAttachment;
+    CustomRotarySlider rateSliderHz;
+    juce::Label rateLabelHz;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rateHzAttachment;
+    
+    juce::ComboBox bpmChooser;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> bpmChooserAttachment;
     
     juce::ComboBox workModeChooser;
+    juce::Label bpmChooserLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> workModeAttachment;
     
     juce::ComboBox rateModeChooser;

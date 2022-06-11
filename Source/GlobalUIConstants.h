@@ -89,4 +89,9 @@ namespace UI {
     
         const int labelHeight = 40;
     }
+
+    namespace EQ{
+        const int width = 502;
+        const int height = 270;
+    }
 }

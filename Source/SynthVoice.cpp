@@ -48,14 +48,15 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
         thirdOscPanner.prepare(spec);
     }
     
-            
-    //firstAdsr.setSampleRate(sampleRate);
-    //secondAdsr.setSampleRate(sampleRate);
-    //thirdAdsr.setSampleRate(sampleRate);
+    firstOscFrequency.reset(sampleRate, portamentoTime);
+    secondOscFrequency.reset(sampleRate, portamentoTime);
+    thirdOscFrequency.reset(sampleRate, portamentoTime);
     
     firstAdsr.setSampleRate(sampleRate);
     secondAdsr.setSampleRate(sampleRate);
     thirdAdsr.setSampleRate(sampleRate);
+    
+    currentSampleRate = sampleRate;
     
     isPrepared = true;
 }
@@ -79,8 +80,13 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     juce::dsp::AudioBlock<float> secondAudioBlock{ secondVoiceBuffer };
     juce::dsp::AudioBlock<float> thirdAudioBlock{ thirdVoiceBuffer };
     
+    //frequency.skip(numSamples);
+    //double currentFreq = frequency.getNextValue();
+    
     if(firstOscIsTurnedOn){
-        firstOsc.setWaveFrequency(playingNote + firstTranspose);
+        //firstOsc.setWaveFrequency(playingNote + firstTranspose);
+        firstOscFrequency.skip(numSamples);
+        firstOsc.setWaveFrequency(firstOscFrequency.getNextValue());
         firstOsc.getNextAudioBlock(firstAudioBlock);
         juce::dsp::ProcessContextReplacing<float> firstContext(firstAudioBlock);
         firstOscGain.process(firstContext); // ?????????
@@ -91,7 +97,9 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
         
     
     if(secondOscIsTurnedOn){
-        secondOsc.setWaveFrequency(playingNote + secondTranspose);
+        //secondOsc.setWaveFrequency(playingNote + secondTranspose);
+        secondOscFrequency.skip(numSamples);
+        secondOsc.setWaveFrequency(secondOscFrequency.getNextValue());
         secondOsc.getNextAudioBlock(secondAudioBlock);
         juce::dsp::ProcessContextReplacing<float> secondContext(secondAudioBlock);
         secondOscGain.process(secondContext);
@@ -102,7 +110,9 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
         
     
     if(thirdOscIsTurnedOn){
-        thirdOsc.setWaveFrequency(playingNote + thirdTranspose);
+        //thirdOsc.setWaveFrequency(playingNote + thirdTranspose);
+        thirdOscFrequency.skip(numSamples);
+        thirdOsc.setWaveFrequency(thirdOscFrequency.getNextValue());
         thirdOsc.getNextAudioBlock(thirdAudioBlock);
         juce::dsp::ProcessContextReplacing<float> thirdContext(thirdAudioBlock);
         thirdOscGain.process(thirdContext);
@@ -128,18 +138,20 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
 void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition)
 {
     if(firstOscIsTurnedOn){
-        firstOsc.setWaveFrequency(midiNoteNumber + firstTranspose);
-        //firstNote = midiNoteNumber;
+        firstOscFrequency.reset(currentSampleRate, portamentoTime);
+        firstOscFrequency.setTargetValue(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber + firstTranspose));
         firstAdsr.noteOn();
     }
     
     if(secondOscIsTurnedOn){
-        secondOsc.setWaveFrequency(midiNoteNumber + secondTranspose);
+        secondOscFrequency.reset(currentSampleRate, portamentoTime);
+        secondOscFrequency.setTargetValue(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber + secondTranspose));
         secondAdsr.noteOn();
     }
     
     if(thirdOscIsTurnedOn){
-        thirdOsc.setWaveFrequency(midiNoteNumber + thirdTranspose);
+        thirdOscFrequency.reset(currentSampleRate, portamentoTime);
+        thirdOscFrequency.setTargetValue(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber + thirdTranspose));
         thirdAdsr.noteOn();
     }
 

@@ -7,6 +7,7 @@
 #include "LFOBlockComponent.h"
 #include "CustomLookAndFeel.h"
 #include "ModulationMatrixComponent.h"
+#include "EqualizerComponent.h"
 
 //==============================================================================
 /**
@@ -22,17 +23,21 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     Wave5AudioProcessor& audioProcessor;
-    //ModifiedAdsrComponent adsrComponent;
     OscillatorsBlockComponent oscBlock;
     LFOBlockComponent lfoBlock;
-    
+    EqualizerComponent equalizer;
     ModulationMatrixComponent matrixComponent;
     juce::Viewport matrixViewport;
-    
     CustomLookAndFeel* lookAndFeel;
+    
+    juce::Rectangle<int> globalPropBounds;
+    CustomRotarySlider globalVolumeSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> globalVolumeAttachment;
+    juce::Label globalVolumeLabel;
+    juce::Slider glideSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> glideAttachment;
+    juce::Label glideLabel;
     
     int am_of_parameters = 0;
     

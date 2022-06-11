@@ -13,7 +13,7 @@
 OscData::OscData() 
     : juce::dsp::Oscillator<float>()
 {
-
+    std::srand(std::time(NULL));
 }
 
 OscData::~OscData() {};
@@ -29,7 +29,7 @@ void OscData::setWaveType(const int choice)
     switch (choice)
     {
     case 0:
-        // Sine
+        // Sine wave
         initialise([](float x) { return std::sin(x); });
         break;
 
@@ -44,9 +44,12 @@ void OscData::setWaveType(const int choice)
         break;
             
     case 3:
-        //initialise([](float x){ return x; });
+        // Triangle wave
+        initialise([](float x){ return 1.f - std::abs(x / juce::MathConstants<float>::pi) + 2.f; });
         break;
     case 4:
+        // White Noise wave
+            initialise([](float x){ return -1.f + static_cast<float>(std::rand()) * static_cast<float>(1.f + 1.f) / RAND_MAX; });
         break;
 
     default:
@@ -55,10 +58,10 @@ void OscData::setWaveType(const int choice)
     }
 }
 
-void OscData::setWaveFrequency(const int midiNoteNumber)
+void OscData::setWaveFrequency(double frequencyInHz)
 {
-    setFrequency(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber));
-    lastMidiNote = midiNoteNumber;
+    setFrequency(frequencyInHz);
+    //lastMidiNote = midiNoteNumber;
 }
 
 void OscData::getNextAudioBlock(juce::dsp::AudioBlock<float>& block)

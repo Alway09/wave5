@@ -46,6 +46,12 @@ public:
     void turnInState(bool state);
     bool isEnable() const { return LFOisEnable; }
     
+    void setWoringMode(int index);
+    void setRateMode(int index);
+    
+    void setHzRate(float newRate){ HZRate = newRate; }
+    void setBpmRate(int index);
+    
     void begin();
     void end();
     
@@ -72,6 +78,11 @@ private:
     bool isRunning{ false };
     
     float envelopeVal = 0;
+    float currentLFOPos = 0.f;
+    float previouseLFOPos = 0.f;
+    
+    float HZRate = 0.f;
+    float BPMRate = 1.f;
     //bool isEnvelope{ true };
     
     //bool isHZRate{ false };
