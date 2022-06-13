@@ -12,9 +12,6 @@ peakFreqSlider("Freq"),
 peakQSlider("Q"),
 peakGainSlider("Gain")
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-    
     lowCutLabel.setText("LowCut", juce::NotificationType::dontSendNotification);
     //lowCutLabel.setJustificationType(juce::Justification::centred);
     lowCutLabel.setColour(juce::Label::textColourId, juce::Colours::black);
@@ -28,7 +25,6 @@ peakGainSlider("Gain")
     lowCutSlopeLable.setColour(juce::Label::textColourId, juce::Colours::black);
     
     peakLabel.setText("Peak", juce::NotificationType::dontSendNotification);
-    //peakLabel.setJustificationType(juce::Justification::centred);
     peakLabel.setColour(juce::Label::textColourId, juce::Colours::black);
 
     peakFreqLabel.setText("Freq", juce::NotificationType::dontSendNotification);
@@ -44,7 +40,6 @@ peakGainSlider("Gain")
     peakGainLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     
     highCutLabel.setText("HighCut", juce::NotificationType::dontSendNotification);
-    //highCutLabel.setJustificationType(juce::Justification::centred);
     highCutLabel.setColour(juce::Label::textColourId, juce::Colours::black);
 
     highCutFreqLabel.setText("Freq", juce::NotificationType::dontSendNotification);
@@ -113,6 +108,11 @@ peakGainSlider("Gain")
     
     lowCutSlopeChooser.setColour(juce::ComboBox::textColourId, juce::Colours::black);
     highCutSlopeChooser.setColour(juce::ComboBox::textColourId, juce::Colours::black);
+    
+    lowCutFreqSlider.setTextValueSuffix(" Hz");
+    peakGainSlider.setTextValueSuffix(" dB");
+    highCutFreqSlider.setTextValueSuffix(" Hz");
+    peakFreqSlider.setTextValueSuffix(" Hz");
     
     addAndMakeVisible(lowCutLabel);
     addAndMakeVisible(lowCutBypass);

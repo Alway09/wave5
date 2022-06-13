@@ -16,24 +16,12 @@ Wave5AudioProcessor::Wave5AudioProcessor()
 #endif
 {
     allRangedParametersIDs.add(juce::String("<add automation>"));
-    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[0]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[1]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[2]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::firstAdsrParameters[3]);
     allRangedParametersIDs.add(STR_CONST::ADSR::firstOscGain);
     allRangedParametersIDs.add(STR_CONST::ADSR::firstOscTranspose);
     allRangedParametersIDs.add(STR_CONST::ADSR::firstOscPan);
-    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[0]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[1]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[2]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::secondAdsrParameters[3]);
     allRangedParametersIDs.add(STR_CONST::ADSR::secondOscGain);
     allRangedParametersIDs.add(STR_CONST::ADSR::secondOscTranspose);
     allRangedParametersIDs.add(STR_CONST::ADSR::secondOscPan);
-    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[0]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[1]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[2]);
-    allRangedParametersIDs.add(STR_CONST::ADSR::thirdAdsrParameters[3]);
     allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscGain);
     allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscTranspose);
     allRangedParametersIDs.add(STR_CONST::ADSR::thirdOscPan);
@@ -41,6 +29,7 @@ Wave5AudioProcessor::Wave5AudioProcessor()
     allRangedParametersIDs.add(STR_CONST::EQ::peakFreq);
     allRangedParametersIDs.add(STR_CONST::EQ::lowCutFreq);
     allRangedParametersIDs.add(STR_CONST::EQ::peakGain);
+    allRangedParametersIDs.add(STR_CONST::EQ::peakQuality);
     
     modulationMatrixAtomic.store(new ModulationMatrixData(&apvts));
     

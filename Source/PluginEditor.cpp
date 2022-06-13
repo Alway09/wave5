@@ -37,6 +37,9 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
     glideSlider.setLookAndFeel(lookAndFeel);
     glideSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 40, 20);
     
+    globalVolumeSlider.setTextValueSuffix(" dB");
+    glideSlider.setTextValueSuffix(" s");
+    
     glideAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(p.apvts,
                                                                                              STR_CONST::glideTime,
                                                                                              glideSlider);
@@ -47,7 +50,7 @@ Wave5AudioProcessorEditor::Wave5AudioProcessorEditor (Wave5AudioProcessor& p)
     
     addAndMakeVisible(oscBlock);
     addAndMakeVisible(lfoBlock);
-    //addAndMakeVisible(matrixComponent);
+    
     matrixViewport.setSize(UI::MODULATION_MATRIX::width - 2 * UI::GLOBAL::paddingFromStoke - 3*UI::GLOBAL::strokeLineWigthInside,
                            UI::MODULATION_MATRIX::height - 2 * UI::GLOBAL::paddingFromStoke - 2*UI::GLOBAL::strokeLineWigthInside);
     matrixViewport.setViewedComponent(&matrixComponent, false);

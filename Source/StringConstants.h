@@ -2,8 +2,8 @@
 
 namespace STR_CONST{
 
-const juce::String glideTime = "GLIDETIME";
-const juce::String globalVolume = "GLOBALVOLUME";
+    const juce::String glideTime = "GLIDETIME";
+    const juce::String globalVolume = "Global Volume";
 
 
     namespace ADSR{
@@ -17,10 +17,10 @@ const juce::String globalVolume = "GLOBALVOLUME";
         
     
         const juce::String firstOscOn = "OSCON1";
-        const juce::String firstOscGain = "GAINOSC1";
+        const juce::String firstOscGain = "OSC1 Gain";
         const juce::String firstOscWaveCoose = "WAVECHOOSEOSC1";
-        const juce::String firstOscPan = "PANOSC1";
-        const juce::String firstOscTranspose = "TRANSPOSE1";
+        const juce::String firstOscPan = "OSC1 Pan";
+        const juce::String firstOscTranspose = "OSC1 Transpose";
     
         const juce::StringArray secondAdsrParameters = {
             "ATTACKTIME2",
@@ -30,11 +30,10 @@ const juce::String globalVolume = "GLOBALVOLUME";
         };
     
         const juce::String secondOscOn = "OSCON2";
-        const juce::String secondOscGain = "GAINOSC2";
+        const juce::String secondOscGain = "OSC2 Gain";
         const juce::String secondOscWaveCoose = "WAVECHOOSEOSC2";
-        const juce::String secondOscPan = "PANOSC2";
-    
-        const juce::String secondOscTranspose = "TRANSPOSE2";
+        const juce::String secondOscPan = "OSC2 Pan";
+        const juce::String secondOscTranspose = "OSC2 Tarnspose";
         
         const juce::StringArray thirdAdsrParameters = {
             "ATTACKTIME3",
@@ -44,12 +43,11 @@ const juce::String globalVolume = "GLOBALVOLUME";
         };
     
         const juce::String thirdOscOn = "OSCON3";
-        const juce::String thirdOscGain = "GAINOSC3";
+        const juce::String thirdOscGain = "OSC3 Gain";
         const juce::String thirdOscWaveCoose = "WAVECHOOSEOSC3";
-        const juce::String thirdOscPan = "PANOSC3";
-        const juce::String thirdOscTranspose = "TRANSPOSE3";
-        
-        //const juce::String adsrStateId = "ADSRSTATE";
+        const juce::String thirdOscPan = "OSC3 Pan";
+        const juce::String thirdOscTranspose = "OSC3 Transpose";
+
         const juce::StringArray adsrStates = {
             "Idle",
             "Attack",
@@ -103,11 +101,11 @@ const juce::String globalVolume = "GLOBALVOLUME";
 
     namespace EQ
     {
-        const juce::String lowCutFreq = "LOWCUTFREQ";
-        const juce::String highCutFreq = "HIGHCUTFREQ";
-        const juce::String peakFreq = "PEAKFREQ";
-        const juce::String peakGain = "PEAKGAIN";
-        const juce::String peakQuality = "PEAKQUALITY";
+        const juce::String lowCutFreq = "LowCut Freq";
+        const juce::String highCutFreq = "HighCut Freq";
+        const juce::String peakFreq = "Peak Freq";
+        const juce::String peakGain = "Peak Gain";
+        const juce::String peakQuality = "Peak Q";
         const juce::String lowCutSlope = "LOWCUTSLOPE";
         const juce::String highCutSlope = "HIGHCUTSLOPE";
         const juce::String lowCutBypassed = "LOWCUTBYPASSED";
